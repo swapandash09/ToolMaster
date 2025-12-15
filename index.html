@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToolMaster Pro - V5 Ultimate</title>
+    <title>ToolMaster AI - Developer Swapan</title>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,222 +14,218 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 </head>
 <body>
 
-    <div class="ambient-layer">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
-
+    <div class="mesh-background"></div>
     <div id="toast-container"></div>
-
     <div id="loading-overlay" class="hidden">
-        <div class="glass-loader">
+        <div class="loader-content">
             <div class="spinner"></div>
-            <p id="loading-text">Processing...</p>
+            <p id="loading-text">AI Processing...</p>
         </div>
     </div>
 
-    <nav class="glass-nav">
-        <div class="container nav-content">
-            <div class="logo" onclick="showHome()">
-                <div class="logo-box"><i class="ri-flashlight-fill"></i></div>
-                <span>ToolMaster<span class="highlight">Pro</span></span>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <div class="brand" onclick="showHome()">
+                <div class="logo-icon"><i class="ri-cpu-line"></i></div>
+                <span class="brand-name">ToolMaster<span class="dot">.ai</span></span>
             </div>
-            <button class="theme-btn" onclick="toggleTheme()" title="Toggle Mode">
-                <i class="ri-sun-line" id="theme-icon"></i>
-            </button>
+            <div class="nav-links">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">
+                    <i class="ri-moon-line" id="theme-icon"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
     <main id="home-page" class="fade-in">
-        <header class="hero container">
-            <span class="status-pill">⚡ Ultra Fast Engine</span>
-            <h1>Digital Tools <br> <span class="gradient-text">Redefined.</span></h1>
-            
-            <div class="search-box">
-                <i class="ri-search-line"></i>
-                <input type="text" id="search-bar" placeholder="Find a tool (e.g. PDF, Image)..." onkeyup="filterTools()" autocomplete="off">
+        <header class="hero-section">
+            <div class="container">
+                <span class="badge-pill">✨ V10.0 Ultimate</span>
+                <h1 class="hero-title">Intelligent Tools <br> <span class="gradient-text">Zero Latency</span></h1>
+                
+                <div class="smart-search-wrapper">
+                    <div class="search-box">
+                        <i class="ri-search-line search-icon"></i>
+                        <input type="text" id="search-bar" placeholder="Ask ToolMaster (e.g. PDF, QR, Eraser)..." onkeyup="filterTools()" autocomplete="off">
+                    </div>
+                </div>
             </div>
         </header>
 
-        <section class="container">
+        <section class="container tool-grid-section">
             <div class="grid" id="tools-grid">
-                <div class="tool-card" onclick="openTool('excel-tool')">
-                    <div class="card-icon green-glow"><i class="ri-file-excel-2-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>Excel to PDF 4K</h3>
-                        <p>Exact Copy & Colors.</p>
-                    </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                
+                <div class="tool-card" onclick="openTool('bg-remover-tool')">
+                    <div class="card-icon gradient-1"><i class="ri-magic-line"></i></div>
+                    <div class="card-info"><h3>Magic Eraser</h3><p>Remove BG with Slider.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
 
                 <div class="tool-card" onclick="openTool('pdf-excel-tool')">
-                    <div class="card-icon orange-glow"><i class="ri-file-transfer-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>PDF to Excel</h3>
-                        <p>Smart Table Extract.</p>
+                    <div class="card-icon gradient-2 dual-icon-box">
+                        <i class="ri-file-pdf-2-fill"></i><i class="ri-arrow-right-s-line" style="opacity:0.6;"></i><i class="ri-file-excel-2-fill"></i>
                     </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                    <div class="card-info"><h3>PDF to Excel</h3><p>AI Table Extract.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
 
-                <div class="tool-card" onclick="openTool('img-tool')">
-                    <div class="card-icon blue-glow"><i class="ri-image-2-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>Image Compressor</h3>
-                        <p>Reduce Size (KB/MB).</p>
-                    </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                <div class="tool-card" onclick="openTool('excel-tool')">
+                    <div class="card-icon gradient-3"><i class="ri-file-excel-2-fill"></i></div>
+                    <div class="card-info"><h3>Excel to PDF</h3><p>AI Auto-Scaling.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
 
-                <div class="tool-card" onclick="openTool('sum-tool')">
-                    <div class="card-icon purple-glow"><i class="ri-calculator-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>Smart Sum</h3>
-                        <p>AI Data Calc.</p>
-                    </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                <div class="tool-card" onclick="openTool('pdf-jpg-tool')">
+                    <div class="card-icon gradient-6"><i class="ri-image-line"></i></div>
+                    <div class="card-info"><h3>PDF to JPG</h3><p>Custom Quality Export.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
 
                 <div class="tool-card" onclick="openTool('jpg-pdf-tool')">
-                    <div class="card-icon red-glow"><i class="ri-gallery-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>JPG to PDF</h3>
-                        <p>Album to Doc.</p>
-                    </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                    <div class="card-icon gradient-4"><i class="ri-file-image-line"></i></div>
+                    <div class="card-info"><h3>JPG to PDF</h3><p>AI Smart Fit Layout.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
 
-                <div class="tool-card" onclick="openTool('merge-pdf-tool')">
-                    <div class="card-icon pink-glow"><i class="ri-file-zip-fill"></i></div>
-                    <div class="card-meta">
-                        <h3>Merge PDFs</h3>
-                        <p>Secure Join.</p>
-                    </div>
-                    <i class="ri-arrow-right-line action-icon"></i>
+                <div class="tool-card" onclick="openTool('img-tool')">
+                    <div class="card-icon gradient-5"><i class="ri-image-edit-line"></i></div>
+                    <div class="card-info"><h3>Compressor</h3><p>Target Size KB.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
+                </div>
+
+                <div class="tool-card" onclick="openTool('photo-qr-tool')">
+                    <div class="card-icon gradient-7"><i class="ri-qr-code-line"></i></div>
+                    <div class="card-info"><h3>Photo to QR</h3><p>Upload & Scan.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
+                </div>
+
+                <div class="tool-card" onclick="openTool('pass-tool')">
+                    <div class="card-icon gradient-8"><i class="ri-shield-keyhole-fill"></i></div>
+                    <div class="card-info"><h3>Secure Gen</h3><p>Strong Keys.</p></div>
+                    <div class="hover-arrow"><i class="ri-arrow-right-line"></i></div>
                 </div>
             </div>
         </section>
     </main>
 
-    <div id="excel-tool" class="tool-workspace hidden container">
-        <div class="tool-header">
-            <button class="back-btn" onclick="showHome()">Back</button>
-            <h2>Excel to PDF (4K)</h2>
-        </div>
-        <div class="workspace-grid">
-            <div class="sidebar">
-                <div class="upload-zone" onclick="document.getElementById('excel-input').click()">
-                    <i class="ri-upload-2-line"></i>
-                    <p>Upload Excel File</p>
-                    <input type="file" id="excel-input" accept=".xlsx, .xls">
-                </div>
-                <div class="options">
-                    <label>Layout Mode</label>
-                    <select id="pdf-orient" class="std-input">
-                        <option value="landscape">Landscape (Best Fit)</option>
-                        <option value="portrait">Portrait</option>
-                    </select>
-                </div>
-                <div class="check-opt">
-                    <input type="checkbox" id="ai-insight-toggle" checked>
-                    <label>Show AI Data Stats</label>
-                </div>
-                <button class="btn-primary" onclick="generateUltraHDPDF()">Generate PDF</button>
+    <div id="bg-remover-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Magic Eraser</h2></div>
+        <div class="split-layout">
+            <div class="sidebar-panel">
+                <div class="upload-box" onclick="document.getElementById('bg-input').click()"><i class="ri-magic-line"></i><p>Upload Photo</p><input type="file" id="bg-input" accept="image/*"></div>
+                <div class="control-group mt-4"><label>Background</label><div class="color-grid"><button class="color-btn transparent active" onclick="changeBg('transparent')"></button><button class="color-btn white" onclick="changeBg('#ffffff')"></button><button class="color-btn black" onclick="changeBg('#000000')"></button></div></div>
+                <button class="action-btn" id="dl-bg-btn" disabled>Download</button>
             </div>
-            
-            <div class="main-preview">
-                <div id="excel-ai-analysis" class="ai-panel hidden">
-                    <div class="ai-title"><i class="ri-magic-line"></i> Data Insights</div>
-                    <ul id="excel-stats-list"></ul>
-                </div>
-                <div id="export-container" class="paper-canvas">
-                    <div id="excel-preview-container" class="excel-render">
-                        <div class="placeholder">Preview will load here...</div>
-                    </div>
+            <div class="main-panel">
+                <div id="bg-processing" class="hidden state-msg"><div class="spinner"></div><p>AI Removing...</p></div>
+                <div id="bg-empty-state" class="empty-state"><i class="ri-image-add-line" style="font-size:3rem; opacity:0.5;"></i><p>Upload Image</p></div>
+                <div id="compare-container" class="compare-container hidden">
+                    <div class="img-layer base-layer" id="bg-result-layer"><img id="bg-result-img" src=""></div>
+                    <div class="img-layer overlay-layer" id="bg-overlay-layer"><img id="bg-original-img" src=""></div>
+                    <div class="slider-handle" id="slider-handle"><div class="handle-line"></div><div class="handle-circle"><i class="ri-arrow-left-right-line"></i></div></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="pdf-excel-tool" class="tool-workspace hidden container">
-        <div class="tool-header"><button class="back-btn" onclick="showHome()">Back</button><h2>PDF to Excel</h2></div>
-        <div class="workspace-center">
-            <div class="upload-zone large" onclick="document.getElementById('pdf-to-ex-input').click()">
-                <i class="ri-file-text-line"></i>
-                <p>Upload PDF Document</p>
-                <input type="file" id="pdf-to-ex-input" accept=".pdf">
-            </div>
-            <button class="btn-primary mt-20" onclick="convertPDFtoExcel()">Start Extraction</button>
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>PDF to Excel</h2></div>
+        <div class="center-panel bordered-dashboard">
+            <div class="upload-box large" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-pdf-line"></i><p>Drop PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div>
+            <button class="action-btn mt-4" onclick="convertPDFtoExcel()">Start Extraction</button>
         </div>
     </div>
 
-    <div id="img-tool" class="tool-workspace hidden container">
-        <div class="tool-header"><button class="back-btn" onclick="showHome()">Back</button><h2>Image Compressor</h2></div>
-        <div class="workspace-grid">
-            <div class="sidebar">
-                <div class="upload-zone" onclick="document.getElementById('img-input').click()">
-                    <i class="ri-image-edit-line"></i><p>Upload Image</p>
-                    <input type="file" id="img-input" accept="image/*">
-                </div>
-                <div class="options">
-                    <label>Quality: <span id="q-val" class="text-accent">80%</span></label>
-                    <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.8">
-                </div>
-                <button class="btn-primary" id="dl-img-btn">Download</button>
+    <div id="excel-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Excel to PDF</h2></div>
+        <div class="split-layout">
+            <div class="sidebar-panel">
+                <div class="upload-box" onclick="document.getElementById('excel-input').click()"><i class="ri-file-excel-2-line"></i><p>Drop Excel</p><input type="file" id="excel-input" accept=".xlsx, .xls"></div>
+                <div class="control-group"><label>Layout</label><select id="pdf-orient" class="custom-select"><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select></div>
+                <div class="control-group mt-4"><input type="checkbox" id="auto-fit" checked> <label>🤖 AI Auto-Scale</label></div>
+                <button class="action-btn" onclick="generateUltraHDPDF()">Generate PDF</button>
             </div>
-            <div class="main-preview">
-                <div class="compare-view">
-                    <div class="img-box">
-                        <span class="tag">Original</span>
-                        <p id="orig-size-display">0 KB</p>
-                        <img id="orig-prev">
-                    </div>
-                    <div class="img-box active">
-                        <span class="tag highlight">Result</span>
-                        <p id="comp-size-display">0 KB</p>
-                        <img id="comp-prev">
-                    </div>
-                </div>
-            </div>
+            <div class="main-panel"><div id="export-container" class="preview-canvas"><div id="excel-preview-container" class="excel-content"><div class="empty-state">Preview...</div></div></div></div>
         </div>
     </div>
 
-    <div id="sum-tool" class="tool-workspace hidden container">
-        <div class="tool-header"><button class="back-btn" onclick="showHome()">Back</button><h2>Smart Sum</h2></div>
-        <div class="workspace-center">
-            <textarea id="sum-input" class="std-input area" placeholder="Paste data containing numbers..."></textarea>
-            <button class="btn-primary mt-20" onclick="calculateSum()">Analyze Data</button>
-            <div class="result-stats">
-                <div class="stat-main">
-                    <span>Total Sum</span>
-                    <h3 id="res-sum">0</h3>
-                </div>
-                <div class="stat-sub">
-                    <span>Count: <b id="res-cnt">0</b></span>
-                    <span>Avg: <b id="res-avg">0</b></span>
-                </div>
+    <div id="pdf-jpg-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>PDF to JPG</h2></div>
+        <div class="split-layout">
+            <div class="sidebar-panel">
+                <div class="upload-box" onclick="document.getElementById('pdf-jpg-input').click()"><i class="ri-image-line"></i><p>Drop PDF</p><input type="file" id="pdf-jpg-input" accept=".pdf"></div>
+                <div class="control-group mt-4"><label>Quality: <span id="jpg-qual-val">High (100%)</span></label><input type="range" id="jpg-quality" min="0.1" max="1" step="0.1" value="1.0" oninput="updateJpgQualityLabel(this.value)"></div>
+                <button class="action-btn" onclick="convertPdfToJpg()">Convert All Pages</button>
             </div>
+            <div class="main-panel"><div id="jpg-preview-grid" class="image-grid-preview"><div class="empty-state">Pages will appear here...</div></div></div>
         </div>
     </div>
 
     <div id="jpg-pdf-tool" class="tool-workspace hidden container">
-        <div class="tool-header"><button class="back-btn" onclick="showHome()">Back</button><h2>JPG to PDF</h2></div>
-        <div class="workspace-center"><input type="file" id="jpg-input" multiple accept="image/*" class="std-input"><button class="btn-primary mt-20" onclick="convertJpgToPdf()">Convert</button></div>
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>JPG to PDF</h2></div>
+        <div class="center-panel bordered-dashboard">
+            <div class="upload-box large" onclick="document.getElementById('jpg-input').click()"><i class="ri-gallery-upload-line"></i><p>Drop Images</p><input type="file" id="jpg-input" multiple accept="image/*"></div>
+            <div class="control-group mt-4 text-center"><input type="checkbox" id="ai-fit-pdf" checked> <label>🤖 AI Smart Fit</label></div>
+            <button class="action-btn mt-4" onclick="convertJpgToPdf()">Create PDF</button>
+        </div>
     </div>
-    <div id="merge-pdf-tool" class="tool-workspace hidden container">
-        <div class="tool-header"><button class="back-btn" onclick="showHome()">Back</button><h2>Merge PDF</h2></div>
-        <div class="workspace-center"><input type="file" id="m-pdf1" accept=".pdf" class="std-input"><input type="file" id="m-pdf2" accept=".pdf" class="std-input mt-10"><button class="btn-primary mt-20" onclick="mergePdfs()">Merge</button></div>
+
+    <div id="img-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Back</button><h2>Compressor</h2></div>
+        <div class="split-layout">
+            <div class="sidebar-panel">
+                <div class="upload-box" onclick="document.getElementById('img-input').click()"><i class="ri-image-line"></i><p>Drop Image</p><input type="file" id="img-input" accept="image/*"></div>
+                <div class="control-group"><label>Mode</label><select id="comp-mode" class="custom-select" onchange="toggleSizeInput()"><option value="quality">Quality %</option><option value="target">Target KB</option></select></div>
+                <div class="control-group" id="quality-wrapper"><label>Quality: <span id="q-val">80%</span></label><input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.8"></div>
+                <div class="control-group hidden" id="target-wrapper"><label>Max KB</label><input type="number" id="target-kb" class="custom-select" placeholder="e.g. 50"></div>
+                <button class="action-btn" id="dl-img-btn">Download</button>
+            </div>
+            <div class="main-panel"><div class="image-compare"><div class="img-container"><span class="label">Original</span><p id="orig-size-display">0 KB</p><img id="orig-prev"></div><div class="img-container result"><span class="label highlight">Result</span><p id="comp-size-display">0 KB</p><img id="comp-prev"></div></div></div>
+        </div>
+    </div>
+
+    <div id="photo-qr-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Photo to QR</h2></div>
+        <div class="split-layout">
+            <div class="sidebar-panel">
+                <div class="upload-box" onclick="document.getElementById('qr-img-input').click()"><i class="ri-share-forward-line"></i><p>Upload Photo</p><input type="file" id="qr-img-input" accept="image/*"></div>
+                <button class="action-btn" id="gen-qr-btn" disabled>Generate QR</button>
+            </div>
+            <div class="main-panel center-panel">
+                <div id="qr-loading" class="hidden state-msg"><div class="spinner"></div><p>Generating Link...</p></div>
+                <div id="qr-result-box" class="hidden text-center">
+                    <div id="qrcode" style="display:inline-block; padding:15px; background:white; border-radius:10px;"></div>
+                    <input type="text" id="img-share-link" class="custom-select mt-4" readonly>
+                    <button class="action-btn mt-2" onclick="copyLink()">Copy Link</button>
+                </div>
+                <div id="qr-empty" class="empty-state"><i class="ri-qr-scan-2-line" style="font-size:3rem; opacity:0.5;"></i><p>QR will appear here</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pass-tool" class="tool-workspace hidden container">
+        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Secure Gen</h2></div>
+        <div class="center-panel bordered-dashboard">
+            <div class="pass-display" id="generated-pass" onclick="copyPass()">CLICK GENERATE</div>
+            <div class="control-group" style="max-width:400px; margin:20px auto;"><label>Length</label><input type="range" id="pass-len" min="8" max="64" value="16"></div>
+            <button class="action-btn" onclick="generatePass()">Generate</button>
+        </div>
     </div>
 
     <footer>
-        <p>Engineered by <span class="highlight">Swapan</span> • Made in India 🇮🇳</p>
-        <div class="links"><a href="#">Privacy</a> <a href="#">Terms</a></div>
+        <div class="container footer-content">
+            <div class="footer-left"><h4>ToolMaster.ai</h4><p>Ultimate Suite V10.</p></div>
+            <div class="footer-bottom"><p>Developer by <b>Swapan</b> • Made in India 🇮🇳</p></div>
+        </div>
     </footer>
 
     <script src="script.js"></script>
 </body>
-</html>
+        </html>
 
