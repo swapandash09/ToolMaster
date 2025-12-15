@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolMaster Pro - Developed by Swapan</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+</head>
+<body>
+
+    <div id="welcome-overlay">
+        <div class="welcome-box">
+            <div class="loader-icon"><i class="ri-robot-2-line"></i></div>
+            <h1>ToolMaster<span class="highlight">.ai</span></h1>
+            <p>Professional Suite • No Watermark</p>
+            <p class="dev-tag">Developed by Swapan</p>
+            <button class="btn-glow" onclick="enterSite()">Enter Website 🚀</button>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner-box">
+            <div class="spinner"></div>
+            <p>Processing Request... ⏳</p>
+        </div>
+    </div>
+
+    <nav>
+        <div class="container nav-content">
+            <div class="logo" onclick="showHome()">ToolMaster<span class="highlight">Pro</span></div>
+            <button class="theme-btn" onclick="toggleTheme()"><i class="ri-moon-line"></i></button>
+        </div>
+    </nav>
+
+    <main id="home-page">
+        <section class="hero container">
+            <h1>All-In-One Web Tools <br> <span class="gradient-text">+ 4K Accuracy</span></h1>
+            <input type="text" id="search-bar" placeholder="Search (Excel, PDF, Sum)..." onkeyup="filterTools()">
+        </section>
+
+        <section class="container">
+            <div class="grid" id="tools-grid">
+                <div class="card" onclick="openTool('excel-tool')">
+                    <div class="icon-box" style="color:#10b981;"><i class="ri-file-excel-2-fill"></i></div>
+                    <h3>Excel to PDF (Pro)</h3><p>Exact Copy, Colors, No Logo.</p>
+                </div>
+                <div class="card" onclick="openTool('pdf-excel-tool')">
+                    <div class="icon-box" style="color:#f59e0b;"><i class="ri-file-transfer-line"></i></div>
+                    <h3>PDF to Excel</h3><p>Extract Data Tables.</p>
+                </div>
+                <div class="card" onclick="openTool('img-tool')">
+                    <div class="icon-box" style="color:#3b82f6;"><i class="ri-image-2-line"></i></div>
+                    <h3>Image Compressor</h3><p>Resize No Crop.</p>
+                </div>
+                <div class="card" onclick="openTool('sum-tool')">
+                    <div class="icon-box" style="color:#8b5cf6;"><i class="ri-calculator-fill"></i></div>
+                    <h3>Smart Sum</h3><p>100% Accurate Math.</p>
+                </div>
+                <div class="card" onclick="openTool('jpg-pdf-tool')">
+                    <div class="icon-box" style="color:#ef4444;"><i class="ri-file-image-fill"></i></div>
+                    <h3>JPG to PDF</h3><p>Images to PDF.</p>
+                </div>
+                <div class="card" onclick="openTool('merge-pdf-tool')">
+                    <div class="icon-box" style="color:#ec4899;"><i class="ri-file-copy-2-fill"></i></div>
+                    <h3>Merge PDF</h3><p>Join Files.</p>
+                </div>
+                <div class="card" onclick="openTool('video-tool')">
+                    <div class="icon-box" style="color:#ef4444;"><i class="ri-camera-fill"></i></div>
+                    <h3>Webcam</h3><p>Record Video.</p>
+                </div>
+                <div class="card" onclick="openTool('json-tool')">
+                    <div class="icon-box" style="color:#10b981;"><i class="ri-code-s-slash-line"></i></div>
+                    <h3>JSON Format</h3><p>Beautify Code.</p>
+                </div>
+                <div class="card" onclick="openTool('html-pdf-tool')">
+                    <div class="icon-box" style="color:#f97316;"><i class="ri-html5-fill"></i></div>
+                    <h3>HTML to PDF</h3><p>Web to PDF.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="excel-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div>
+        <h2>Excel to PDF (Clean HD)</h2>
+        <div class="tool-layout">
+            <div class="controls-panel">
+                <div class="upload-area"><i class="ri-file-excel-2-line"></i><p>Upload Excel</p><input type="file" id="excel-input" accept=".xlsx, .xls"></div>
+                <div class="options-grid mt-4">
+                    <label>Layout:</label>
+                    <select id="pdf-orient" class="input-field">
+                        <option value="landscape">Landscape (Best)</option>
+                        <option value="portrait">Portrait</option>
+                    </select>
+                </div>
+                <div class="ai-toggle-box">
+                    <input type="checkbox" id="ai-insight-toggle" checked>
+                    <label>✨ Show AI Analysis (Screen Only)</label>
+                </div>
+                <button class="btn-primary mt-4" onclick="generateUltraHDPDF()">Download PDF (No Watermark) 📥</button>
+            </div>
+
+            <div class="preview-section">
+                <div id="excel-ai-analysis" class="ai-stats hidden" style="margin-bottom: 20px;">
+                    <h4 style="color: #3b82f6; margin-bottom: 10px;">🤖 AI Data Insights</h4>
+                    <ul id="excel-stats-list" style="list-style: none; padding: 0;"></ul>
+                </div>
+
+                <div id="export-container" style="background: white; padding: 20px; border-radius: 5px;">
+                    <div id="excel-preview-container" class="excel-scroll" style="border: none; padding: 0;">
+                        <p class="placeholder-text" style="color: #64748b; text-align: center; margin-top: 20px;">Upload file to see preview...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-excel-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div>
+        <h2>PDF to Excel (Extractor)</h2>
+        <div class="tool-layout">
+            <div class="controls-panel">
+                <div class="upload-area"><i class="ri-file-pdf-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div>
+                <button class="btn-primary mt-4" onclick="convertPDFtoExcel()">Extract to Excel 📥</button>
+            </div>
+            <div class="result-box"><i class="ri-table-line" style="font-size:3rem; opacity:0.5;"></i><p>File will download automatically.</p></div>
+        </div>
+    </div>
+
+    <div id="img-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div>
+        <h2>Image Compressor</h2>
+        <div class="tool-layout">
+            <div class="controls-panel">
+                <div class="upload-area"><i class="ri-image-line"></i><input type="file" id="img-input" accept="image/*"><p>Upload</p></div>
+                <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.8" class="input-field mt-4">
+                <button class="btn-primary mt-4" id="dl-img-btn">Download</button>
+            </div>
+            <div class="result-box">
+                <div class="compare-row">
+                    <div class="c-item"><span>Original</span><img id="orig-prev"></div>
+                    <div class="c-item"><span>Result</span><img id="comp-prev"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sum-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div>
+        <h2>Smart Sum</h2>
+        <div class="tool-layout">
+            <div class="controls-panel">
+                <textarea id="sum-input" class="input-field" rows="8" placeholder="Paste numbers..."></textarea>
+                <button class="btn-primary mt-4" onclick="calculateSum()">Calculate</button>
+            </div>
+            <div class="result-box">
+                <h3 id="res-sum" style="font-size:2.5rem; color:#4ade80;">0</h3>
+                <p>Count: <b id="res-cnt">0</b> | Avg: <b id="res-avg">0</b></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="jpg-pdf-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div><h2>JPG to PDF</h2>
+        <div class="controls-panel"><input type="file" id="jpg-input" multiple class="input-field"><button class="btn-primary" onclick="convertJpgToPdf()">Convert</button></div>
+    </div>
+
+    <div id="merge-pdf-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div><h2>Merge PDF</h2>
+        <div class="controls-panel"><input type="file" id="m-pdf1" class="input-field"><input type="file" id="m-pdf2" class="input-field"><button class="btn-primary" onclick="mergePdfs()">Merge</button></div>
+    </div>
+
+    <div id="html-pdf-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div><h2>HTML to PDF</h2>
+        <div class="controls-panel"><textarea id="html-input" class="input-field" rows="10"></textarea><button class="btn-primary" onclick="convertHtmlToPdf()">Save PDF</button></div>
+    </div>
+
+    <div id="video-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div><h2>Webcam</h2>
+        <div class="controls-panel"><button class="btn-primary" onclick="startRecording()">Rec</button><button class="btn-primary" onclick="stopRecording()">Stop</button></div>
+        <div class="result-box"><video id="webcam-preview" autoplay muted style="max-width:100%"></video></div>
+    </div>
+    <div id="json-tool" class="tool-workspace hidden container">
+        <div class="back-btn" onclick="showHome()">← Back</div><h2>JSON Formatter</h2>
+        <div class="controls-panel"><textarea id="json-input" class="input-field" rows="10"></textarea><button class="btn-primary" onclick="formatJSON()">Format</button></div>
+        <div class="result-box"><textarea id="json-output" class="input-field" rows="10" readonly></textarea></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+  </html>
+  
