@@ -1,0 +1,36 @@
+/* Common Components */
+.tool-workspace { width: 100%; max-width: 1200px; margin: 0 auto; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.ws-head { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+.ws-head h2 { font-size: 1.5rem; font-weight: 600; color: var(--text); }
+.back-pill {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+    color: var(--text-muted); padding: 8px 18px; border-radius: 50px; cursor: pointer;
+    font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 5px;
+}
+.back-pill:hover { background: var(--primary); border-color: var(--primary); color: white; }
+.ws-body {
+    background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+    padding: 40px; backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+.upload-zone {
+    border: 2px dashed var(--border); border-radius: 16px; padding: 50px 20px;
+    text-align: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2);
+    margin-bottom: 20px; position: relative; overflow: hidden;
+}
+.upload-zone:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.08); }
+.upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 15px; display: block; }
+.upload-zone input { display: none; }
+.glass-input {
+    width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border);
+    color: var(--text); padding: 14px 18px; border-radius: 12px; outline: none;
+    transition: 0.3s; font-size: 0.95rem; margin-bottom: 15px;
+}
+.glass-input:focus { border-color: var(--primary); background: rgba(0, 0, 0, 0.5); }
+.glow-btn {
+    width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4); transition: 0.3s; margin-top: 10px;
+}
+.glow-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6); }
+@media (max-width: 600px) { .ws-body { padding: 20px; } .upload-zone { padding: 30px 15px; } }
