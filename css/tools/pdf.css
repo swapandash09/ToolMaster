@@ -1,16 +1,44 @@
-/* PDF Grid */
-.image-grid-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px 0; margin-top: 20px; }
-.img-card {
-    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden; text-align: center; transition: 0.3s;
-    position: relative; padding-bottom: 50px;
+@media print {
+    /* 1. Grid Layout for A4 Paper */
+    .image-grid-preview {
+        display: grid;
+        /* Force fixed columns (3 fits nicely on A4 Portrait) */
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 15px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 2. Card Ink-Saving Mode */
+    .img-card {
+        /* Remove dark background & glow */
+        background: #fff !important; 
+        border: 1px solid #ccc !important;
+        border-radius: 4px !important; /* Smaller radius looks sharper on paper */
+        box-shadow: none !important;
+        
+        /* CRITICAL: Prevent cards from being cut in half */
+        break-inside: avoid;
+        page-break-inside: avoid;
+        
+        /* Remove padding reserved for the hidden download button */
+        padding-bottom: 5px !important; 
+        transform: none !important; /* Disable hover effects */
+    }
+
+    /* 3. Image Optimization */
+    .img-card img {
+        /* Remove dark gray background to save ink */
+        background: transparent !important; 
+        border: none !important;
+        
+        /* Ensure high-res print quality */
+        max-height: 180px; 
+        object-fit: contain;
+    }
+
+    /* 4. Hide Useless Elements */
+    .dl-btn {
+        display: none !important;
+    }
 }
-.img-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-.img-card img { width: 100%; height: 200px; object-fit: contain; background: #333; border-bottom: 1px solid var(--border); }
-.dl-btn {
-    position: absolute; bottom: 10px; left: 10px; right: 10px;
-    padding: 8px; color: white; background: var(--primary); text-decoration: none;
-    font-size: 0.85rem; border-radius: 6px; font-weight: 500; transition: 0.2s;
-}
-.dl-btn:hover { background: #4f46e5; }
-@media (max-width: 600px) { .image-grid-preview { grid-template-columns: repeat(2, 1fr); gap: 10px; } .img-card img { height: 150px; } }
