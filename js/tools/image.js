@@ -1,5 +1,5 @@
 // ==========================================
-// 🖼️ IMAGE TOOLS MODULE (STABLE V36)
+// 🖼️ IMAGE TOOLS MODULE (FINAL STABLE VERSION)
 // ==========================================
 
 // --- 1. MAGIC ERASER (BACKGROUND REMOVER) ---
@@ -11,49 +11,48 @@ if (bgInput) {
         if (!file) return;
 
         // UI Reset
-        loader(true);
+        if(typeof loader === 'function') loader(true);
         const compareContainer = document.getElementById('compare-container');
         const dlBtn = document.getElementById('dl-bg-btn');
         
         if(compareContainer) compareContainer.classList.add('hidden');
         if(dlBtn) dlBtn.classList.add('hidden');
 
-        // Create Object URL
-        const imgUrl = URL.createObjectURL(file);
-        const originalImg = document.getElementById('bg-original-img');
-        if(originalImg) originalImg.src = imgUrl;
+        // Show Original (Preview)
+        const originalPreview = document.getElementById('bg-original-img');
+        if(originalPreview) originalPreview.src = URL.createObjectURL(file);
 
         try {
-            // 1. Load Library Dynamically (Prevents Page Lag)
+            // STEP 1: Optimize Image (Resize if too big to prevent crash)
+            // Shrink to max 1500px width/height
+            const optimizedBlob = await resizeImage(file, 1500); 
+
+            // STEP 2: Load AI Library
             const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
 
-            // 2. Configuration (CRITICAL FOR STABILITY)
+            // STEP 3: Config (Force CDN for Models)
             const config = {
-                publicPath: "https://static.imgly.com/assets/data/background-removal-data/", // Fetch models from reliable CDN
+                publicPath: "https://static.imgly.com/assets/data/background-removal-data/",
                 progress: (key, current, total) => {
-                    const percent = Math.round((current / total) * 100);
-                    // Optional: Show progress in console or toast
-                    console.log(`AI Model Loading: ${percent}%`);
-                },
-                debug: false
+                    console.log(`Downloading AI: ${Math.round((current / total) * 100)}%`);
+                }
             };
 
-            // 3. Process Image
-            // Blob conversion helps reduce memory usage
-            const blob = await removeBackground(imgUrl, config);
+            // STEP 4: Process Optimized Image
+            const blob = await removeBackground(optimizedBlob, config);
             const processedUrl = URL.createObjectURL(blob);
 
-            // 4. Update UI
+            // Update Result UI
             const resultImg = document.getElementById('bg-result-img');
             if(resultImg) resultImg.src = processedUrl;
 
+            // Show Slider & Download
             if(compareContainer) {
                 compareContainer.classList.remove('hidden');
-                // Reset slider
                 const slider = document.querySelector('.slider');
-                if(slider) {
-                    slider.value = 50;
-                    slideCompare(50);
+                if(slider) { 
+                    slider.value = 50; 
+                    slideCompare(50); // Reset position
                 }
             }
 
@@ -62,26 +61,65 @@ if (bgInput) {
                 dlBtn.onclick = () => {
                     const a = document.createElement('a');
                     a.href = processedUrl;
-                    a.download = `NoBG_${Date.now()}.png`;
+                    a.download = `ToolMaster_NoBG_${Date.now()}.png`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                    showToast("Downloaded Successfully!", "success");
+                    if(typeof showToast === 'function') showToast("Downloaded Successfully!", "success");
                 };
             }
 
-            showToast("Background Removed!", "success");
+            if(typeof showToast === 'function') showToast("Background Removed!", "success");
 
         } catch (err) {
-            console.error("BG Removal Error:", err);
-            showToast("Error: Check Internet or try smaller image.", "error");
+            console.error("AI Error:", err);
+            let msg = "Error: Could not process image.";
+            if(err.message && err.message.includes("fetch")) msg = "Network Error: Models failed to load.";
+            if(typeof showToast === 'function') showToast(msg, "error");
         } finally {
-            loader(false);
+            if(typeof loader === 'function') loader(false);
         }
     });
 }
 
-// Slider Logic for Before/After
+// Helper: Smart Image Resizer (Prevents Browser Crash)
+function resizeImage(file, maxDimension) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Calculate new size keeping aspect ratio
+            if (width > height) {
+                if (width > maxDimension) {
+                    height *= maxDimension / width;
+                    width = maxDimension;
+                }
+            } else {
+                if (height > maxDimension) {
+                    width *= maxDimension / height;
+                    height = maxDimension;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert back to Blob (JPEG for speed)
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/jpeg', 0.9);
+        };
+        img.onerror = reject;
+    });
+}
+
+// Slider Logic for Magic Eraser
 window.slideCompare = (val) => {
     const frontImg = document.getElementById('bg-original-img');
     if (frontImg) {
@@ -90,136 +128,127 @@ window.slideCompare = (val) => {
 };
 
 
-// --- 2. IMAGE COMPRESSOR ---
-const imgInput = document.getElementById('img-input');
-
-if(imgInput) {
-    window.liveCompress = () => {
-        if (!imgInput.files[0]) return showToast("Select an image first.", "error");
-
-        loader(true);
-        const file = imgInput.files[0];
-        const qualityVal = document.getElementById('quality').value;
-        const quality = parseFloat(qualityVal);
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-
-                // Compress logic
-                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-
-                // Update Preview
-                const previewImg = document.getElementById('comp-prev');
-                if(previewImg) {
-                    previewImg.src = compressedDataUrl;
-                    previewImg.style.display = "block";
-                }
-
-                // Size Calculation
-                const originalSize = (file.size / 1024).toFixed(2);
-                const compressedSize = (Math.round((compressedDataUrl.length - 22) * 3 / 4) / 1024).toFixed(2);
-
-                showToast(`Saved: ${originalSize}KB → ${compressedSize}KB`, "success");
-
-                // Auto Download Setup (Optional: Or make user click image)
-                previewImg.onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = compressedDataUrl;
-                    a.download = `Compressed_${Date.now()}.jpg`;
-                    a.click();
-                };
-                
-                loader(false);
-            };
-        };
+// --- 2. IMAGE COMPRESSOR (LIVE PREVIEW) ---
+window.liveCompress = () => {
+    const input = document.getElementById('img-input');
+    if(!input || !input.files[0]) return showToast("Select an image first.", "error");
+    
+    if(typeof loader === 'function') loader(true);
+    
+    const quality = parseFloat(document.getElementById('quality').value);
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
         
-        reader.onerror = () => {
-            loader(false);
-            showToast("Error reading file.", "error");
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            
+            // Compress
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            
+            // Show Preview
+            const previewImg = document.getElementById('comp-prev');
+            if(previewImg) {
+                previewImg.src = compressedDataUrl;
+                
+                // Click to Download
+                previewImg.onclick = () => {
+                     const a = document.createElement('a');
+                     a.href = compressedDataUrl;
+                     a.download = `Compressed_${Date.now()}.jpg`;
+                     a.click();
+                };
+            }
+            
+            // Calculate Stats
+            const originalSize = (file.size / 1024).toFixed(2); // KB
+            // Base64 length approx size calculation
+            const compressedSize = (Math.round((compressedDataUrl.length - 22) * 3 / 4) / 1024).toFixed(2); 
+            
+            if(typeof showToast === 'function') showToast(`Compressed: ${originalSize}KB → ${compressedSize}KB`, "success");
+            if(typeof loader === 'function') loader(false);
         };
     };
+    reader.readAsDataURL(file);
 }
 
 
-// --- 3. PHOTO TO QR CODE (CLOUD API) ---
+// --- 3. PHOTO TO QR CODE (WITH DOWNLOAD) ---
 const qrInput = document.getElementById('qr-img-input');
 const genQrBtn = document.getElementById('gen-qr-btn');
 
 if (qrInput && genQrBtn) {
     genQrBtn.onclick = () => {
-        if (!qrInput.files.length) return showToast("Select an image first.", "error");
-
-        loader(true);
+        if(!qrInput.files.length) return showToast("Select an image first.", "error");
+        
+        if(typeof loader === 'function') loader(true);
         const formData = new FormData();
         formData.append("image", qrInput.files[0]);
-
-        // Free API Key (ImgBB) - Replace with your own if this hits limits
-        const API_KEY = '6d207e02198a847aa98d0a2a901485a5';
-
+        
+        // Free ImgBB API Key
+        const API_KEY = '6d207e02198a847aa98d0a2a901485a5'; 
+        
         fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
             method: 'POST',
             body: formData
         })
         .then(res => res.json())
         .then(result => {
-            if (result.success) {
+            if(result.success) {
                 const url = result.data.url;
                 const qrContainer = document.getElementById('qrcode');
                 
                 if(qrContainer) {
-                    qrContainer.innerHTML = ""; // Clear previous
+                    qrContainer.innerHTML = ""; // Clear old QR
                     
                     // Generate QR
                     new QRCode(qrContainer, {
                         text: url,
-                        width: 160,
-                        height: 160,
+                        width: 150,
+                        height: 150,
                         colorDark : "#000000",
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.H
                     });
-
-                    // Add a download button below QR
+                    
+                    // Add Download Button
                     setTimeout(() => {
-                        const qrImg = qrContainer.querySelector("img");
+                        const qrImg = qrContainer.querySelector('img');
                         if(qrImg) {
-                            const btn = document.createElement("button");
-                            btn.innerText = "Download QR";
-                            btn.className = "glow-btn small";
-                            btn.style.marginTop = "15px";
-                            btn.onclick = () => {
-                                const a = document.createElement("a");
+                            const dlBtn = document.createElement('button');
+                            dlBtn.innerText = "Download QR";
+                            dlBtn.className = "glow-btn small";
+                            dlBtn.style.marginTop = "15px";
+                            dlBtn.onclick = () => {
+                                const a = document.createElement('a');
                                 a.href = qrImg.src;
-                                a.download = "ScanMe.png";
+                                a.download = "Photo_QR.png";
                                 a.click();
                             };
-                            qrContainer.appendChild(btn);
+                            qrContainer.appendChild(dlBtn);
                         }
                     }, 500);
                 }
-                showToast("QR Code Generated!", "success");
+
+                if(typeof showToast === 'function') showToast("QR Code Generated!", "success");
             } else {
-                showToast("Upload Failed. Image too large?", "error");
+                if(typeof showToast === 'function') showToast("Upload Failed. Try smaller image.", "error");
             }
         })
-        .catch(error => {
-            console.error(error);
-            showToast("Network Error. Check console.", "error");
+        .catch(err => {
+            console.error(err);
+            if(typeof showToast === 'function') showToast("Network Error.", "error");
         })
         .finally(() => {
-            loader(false);
+            if(typeof loader === 'function') loader(false);
         });
     };
-                      }
+}
