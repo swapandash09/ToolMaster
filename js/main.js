@@ -1,5 +1,5 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V39 PRO (STABLE)
+// ⚡ TOOLMASTER TITANIUM V39 PRO - MAIN JS
 // ==========================================
 
 const App = {
@@ -7,86 +7,72 @@ const App = {
     currentPage: 'home-page',
     
     init: function() {
-        console.log(`%c ToolMaster ${this.version} %c Running `, 
-        'background:#6366f1; color:white; padding:4px; border-radius:4px;', 
-        'color:#6366f1;');
-        
+        console.log(`ToolMaster ${this.version} Initialized`);
         this.loadTheme();
         this.addGlobalListeners();
         
         // Loader handling
-        setTimeout(() => this.loader(false), 600);
+        setTimeout(() => this.loader(false), 500);
     },
 
-    // --- 1. FIXED NAVIGATION SYSTEM ---
+    // --- 1. CORE NAVIGATION ROUTER ---
     navigateTo: function(viewId) {
         const homePage = document.getElementById('home-page');
         const toolContainer = document.getElementById('tool-container');
 
-        if (!homePage || !toolContainer) {
-            console.error("Critical UI elements missing!");
-            return;
-        }
+        if (!homePage || !toolContainer) return;
 
-        // Reset: Hide everything first for a clean transition
         if (viewId === 'home-page') {
+            // SHOW HOME
             toolContainer.classList.add('hidden');
             homePage.classList.remove('hidden');
             homePage.classList.add('fade-in');
             this.currentPage = 'home-page';
         } 
         else {
+            // SHOW TOOL
             const toolElement = document.getElementById(viewId);
             
             if (toolElement) {
-                // Step 1: Hide Home and Show Container
                 homePage.classList.add('hidden');
                 toolContainer.classList.remove('hidden');
                 
-                // Step 2: Hide all other tool workspaces
+                // Hide all workspaces first
                 document.querySelectorAll('.tool-workspace').forEach(el => {
                     el.classList.add('hidden');
+                    el.classList.remove('slide-up');
                 });
                 
-                // Step 3: Show selected tool with animation
+                // Show selected tool
                 toolElement.classList.remove('hidden');
                 toolElement.classList.add('slide-up');
                 
-                // Step 4: Scroll content area to top
-                const contentArea = document.querySelector('.content-area');
-                if (contentArea) contentArea.scrollTop = 0;
-                
                 this.currentPage = viewId;
+                document.querySelector('.content-area').scrollTop = 0;
             } else {
-                this.showToast("Error: Tool ID not found!", "error");
-                this.goHome(); // Fallback to home
+                this.showToast("Error: Tool not found!", "error");
             }
         }
-        
         this.updateSidebar(viewId);
     },
 
-    goHome: function() {
-        this.navigateTo('home-page');
-    },
+    goHome: function() { this.navigateTo('home-page'); },
 
-    // --- 2. SIDEBAR ACTIVE STATE FIX ---
+    // --- 2. THEME & UI ---
     updateSidebar: function(viewId) {
         document.querySelectorAll('.side-nav li').forEach(li => {
             li.classList.remove('active');
-            // Agar li ka onclick viewId contain karta hai to use active karo
             if (li.getAttribute('onclick') && li.getAttribute('onclick').includes(viewId)) {
                 li.classList.add('active');
             }
         });
     },
 
-    // --- 3. THEME ENGINE ---
     toggleTheme: function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         localStorage.setItem('tm_theme', isLight ? 'light' : 'dark');
-        this.showToast(isLight ? "Light Mode Active" : "Dark Mode Active", "info");
+        this.showToast(isLight ? "Light Mode" : "Dark Mode", "info");
     },
 
     loadTheme: function() {
@@ -94,82 +80,50 @@ const App = {
         if(saved === 'light') document.body.classList.add('light-mode');
     },
 
-    // --- 4. IMPROVED TOAST SYSTEM ---
     showToast: function(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         if(!container) return;
 
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type} slide-up`;
+        toast.className = `toast toast-${type} fade-in`;
+        toast.innerHTML = `<span>${msg}</span>`;
         
-        const icon = type === 'error' ? 'ri-error-warning-fill' : 
-                     type === 'info' ? 'ri-information-fill' : 'ri-checkbox-circle-fill';
-        
-        toast.innerHTML = `<i class="${icon}"></i> <span>${msg}</span>`;
-        
-        // Final V39 Styling logic
+        // Enhanced Styling
         toast.style.cssText = `
-            background: rgba(15, 15, 20, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid ${type === 'error' ? '#ef4444' : 'rgba(255,255,255,0.1)'};
-            color: white; padding: 14px 24px; border-radius: 50px; margin-top: 10px;
-            display: flex; align-items: center; gap: 12px; min-width: 280px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            background: rgba(15, 15, 20, 0.9); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); color: white;
+            padding: 12px 24px; border-radius: 50px; margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         `;
+        if(type === 'error') toast.style.borderColor = '#ef4444';
 
         container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px) scale(0.9)';
-            setTimeout(() => toast.remove(), 400);
-        }, 3000);
+        setTimeout(() => toast.remove(), 3000);
     },
 
-    // --- 5. SMART FILTER ---
-    filterTools: function(val) {
-        const term = val.toLowerCase();
-        document.querySelectorAll('.t-card').forEach(card => {
-            const title = card.querySelector('h4').innerText.toLowerCase();
-            const desc = card.querySelector('p').innerText.toLowerCase();
-            card.style.display = (title.includes(term) || desc.includes(term)) ? 'flex' : 'none';
-        });
+    loader: function(show) {
+        const el = document.getElementById('loading-overlay');
+        if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden');
     },
 
     addGlobalListeners: function() {
         const search = document.getElementById('search-bar');
         if(search) {
-            search.addEventListener('input', (e) => this.filterTools(e.target.value));
-            // Add Ctrl+K Shortcut for search
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    search.focus();
-                }
+            search.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.t-card').forEach(card => {
+                    const txt = card.innerText.toLowerCase();
+                    card.style.display = txt.includes(term) ? 'flex' : 'none';
+                });
             });
-        }
-    },
-
-    loader: function(show) {
-        const el = document.getElementById('loading-overlay');
-        if(el) {
-            if(show) {
-                el.classList.remove('hidden');
-                el.style.opacity = '1';
-            } else {
-                el.style.opacity = '0';
-                setTimeout(() => el.classList.add('hidden'), 500);
-            }
         }
     }
 };
 
-// --- GLOBAL EXPORTS ---
+// Global Exports
 window.showHome = () => App.goHome();
 window.openTool = (id) => App.navigateTo(id);
 window.toggleTheme = () => App.toggleTheme();
-window.showToast = (m, t) => App.showToast(m, t);
 window.loader = (s) => App.loader(s);
 
-// Launch
 document.addEventListener('DOMContentLoaded', () => App.init());
