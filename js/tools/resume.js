@@ -1,77 +1,220 @@
-/* --- RESUME BUILDER PRO STYLES --- */
+// ==========================================
+// 📄 RESUME BUILDER MODULE (FINAL FIXED)
+// ==========================================
 
-/* Input Layout */
-.input-group { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-.group-title { color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.ai-box { margin-bottom: 10px; }
+let resumeData = {
+    name: "", title: "", email: "", phone: "", address: "", website: "",
+    summary: "", company: "", dates: "", jobdesc: "", skills: "",
+    theme: "theme-blue"
+};
 
-/* Color Picker */
-.color-picker-row { display: flex; gap: 10px; margin-top: 10px; }
-.c-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: 0.2s; }
-.c-dot:hover { transform: scale(1.1); border-color: white; }
-.c-blue { background: linear-gradient(135deg, #2563eb, #06b6d4); }
-.c-green { background: linear-gradient(135deg, #10b981, #84cc16); }
-.c-purple { background: linear-gradient(135deg, #7c3aed, #d946ef); }
-.c-gold { background: linear-gradient(135deg, #d97706, #fbbf24); }
-.c-dark { background: linear-gradient(135deg, #1f2937, #4b5563); }
+// 1. Live Update Logic
+function updateResume() {
+    // Capture Inputs safely
+    resumeData.name = getValue('in-name');
+    resumeData.title = getValue('in-title');
+    resumeData.email = getValue('in-email');
+    resumeData.phone = getValue('in-phone');
+    resumeData.address = getValue('in-address');
+    resumeData.website = getValue('in-web');
+    resumeData.summary = getValue('in-summary');
+    resumeData.company = getValue('in-company');
+    resumeData.dates = getValue('in-dates');
+    resumeData.jobdesc = getValue('in-job-desc');
+    resumeData.skills = getValue('in-skills');
 
-/* === A4 RESUME PAPER DESIGN === */
-.resume-paper {
-    width: 210mm; min-height: 297mm; background: #fff; color: #333;
-    font-family: 'Outfit', sans-serif; /* Modern Font */
-    display: flex; flex-direction: column;
-    position: relative; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    renderResume();
 }
 
-/* Theme Variables (Default Blue) */
-.resume-paper.theme-blue { --accent: #2563eb; --accent-grad: linear-gradient(90deg, #2563eb, #06b6d4); }
-.resume-paper.theme-green { --accent: #059669; --accent-grad: linear-gradient(90deg, #059669, #84cc16); }
-.resume-paper.theme-purple { --accent: #7c3aed; --accent-grad: linear-gradient(90deg, #7c3aed, #d946ef); }
-.resume-paper.theme-gold { --accent: #d97706; --accent-grad: linear-gradient(90deg, #d97706, #fbbf24); }
-.resume-paper.theme-dark { --accent: #1f2937; --accent-grad: linear-gradient(90deg, #1f2937, #6b7280); }
-
-/* Header Design */
-.res-header {
-    background: #f8fafc; padding: 40px; border-bottom: 4px solid;
-    border-image: var(--accent-grad) 1;
-    display: flex; justify-content: space-between; align-items: center;
-}
-.res-header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; line-height: 1; color: #1e293b; text-transform: uppercase; }
-.accent-text { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 2px; margin-top: 5px; }
-
-.header-contact { display: flex; flex-direction: column; gap: 4px; text-align: right; font-size: 0.8rem; color: #64748b; }
-.header-contact i { color: var(--accent); margin-right: 5px; }
-
-/* Body Layout */
-.res-body { display: flex; flex: 1; padding: 30px 40px; gap: 30px; }
-.col-left { width: 35%; border-right: 1px solid #e2e8f0; padding-right: 20px; }
-.col-right { width: 65%; }
-
-/* Sections */
-.section-block { margin-bottom: 30px; }
-.section-title {
-    font-size: 0.85rem; font-weight: 700; color: #1e293b;
-    border-bottom: 2px solid var(--accent); display: inline-block;
-    padding-bottom: 3px; margin-bottom: 15px; letter-spacing: 1px;
+function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : "";
 }
 
-#res-summary { font-size: 0.9rem; line-height: 1.6; color: #475569; text-align: justify; }
+function renderResume() {
+    // Header
+    setText('res-name', resumeData.name || "YOUR NAME");
+    setText('res-title', resumeData.title || "PROFESSIONAL TITLE");
+    
+    // Contact Bar
+    const locationHTML = resumeData.address ? `<i class="ri-map-pin-line"></i> ${resumeData.address}` : '';
+    const phoneHTML = resumeData.phone ? `<i class="ri-phone-line"></i> ${resumeData.phone}` : '';
+    const emailHTML = resumeData.email ? `<i class="ri-mail-line"></i> ${resumeData.email}` : '';
+    const webHTML = resumeData.website ? `<i class="ri-global-line"></i> ${resumeData.website}` : '';
+    
+    const contactBar = document.querySelector('.header-contact');
+    if(contactBar) {
+        contactBar.innerHTML = `${locationHTML} ${phoneHTML} ${emailHTML} ${webHTML}`;
+    }
 
-/* Skills */
-.skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-.res-skill-tag {
-    background: #f1f5f9; color: #334155; padding: 4px 10px;
-    border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+    // Summary
+    setText('res-summary', resumeData.summary || "Your professional profile summary will appear here.");
+
+    // Experience
+    setText('res-company', resumeData.company || "Company Name");
+    setText('res-dates', resumeData.dates || "2020 - Present");
+    
+    const jobDescEl = document.getElementById('res-job-desc');
+    if(jobDescEl) {
+        jobDescEl.innerHTML = resumeData.jobdesc ? resumeData.jobdesc.replace(/\n/g, '<br>') : "• Describe your responsibilities here.";
+    }
+
+    // Skills
+    const skillsContainer = document.getElementById('res-skills');
+    if(skillsContainer) {
+        skillsContainer.innerHTML = '';
+        if(resumeData.skills) {
+            resumeData.skills.split(',').forEach(s => {
+                if(s.trim()) {
+                    const tag = document.createElement('span');
+                    tag.className = 'res-skill-tag';
+                    tag.innerText = s.trim();
+                    skillsContainer.appendChild(tag);
+                }
+            });
+        } else {
+            skillsContainer.innerHTML = '<span class="res-skill-tag">Skill 1</span><span class="res-skill-tag">Skill 2</span>';
+        }
+    }
 }
 
-/* Jobs */
-.job-item { margin-bottom: 20px; }
-.job-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-.job-head h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
-.job-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
-.job-desc { font-size: 0.9rem; color: #475569; line-height: 1.5; }
+function setText(id, val) {
+    const el = document.getElementById(id);
+    if(el) el.innerText = val;
+}
 
-/* Footer Gradient */
-.res-footer-bar { height: 10px; background: var(--accent-grad); margin-top: auto; }
+// 2. AI SUMMARY GENERATOR
+function generateAISummary() {
+    const title = getValue('in-title').toLowerCase();
+    const box = document.getElementById('in-summary');
+    
+    if(!title) {
+        if(typeof showToast === 'function') showToast("Enter Job Title first!", "error");
+        return;
+    }
+    
+    // Simple Logic-based AI
+    let aiText = "";
+    if(title.includes('developer') || title.includes('coder')) {
+        aiText = `Innovative ${title} with a passion for building scalable software solutions. Proficient in modern coding practices and dedicated to optimizing user experience.`;
+    } else if (title.includes('designer') || title.includes('artist')) {
+        aiText = `Visionary ${title} with a strong eye for aesthetics and user-centered design. Experienced in transforming complex concepts into intuitive designs.`;
+    } else if (title.includes('manager') || title.includes('lead')) {
+        aiText = `Results-oriented ${title} with extensive experience in leading teams and driving business growth. Skilled in strategic planning and fostering a collaborative culture.`;
+    } else {
+        aiText = `Dedicated ${title} with a strong work ethic and a commitment to excellence. Eager to leverage skills in a challenging environment.`;
+    }
+
+    // Typewriter Animation
+    box.value = "";
+    let i = 0;
+    function typeWriter() {
+        if (i < aiText.length) {
+            box.value += aiText.charAt(i);
+            i++;
+            setTimeout(typeWriter, 15);
+        } else {
+            updateResume();
+        }
+    }
+    typeWriter();
+}
+
+// 3. COLOR THEME
+function setThemeColor(themeName) {
+    const paper = document.getElementById('resume-preview');
+    if(!paper) return;
+    
+    // Remove old themes
+    paper.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-gold', 'theme-dark');
+    // Add new theme
+    paper.classList.add(`theme-${themeName}`);
+    resumeData.theme = `theme-${themeName}`;
+}
+
+// 4. JSON SAVE & LOAD
+function saveResumeJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resumeData));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `Resume_Data_${resumeData.name || 'Draft'}.json`);
+    document.body.appendChild(dlAnchorElem);
+    dlAnchorElem.click();
+    dlAnchorElem.remove();
+    if(typeof showToast === 'function') showToast("Data Saved!", "success");
+}
+
+function loadResumeJSON(input) {
+    const file = input.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            resumeData = JSON.parse(e.target.result);
+            // Fill fields
+            document.getElementById('in-name').value = resumeData.name || "";
+            document.getElementById('in-title').value = resumeData.title || "";
+            document.getElementById('in-email').value = resumeData.email || "";
+            document.getElementById('in-phone').value = resumeData.phone || "";
+            document.getElementById('in-address').value = resumeData.address || "";
+            document.getElementById('in-web').value = resumeData.website || "";
+            document.getElementById('in-summary').value = resumeData.summary || "";
+            document.getElementById('in-company').value = resumeData.company || "";
+            document.getElementById('in-dates').value = resumeData.dates || "";
+            document.getElementById('in-job-desc').value = resumeData.jobdesc || "";
+            document.getElementById('in-skills').value = resumeData.skills || "";
+            
+            if(resumeData.theme) setThemeColor(resumeData.theme.replace('theme-', ''));
+            
+            renderResume();
+            if(typeof showToast === 'function') showToast("Resume Loaded!", "success");
+        } catch(err) {
+            if(typeof showToast === 'function') showToast("Invalid JSON File", "error");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// 5. PDF DOWNLOAD (FIXED & IMPROVED)
+function downloadResumePDF() {
+    const element = document.getElementById('resume-preview');
+    
+    if (!element) {
+        if(typeof showToast === 'function') showToast("Error: Resume preview not found.", "error");
+        return;
+    }
+
+    // Check if library is loaded
+    if (typeof html2pdf === 'undefined') {
+        alert("Error: PDF Library is missing. Please check your internet connection.");
+        return;
+    }
+
+    if(typeof loader === 'function') loader(true); // Show Spinner
+
+    const safeName = (resumeData.name || 'My_Resume').replace(/[^a-z0-9]/gi, '_');
+
+    const opt = {
+        margin: 0,
+        filename: `${safeName}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 }, // High quality
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, // Crucial for images/icons
+            scrollY: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save()
+        .then(() => {
+            if(typeof loader === 'function') loader(false);
+            if(typeof showToast === 'function') showToast("Resume Downloaded Successfully!", "success");
+        })
+        .catch(err => {
+            console.error(err);
+            if(typeof loader === 'function') loader(false);
+            if(typeof showToast === 'function') showToast("Error generating PDF.", "error");
+        });
+}
