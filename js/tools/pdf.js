@@ -1,13 +1,13 @@
 // ==========================================
-// 📄 PDF TOOLS MODULE (TITANIUM UPGRADE)
+// 📄 PDF TOOLS MODULE (TITANIUM HD UPGRADE)
 // ==========================================
 
-// 1. PDF TO EXCEL (Smart Extraction with Progress)
+// 1. PDF TO EXCEL (Smart Semantic Extraction)
 window.convertPDFtoExcel = async () => {
     const input = document.getElementById('pdf-to-ex-input');
     if (!input || !input.files.length) return showToast("Please select a PDF file first.");
     
-    loader(true); // Show loader
+    loader(true); 
     
     try {
         const fileReader = new FileReader();
@@ -16,33 +16,39 @@ window.convertPDFtoExcel = async () => {
             const pdf = await pdfjsLib.getDocument(typedArray).promise;
             const wb = XLSX.utils.book_new();
             
-            // Loop through pages
             for (let i = 1; i <= pdf.numPages; i++) {
-                // Update Toast with Progress
-                showToast(`Processing Page ${i} of ${pdf.numPages}...`);
+                showToast(`Scanning Page ${i} of ${pdf.numPages}...`); // UX Update
                 
                 const page = await pdf.getPage(i);
                 const content = await page.getTextContent();
                 
-                // Group text items by Y-coordinate (Rows)
+                // --- SMART ROW GROUPING ALGORITHM ---
                 const rows = {};
+                const Y_TOLERANCE = 8; // Pixels tolerance for "same line" detection
+                
                 content.items.forEach(item => {
-                    // Round Y to nearest 10px to handle slight misalignments
-                    const y = Math.round(item.transform[5] / 10) * 10; 
-                    if (!rows[y]) rows[y] = [];
-                    rows[y].push({ x: item.transform[4], text: item.str });
+                    // Check if this item belongs to an existing row (within tolerance)
+                    let matchedY = Object.keys(rows).find(y => Math.abs(y - item.transform[5]) < Y_TOLERANCE);
+                    
+                    if (!matchedY) {
+                        matchedY = item.transform[5]; // Create new row ID
+                        rows[matchedY] = [];
+                    }
+                    rows[matchedY].push({ x: item.transform[4], text: item.str });
                 });
 
-                // Sort Rows (Top to Bottom)
-                // PDF coordinates: (0,0) is bottom-left, so higher Y is top.
-                const sortedY = Object.keys(rows).sort((a,b) => b - a);
+                // Sort Rows (Top -> Bottom)
+                const sortedY = Object.keys(rows).sort((a,b) => b - a); // PDF Y is inverted
                 
                 const sheetData = [];
                 sortedY.forEach(y => {
-                    // Sort Columns (Left to Right)
+                    // Sort Columns (Left -> Right)
                     const rowItems = rows[y].sort((a,b) => a.x - b.x);
-                    // Filter empty strings
-                    const rowText = rowItems.map(item => item.text).filter(t => t.trim() !== "");
+                    
+                    // Filter empty garbage
+                    const rowText = rowItems.map(item => item.text.trim()).filter(t => t !== "");
+                    
+                    // Only add if row has data
                     if(rowText.length > 0) sheetData.push(rowText);
                 });
 
@@ -52,38 +58,41 @@ window.convertPDFtoExcel = async () => {
                 }
             }
             
-            XLSX.writeFile(wb, "ToolMaster_Export.xlsx");
-            showToast("Excel Downloaded Successfully!");
+            XLSX.writeFile(wb, "ToolMaster_Data_Export.xlsx");
+            showToast("Excel Extracted Successfully!");
         };
         fileReader.readAsArrayBuffer(input.files[0]);
     } catch(e) { 
         console.error(e);
-        showToast("Error: Could not parse PDF structure."); 
+        showToast("Error: File is password protected or scanned."); 
     } finally { 
         loader(false); 
     }
 }
 
-// 2. JPG TO PDF (Auto-Orientation & Fit)
+// 2. JPG TO PDF (Ultra HD + Auto Rotate)
 window.convertJpgToPdf = () => {
     const input = document.getElementById('jpg-input');
     if (!input || !input.files.length) return showToast("Select images first.");
     
     loader(true);
     
-    // Create PDF (Default A4)
-    const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    // Initialize PDF
+    const doc = new window.jspdf.jsPDF({
+        orientation: 'p', 
+        unit: 'mm', 
+        format: 'a4',
+        compress: true // Enable compression for huge files
+    });
     
     let processedCount = 0;
     const files = Array.from(input.files);
 
     const processImage = (index) => {
         if (index >= files.length) {
-            doc.save('ToolMaster_Images.pdf');
+            doc.save(`Merged_Images_${new Date().getTime()}.pdf`);
             loader(false);
-            showToast("PDF Merged & Downloaded!");
+            showToast("HD PDF Created Successfully!");
             return;
         }
 
@@ -95,51 +104,59 @@ window.convertJpgToPdf = () => {
             img.src = e.target.result;
             
             img.onload = () => {
-                // Add new page if not the first one
                 if (index > 0) doc.addPage();
 
-                // Determine Orientation
+                // 1. Detect Orientation
                 const isLandscape = img.width > img.height;
-                
-                // Set orientation for current page
-                doc.setPage(index + 1); // Select current page
-                if (isLandscape) {
-                    doc.deletePage(index + 1); // Remove default portrait
-                    doc.addPage('a4', 'landscape'); // Add landscape
-                }
+                const pageWidth = doc.internal.pageSize.getWidth();  // 210mm
+                const pageHeight = doc.internal.pageSize.getHeight(); // 297mm
 
-                // Recalculate dimensions based on orientation
-                const currentW = isLandscape ? pageHeight : pageWidth; // Swap for landscape
+                // 2. Set Page Orientation to match Image
+                doc.setPage(index + 1);
+                if (isLandscape) {
+                    doc.deletePage(index + 1); 
+                    doc.addPage('a4', 'landscape');
+                }
+                
+                // 3. Current Page Dimensions
+                const currentW = isLandscape ? pageHeight : pageWidth;
                 const currentH = isLandscape ? pageWidth : pageHeight;
                 
-                // Margin 10mm
-                const margin = 10;
+                // 4. Calculate Margins & Fit
+                const margin = 10; // 10mm border
                 const maxW = currentW - (margin * 2);
                 const maxH = currentH - (margin * 2);
 
-                // Smart Fit Logic
-                const ratio = Math.min(maxW / img.width, maxH / img.height);
-                const printW = img.width * ratio;
-                const printH = img.height * ratio;
+                const imgRatio = img.width / img.height;
+                const pageRatio = maxW / maxH;
 
-                // Center Image
-                const x = (currentW - printW) / 2;
-                const y = (currentH - printH) / 2;
+                let finalW, finalH;
 
-                doc.addImage(img, 'JPEG', x, y, printW, printH, undefined, 'FAST');
+                if (imgRatio > pageRatio) {
+                    finalW = maxW;
+                    finalH = maxW / imgRatio;
+                } else {
+                    finalH = maxH;
+                    finalW = maxH * imgRatio;
+                }
+
+                // 5. Center the image
+                const x = (currentW - finalW) / 2;
+                const y = (currentH - finalH) / 2;
+
+                // 6. High Quality Render ('SLOW' algorithm is better quality)
+                doc.addImage(img, 'JPEG', x, y, finalW, finalH, undefined, 'SLOW');
                 
-                // Next
                 processImage(index + 1);
             };
         };
         reader.readAsDataURL(file);
     };
 
-    // Start Loop
     processImage(0);
 }
 
-// 3. PDF TO JPG (HD Rendering)
+// 3. PDF TO JPG (300 DPI Print Quality)
 window.convertPdfToJpg = async () => {
     const input = document.getElementById('pdf-jpg-input');
     const grid = document.getElementById('jpg-preview-grid');
@@ -147,7 +164,7 @@ window.convertPdfToJpg = async () => {
     if (!input || !input.files.length) return showToast("Select a PDF file.");
     
     loader(true);
-    grid.innerHTML = ''; // Clear previous results
+    grid.innerHTML = ''; 
 
     try {
         const fileReader = new FileReader();
@@ -156,10 +173,14 @@ window.convertPdfToJpg = async () => {
             const pdf = await pdfjsLib.getDocument(typedArray).promise;
             
             for (let i = 1; i <= pdf.numPages; i++) {
+                showToast(`Rendering Page ${i} (HD)...`);
+                
                 const page = await pdf.getPage(i);
                 
-                // Scale 2.0 = HD Quality (Crisp Text)
-                const viewport = page.getViewport({ scale: 2.0 });
+                // --- ULTRA HD UPGRADE ---
+                // Scale 3.0 = 300 DPI (Standard Print Resolution)
+                // Default is 1.0 (72 DPI - Blurry)
+                const viewport = page.getViewport({ scale: 3.0 });
                 
                 const canvas = document.createElement('canvas');
                 canvas.width = viewport.width;
@@ -170,27 +191,32 @@ window.convertPdfToJpg = async () => {
                     viewport: viewport 
                 }).promise;
                 
-                // Create Card UI
-                const imgData = canvas.toDataURL('image/jpeg', 0.9); // 90% Quality JPG
-                
-                const card = document.createElement('div');
-                card.className = 'img-card fade-in';
-                card.innerHTML = `
-                    <img src="${imgData}" alt="Page ${i}">
-                    <a href="${imgData}" download="Page_${i}.jpg" class="dl-btn">
-                        <i class="ri-download-line"></i> Download Page ${i}
-                    </a>
-                `;
-                grid.appendChild(card);
+                // Create Blob URL (Prevents browser crash on large images)
+                canvas.toBlob((blob) => {
+                    const imgUrl = URL.createObjectURL(blob);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'img-card fade-in';
+                    // We display a small preview but download the FULL HD file
+                    card.innerHTML = `
+                        <div style="height:200px; overflow:hidden; border-bottom:1px solid rgba(255,255,255,0.1)">
+                            <img src="${imgUrl}" style="width:100%; object-fit:contain;" alt="Page ${i}">
+                        </div>
+                        <a href="${imgUrl}" download="Page_${i}_HD.jpg" class="dl-btn">
+                            <i class="ri-download-line"></i> Download HD (Page ${i})
+                        </a>
+                    `;
+                    grid.appendChild(card);
+                }, 'image/jpeg', 1.0); // 1.0 = 100% Quality (No compression artifacts)
             }
             
             loader(false);
-            showToast(`Converted ${pdf.numPages} Pages to Images`);
+            showToast(`Ready! Converted ${pdf.numPages} Pages.`);
         };
         fileReader.readAsArrayBuffer(input.files[0]);
     } catch(e) {
         loader(false);
-        showToast("Error converting PDF");
+        showToast("Error: Ensure PDF is not password protected.");
         console.error(e);
     }
-}
+                             }
