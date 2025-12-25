@@ -1,54 +1,367 @@
-/* WORKSPACE UI */
-.tool-workspace { max-width: 1000px; margin: 0 auto; animation: fade 0.4s ease; }
-.ws-head { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+/* =========================================
+   TOOLMASTER TITANIUM - TOOLS STYLESHEET
+   ========================================= */
+
+/* --- 1. WORKSPACE CONTAINERS --- */
+.tool-workspace {
+    width: 100%;
+    max-width: 1200px; /* Wide for Resume/Excel */
+    margin: 0 auto;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ws-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+.ws-head h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(to right, #fff, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .back-pill {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    color: var(--text); padding: 8px 16px; border-radius: 50px; cursor: pointer; transition: 0.2s;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    display: flex; align-items: center; gap: 5px;
 }
-.back-pill:hover { background: var(--primary); border-color: var(--primary); }
+.back-pill:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
 
+/* --- 2. COMMON FORM ELEMENTS (GLASS STYLE) --- */
 .ws-body {
-    background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
     backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
+.ws-body.max-600 { max-width: 600px; margin: 0 auto; }
+
+/* Upload Zone */
 .upload-zone {
-    border: 2px dashed var(--border); border-radius: 16px; padding: 60px 20px;
-    text-align: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 50px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    background: rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+    position: relative; overflow: hidden;
 }
-.upload-zone:hover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
-.upload-zone i { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; display: block; }
+.upload-zone:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+}
+.upload-zone i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(99,102,241,0.5));
+}
+.upload-zone p { color: var(--text-muted); font-size: 1rem; }
 .upload-zone input { display: none; }
 
+/* Inputs & Selects */
 .glass-input {
-    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-    color: var(--text); padding: 12px 16px; border-radius: 10px; outline: none; transition: 0.2s;
-    margin-bottom: 15px; font-size: 1rem;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 18px;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.3s;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
 }
-.glass-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
+.glass-input:focus {
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+textarea.glass-input { resize: vertical; min-height: 100px; line-height: 1.6; }
 
+/* Buttons */
 .glow-btn {
-    width: 100%; padding: 14px; background: var(--primary); color: white;
-    border: none; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(99,102,241,0.3); transition: 0.3s; margin-top: 15px;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    transition: 0.3s;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
 }
-.glow-btn:hover { transform: scale(1.02); }
+.glow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+}
+.glow-btn.small { padding: 10px; font-size: 0.9rem; width: auto; display: inline-flex; align-items: center; gap: 8px; }
 
-/* RESUME BUILDER */
-.split-view { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
-.editor-panel { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
-.panel-actions { display: flex; gap: 10px; margin-bottom: 15px; }
-.small-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; }
-.small-btn:hover { background: var(--primary); }
+.small-btn {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.2s;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.small-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
 
-.preview-panel { background: #52525b; padding: 30px; border-radius: 16px; display: flex; justify-content: center; overflow: auto; max-height: 80vh; }
+/* Options Bar (Excel/PDF) */
+.options-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.options-bar .glass-input { margin-bottom: 0; }
+.toggle-label {
+    display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;
+    white-space: nowrap;
+}
+
+
+/* --- 3. RESUME BUILDER PRO (Split Layout) --- */
+.split-view {
+    display: grid;
+    grid-template-columns: 380px 1fr; /* Sidebar fixed, Preview flexible */
+    gap: 30px;
+    align-items: start;
+}
+
+/* Editor Panel (Left) */
+.editor-panel {
+    background: var(--card);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    position: sticky;
+    top: 20px;
+}
+.editor-panel::-webkit-scrollbar { width: 6px; }
+.editor-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.panel-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+.input-group { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.input-group:last-child { border-bottom: none; }
+
+.group-title {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ai-box { margin-bottom: 12px; }
+
+/* Color Picker Dots */
+.color-picker-row { display: flex; gap: 12px; margin-top: 10px; }
+.c-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; position: relative; }
+.c-dot:hover { transform: scale(1.15); border-color: white; }
+.c-blue { background: linear-gradient(135deg, #2563eb, #06b6d4); }
+.c-green { background: linear-gradient(135deg, #10b981, #84cc16); }
+.c-purple { background: linear-gradient(135deg, #7c3aed, #d946ef); }
+.c-gold { background: linear-gradient(135deg, #d97706, #fbbf24); }
+.c-dark { background: linear-gradient(135deg, #1f2937, #4b5563); }
+
+/* Preview Panel (Right) */
+.preview-panel {
+    background: #18181b; /* Dark bg to make paper pop */
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+}
+
+/* === A4 PAPER DESIGN === */
 .resume-paper {
-    width: 210mm; min-height: 297mm; background: white; color: #111; padding: 40px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5); font-family: 'Times New Roman', serif; text-align: left;
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    color: #333;
+    font-family: 'Outfit', sans-serif;
+    display: flex; flex-direction: column;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transform-origin: top center;
 }
 
-/* MAGIC ERASER */
-.compare-viewer { position: relative; width: 100%; height: 400px; margin-top: 20px; overflow: hidden; border-radius: 12px; }
-.img-back { width: 100%; height: 100%; object-fit: contain; position: absolute; }
-.img-front { width: 100%; height: 100%; object-fit: contain; position: absolute; clip-path: inset(0 50% 0 0); }
-.slider { position: absolute; bottom: 10px; left: 10%; width: 80%; z-index: 10; }
+/* Theme Variables */
+.resume-paper.theme-blue { --accent: #2563eb; --accent-grad: linear-gradient(90deg, #2563eb, #06b6d4); }
+.resume-paper.theme-green { --accent: #059669; --accent-grad: linear-gradient(90deg, #059669, #84cc16); }
+.resume-paper.theme-purple { --accent: #7c3aed; --accent-grad: linear-gradient(90deg, #7c3aed, #d946ef); }
+.resume-paper.theme-gold { --accent: #d97706; --accent-grad: linear-gradient(90deg, #d97706, #fbbf24); }
+.resume-paper.theme-dark { --accent: #1f2937; --accent-grad: linear-gradient(90deg, #1f2937, #6b7280); }
+
+/* Resume Header */
+.res-header {
+    background: #f8fafc;
+    padding: 40px 40px 30px 40px;
+    border-bottom: 5px solid;
+    border-image: var(--accent-grad) 1;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.header-content h1 { font-size: 2.4rem; font-weight: 800; line-height: 1; color: #1e293b; text-transform: uppercase; margin-bottom: 5px; }
+.accent-text { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+
+.header-contact { display: flex; flex-direction: column; gap: 5px; text-align: right; font-size: 0.85rem; color: #64748b; }
+.header-contact span { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.header-contact i { color: var(--accent); font-size: 1rem; }
+
+/* Resume Body */
+.res-body { display: flex; flex: 1; padding: 35px 40px; gap: 35px; }
+.col-left { width: 35%; border-right: 1px solid #e2e8f0; padding-right: 25px; }
+.col-right { width: 65%; }
+
+.section-block { margin-bottom: 35px; }
+.section-title {
+    font-size: 0.8rem; font-weight: 800; color: #1e293b;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block; padding-bottom: 4px; margin-bottom: 15px;
+    letter-spacing: 1px; text-transform: uppercase;
+}
+
+#res-summary { font-size: 0.95rem; line-height: 1.6; color: #475569; text-align: justify; }
+
+/* Contact List (Left Col) */
+.mini-contact-list { font-size: 0.9rem; color: #475569; display: flex; flex-direction: column; gap: 8px; }
+
+/* Skills Chips */
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.res-skill-tag {
+    background: #f1f5f9; color: #334155; padding: 5px 12px;
+    border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+}
+
+/* Work Experience */
+.job-item { margin-bottom: 25px; }
+.job-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.job-head h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+.job-date { font-size: 0.85rem; color: var(--accent); font-weight: 600; }
+.job-desc { font-size: 0.95rem; color: #475569; line-height: 1.55; }
+
+/* Footer */
+.res-footer-bar { height: 12px; background: var(--accent-grad); margin-top: auto; }
+
+
+/* --- 4. MAGIC ERASER & IMAGES --- */
+.compare-viewer {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    margin-top: 25px;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 20px 20px; /* Checkerboard */
+}
+.img-back { width: 100%; height: 100%; object-fit: contain; position: absolute; top:0; left:0; }
+.img-front { width: 100%; height: 100%; object-fit: contain; position: absolute; top:0; left:0; clip-path: inset(0 50% 0 0); }
+
+/* Custom Range Slider */
+.slider {
+    position: absolute; bottom: 15px; left: 10%; width: 80%;
+    -webkit-appearance: none; background: transparent; z-index: 10;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; height: 30px; width: 30px;
+    border-radius: 50%; background: var(--primary);
+    border: 3px solid white; cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    margin-top: -12px;
+}
+.slider::-webkit-slider-runnable-track {
+    width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px;
+}
+
+/* --- 5. EXCEL / PDF PREVIEWS --- */
+.preview-box {
+    margin-top: 20px;
+    max-height: 500px;
+    overflow: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    color: black;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+.preview-box table { width: 100%; border-collapse: collapse; }
+.preview-box th, .preview-box td { padding: 8px; border: 1px solid #ddd; font-size: 0.9rem; }
+
+
+/* --- 6. VOICE & UTILS --- */
+.big-area {
+    min-height: 200px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+.controls-row {
+    display: flex; gap: 15px; align-items: center; margin-top: 10px;
+}
+.controls-row select { flex: 2; }
+.controls-row input[type=range] { flex: 1; }
+
+.pass-display {
+    text-align: center; font-size: 2rem; font-family: monospace;
+    color: var(--primary); padding: 30px; border: 2px dashed var(--border);
+    border-radius: 12px; margin-bottom: 20px; word-break: break-all;
+}
+
+/* --- 7. MOBILE RESPONSIVENESS --- */
+@media (max-width: 900px) {
+    .split-view { grid-template-columns: 1fr; }
+    .editor-panel { position: static; max-height: none; }
+    .preview-panel { padding: 20px; }
+    
+    /* Scale down resume on mobile so it fits screen */
+    .resume-paper { transform: scale(0.5); transform-origin: top center; margin-bottom: -140mm; }
+    .preview-panel { overflow: hidden; height: 600px; }
+}
+
+@media (max-width: 600px) {
+    .ws-body { padding: 20px; }
+    .ws-head h2 { font-size: 1.2rem; }
+    .controls-row { flex-direction: column; }
+    .upload-zone { padding: 30px 15px; }
+    .options-bar { flex-direction: column; align-items: flex-start; }
+                          }
