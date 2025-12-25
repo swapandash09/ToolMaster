@@ -176,7 +176,7 @@ function loadResumeJSON(input) {
     reader.readAsText(file);
 }
 
-// 5. PDF DOWNLOAD (FIXED & IMPROVED)
+// 5. PDF DOWNLOAD (MOBILE FIX APPLIED)
 function downloadResumePDF() {
     const element = document.getElementById('resume-preview');
     
@@ -195,14 +195,16 @@ function downloadResumePDF() {
 
     const safeName = (resumeData.name || 'My_Resume').replace(/[^a-z0-9]/gi, '_');
 
+    // === CRITICAL FIX SETTINGS ===
     const opt = {
         margin: 0,
         filename: `${safeName}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 }, // High quality
+        image: { type: 'jpeg', quality: 0.98 }, 
         html2canvas: { 
-            scale: 2, 
-            useCORS: true, // Crucial for images/icons
-            scrollY: 0
+            scale: 2,           // High Definition
+            useCORS: true,      // Load Images
+            scrollY: 0,
+            windowWidth: 1200   // <--- THE MAGIC FIX: Forces Desktop Layout on Mobile
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
