@@ -1,0 +1,54 @@
+/* WORKSPACE UI */
+.tool-workspace { max-width: 1000px; margin: 0 auto; animation: fade 0.4s ease; }
+.ws-head { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+.back-pill {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 16px; border-radius: 50px; cursor: pointer; transition: 0.2s;
+}
+.back-pill:hover { background: var(--primary); border-color: var(--primary); }
+
+.ws-body {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px;
+    backdrop-filter: blur(20px);
+}
+
+.upload-zone {
+    border: 2px dashed var(--border); border-radius: 16px; padding: 60px 20px;
+    text-align: center; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2);
+}
+.upload-zone:hover { border-color: var(--primary); background: rgba(99,102,241,0.05); }
+.upload-zone i { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; display: block; }
+.upload-zone input { display: none; }
+
+.glass-input {
+    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    color: var(--text); padding: 12px 16px; border-radius: 10px; outline: none; transition: 0.2s;
+    margin-bottom: 15px; font-size: 1rem;
+}
+.glass-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
+
+.glow-btn {
+    width: 100%; padding: 14px; background: var(--primary); color: white;
+    border: none; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.3); transition: 0.3s; margin-top: 15px;
+}
+.glow-btn:hover { transform: scale(1.02); }
+
+/* RESUME BUILDER */
+.split-view { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.editor-panel { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
+.panel-actions { display: flex; gap: 10px; margin-bottom: 15px; }
+.small-btn { flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; }
+.small-btn:hover { background: var(--primary); }
+
+.preview-panel { background: #52525b; padding: 30px; border-radius: 16px; display: flex; justify-content: center; overflow: auto; max-height: 80vh; }
+.resume-paper {
+    width: 210mm; min-height: 297mm; background: white; color: #111; padding: 40px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5); font-family: 'Times New Roman', serif; text-align: left;
+}
+
+/* MAGIC ERASER */
+.compare-viewer { position: relative; width: 100%; height: 400px; margin-top: 20px; overflow: hidden; border-radius: 12px; }
+.img-back { width: 100%; height: 100%; object-fit: contain; position: absolute; }
+.img-front { width: 100%; height: 100%; object-fit: contain; position: absolute; clip-path: inset(0 50% 0 0); }
+.slider { position: absolute; bottom: 10px; left: 10%; width: 80%; z-index: 10; }
