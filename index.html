@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="ToolMaster AI V35.0 - Ultimate Web Suite. Features: Excel to PDF, Resume Maker, Magic Eraser, Text to Speech, and more. Privacy First.">
-    <title>ToolMaster AI - Apex V35.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolMaster AI - Titanium V36</title>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -18,301 +15,217 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tools.css">
 </head>
 <body>
 
-    <div class="mesh-background"></div>
+    <div class="ambient-glow"></div>
     <div id="toast-container"></div>
-    
     <div id="loading-overlay" class="hidden">
-        <div class="loader-content">
+        <div class="spinner-box">
             <div class="spinner"></div>
-            <p id="loading-text">AI Working...</p>
+            <p>AI Processing...</p>
         </div>
     </div>
 
-    <nav class="navbar">
-        <div class="container nav-inner">
-            <div class="brand" onclick="showHome()">
-                <div class="logo-icon"><i class="ri-sparkling-2-line"></i></div>
-                <span class="brand-name">ToolMaster<span class="dot">.ai</span></span>
+    <div class="app-layout">
+        
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-circle"><i class="ri-infinity-line"></i></div>
+                <span>ToolMaster</span>
             </div>
-            <div class="nav-links">
-                <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
-                    <i class="ri-moon-line" id="theme-icon"></i>
-                </button>
+            
+            <div class="nav-group">
+                <p class="nav-label">Main</p>
+                <ul class="nav-menu">
+                    <li class="active" onclick="showHome()"><i class="ri-dashboard-3-line"></i> Dashboard</li>
+                    <li onclick="toggleTheme()"><i class="ri-moon-clear-line" id="theme-icon"></i> Appearance</li>
+                </ul>
             </div>
-        </div>
-    </nav>
 
-    <main id="home-page" class="fade-in">
-        <header class="hero-section">
-            <div class="container">
-                <span class="badge-pill">✨ V35.0 Apex Release</span>
-                <h1 class="hero-title">Privacy First AI Suite <br> <span class="gradient-text">Local Processing</span></h1>
+            <div class="nav-group">
+                <p class="nav-label">Quick Access</p>
+                <ul class="nav-menu">
+                    <li onclick="openTool('resume-tool')"><i class="ri-user-star-line"></i> Resume Builder</li>
+                    <li onclick="openTool('excel-tool')"><i class="ri-file-excel-2-line"></i> Excel to PDF</li>
+                    <li onclick="openTool('bg-remover-tool')"><i class="ri-magic-line"></i> Magic Eraser</li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-badge">
+                    <i class="ri-vip-crown-2-fill"></i>
+                    <div>
+                        <p class="u-name">Titanium V36</p>
+                        <p class="u-role">Pro Suite</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <div id="home-page" class="fade-in">
+                <header class="glass-header">
+                    <div class="header-text">
+                        <h1>Hello, Creator 👋</h1>
+                        <p>What would you like to build today?</p>
+                    </div>
+                    <div class="search-glass">
+                        <i class="ri-search-2-line"></i>
+                        <input type="text" id="search-bar" placeholder="Search 12+ AI Tools..." onkeyup="filterTools()">
+                    </div>
+                </header>
+
+                <div class="grid-container" id="tools-grid">
+                    <div class="tool-card" onclick="openTool('excel-tool')">
+                        <div class="card-icon green-glow"><i class="ri-file-excel-2-fill"></i></div>
+                        <div class="card-meta"><h3>Excel to PDF</h3><p>Smart A4 Fitting</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('pdf-excel-tool')">
+                        <div class="card-icon orange-glow"><i class="ri-table-view"></i></div>
+                        <div class="card-meta"><h3>PDF to Excel</h3><p>Row Extraction</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('resume-tool')">
+                        <div class="card-icon blue-glow"><i class="ri-profile-fill"></i></div>
+                        <div class="card-meta"><h3>Resume AI</h3><p>Save & Load JSON</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+
+                    <div class="tool-card" onclick="openTool('bg-remover-tool')">
+                        <div class="card-icon purple-glow"><i class="ri-magic-fill"></i></div>
+                        <div class="card-meta"><h3>Magic Eraser</h3><p>Auto Remove BG</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('img-tool')">
+                        <div class="card-icon red-glow"><i class="ri-file-zip-fill"></i></div>
+                        <div class="card-meta"><h3>Compressor</h3><p>Reduce Size</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('photo-qr-tool')">
+                        <div class="card-icon dark-glow"><i class="ri-qr-code-fill"></i></div>
+                        <div class="card-meta"><h3>Photo to QR</h3><p>Cloud Link</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+
+                    <div class="tool-card" onclick="openTool('speech-tool')">
+                        <div class="card-icon pink-glow"><i class="ri-mic-fill"></i></div>
+                        <div class="card-meta"><h3>Voice Type</h3><p>Speech to Text</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('text-speech-tool')">
+                        <div class="card-icon cyan-glow"><i class="ri-robot-fill"></i></div>
+                        <div class="card-meta"><h3>AI Reader</h3><p>Text to Speech</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                    <div class="tool-card" onclick="openTool('pass-tool')">
+                        <div class="card-icon teal-glow"><i class="ri-shield-key-fill"></i></div>
+                        <div class="card-meta"><h3>Secure Gen</h3><p>Passwords</p></div>
+                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tool-container">
                 
-                <div class="smart-search-wrapper">
-                    <div class="search-box">
-                        <i class="ri-search-line search-icon"></i>
-                        <input type="text" id="search-bar" placeholder="Search tools (e.g. PDF, Speech, Remove BG)..." onkeyup="filterTools()" autocomplete="off">
+                <div id="excel-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Excel to PDF</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('excel-input').click()">
+                            <i class="ri-upload-cloud-2-line"></i><p>Click or Drag Excel File</p>
+                            <input type="file" id="excel-input" accept=".xlsx, .xls">
+                        </div>
+                        <div class="options-bar">
+                            <select id="pdf-orient" class="glass-input"><option value="auto">🤖 Auto Orientation</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select>
+                            <label class="toggle-label"><input type="checkbox" id="pdf-border" checked> Borders</label>
+                        </div>
+                        <button class="glow-btn" onclick="generateUltraHDPDF()">Convert to PDF</button>
+                        <div id="excel-preview-container" class="preview-box"></div>
                     </div>
                 </div>
-            </div>
-        </header>
 
-        <section class="container tool-grid-section">
-            <div class="grid" id="tools-grid">
-                
-                <div class="tool-card" onclick="openTool('excel-tool')">
-                    <div class="card-icon icon-excel"><i class="ri-file-excel-2-line"></i></div>
-                    <div class="card-info"><h3>Excel to PDF</h3><p>Smart A4 Fit & Borders.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('text-speech-tool')">
-                    <div class="card-icon icon-speaker"><i class="ri-volume-up-line"></i></div>
-                    <div class="card-info"><h3>Text to Speech</h3><p>AI Robot Voice Reader.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('bg-remover-tool')">
-                    <div class="card-icon icon-magic"><i class="ri-magic-line"></i></div>
-                    <div class="card-info"><h3>Magic Eraser</h3><p>Remove Background.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('resume-tool')">
-                    <div class="card-icon icon-resume"><i class="ri-profile-line"></i></div>
-                    <div class="card-info"><h3>Resume Maker</h3><p>Instant Professional CV.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('img-tool')">
-                    <div class="card-icon icon-zip"><i class="ri-file-zip-line"></i></div>
-                    <div class="card-info"><h3>Compressor</h3><p>Reduce Image Size.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('pdf-excel-tool')">
-                    <div class="card-icon icon-table"><i class="ri-table-line"></i></div>
-                    <div class="card-info"><h3>PDF to Excel</h3><p>Smart Row Extraction.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('speech-tool')">
-                    <div class="card-icon icon-mic"><i class="ri-mic-2-line"></i></div>
-                    <div class="card-info"><h3>Voice Type</h3><p>Dictate Notes (Eng/Hin).</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('pdf-jpg-tool')">
-                    <div class="card-icon icon-pdfimg"><i class="ri-image-2-line"></i></div>
-                    <div class="card-info"><h3>PDF to JPG</h3><p>Convert Pages to HD.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('jpg-pdf-tool')">
-                    <div class="card-icon icon-imgpdf"><i class="ri-file-pdf-line"></i></div>
-                    <div class="card-info"><h3>JPG to PDF</h3><p>Merge Images.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('photo-qr-tool')">
-                    <div class="card-icon icon-qr"><i class="ri-qr-code-line"></i></div>
-                    <div class="card-info"><h3>Photo to QR</h3><p>Cloud Link Gen.</p></div>
-                </div>
-
-                <div class="tool-card" onclick="openTool('pass-tool')">
-                    <div class="card-icon icon-key"><i class="ri-shield-key-line"></i></div>
-                    <div class="card-info"><h3>Secure Gen</h3><p>Safe Passwords.</p></div>
-                </div>
-
-            </div>
-        </section>
-    </main>
-
-    <div id="excel-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Excel to PDF</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel">
-                <div class="upload-box" onclick="document.getElementById('excel-input').click()"><i class="ri-file-excel-2-line"></i><p>Upload Excel</p><input type="file" id="excel-input" accept=".xlsx, .xls"></div>
-                <div class="control-group"><label>Orientation</label><select id="pdf-orient" class="custom-select"><option value="auto">🤖 AI Auto-Detect</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select></div>
-                <button class="action-btn" onclick="generateUltraHDPDF()">Download PDF (Smart Fit)</button>
-            </div>
-            <div class="main-panel">
-                <div id="export-container" class="preview-canvas"><div id="excel-preview-container" class="excel-content"><div class="empty-state">Preview will load here...</div></div></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="text-speech-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>AI Text Reader</h2></div>
-        <div class="center-panel bordered-dashboard" style="max-width: 700px;">
-            <textarea id="tts-input" class="speech-area" placeholder="Paste text here to listen (English, Hindi, etc)..."></textarea>
-            <div class="control-group mt-4" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; text-align:left;">
-                <div><label>Select Voice</label><select id="voice-select" class="custom-select"></select></div>
-                <div><label>Speed: <span id="rate-val">1x</span></label><input type="range" id="rate" min="0.5" max="2" value="1" step="0.1" oninput="document.getElementById('rate-val').innerText=this.value+'x'"></div>
-            </div>
-            <div class="action-row mt-4" style="display:flex; gap:15px; justify-content:center;">
-                <button class="action-btn" onclick="speakText()"><i class="ri-play-fill"></i> Play Audio</button>
-                <button class="action-btn secondary" onclick="stopSpeech()" style="background:#ef4444;"><i class="ri-stop-fill"></i> Stop</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="bg-remover-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Magic Eraser</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel">
-                <div class="upload-box" onclick="document.getElementById('bg-input').click()"><i class="ri-upload-cloud-2-line"></i><p>Upload Photo</p><input type="file" id="bg-input" accept="image/png, image/jpeg"></div>
-                <div class="control-group mt-4">
-                    <h4>Background</h4>
-                    <div class="color-grid">
-                        <button class="color-btn transparent active" onclick="changeBg('transparent')"></button>
-                        <button class="color-btn white" onclick="changeBg('#ffffff')"></button>
-                        <button class="color-btn black" onclick="changeBg('#000000')"></button>
-                        <input type="color" id="bg-color-picker" value="#007bff" oninput="changeBg(this.value)">
+                <div id="resume-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
+                    <div class="split-view">
+                        <div class="editor-panel">
+                            <div class="panel-actions">
+                                <button class="small-btn" onclick="saveResumeJSON()"><i class="ri-save-3-line"></i> Save Data</button>
+                                <button class="small-btn" onclick="document.getElementById('json-load').click()"><i class="ri-upload-2-line"></i> Load Data</button>
+                                <input type="file" id="json-load" accept=".json" style="display:none" onchange="loadResumeJSON(this)">
+                            </div>
+                            <input type="text" class="glass-input" placeholder="Full Name" id="in-name" oninput="updateResume()">
+                            <input type="text" class="glass-input" placeholder="Job Title" id="in-title" oninput="updateResume()">
+                            <input type="text" class="glass-input" placeholder="Phone" id="in-phone" oninput="updateResume()">
+                            <input type="text" class="glass-input" placeholder="Email" id="in-email" oninput="updateResume()">
+                            <textarea class="glass-input" rows="4" placeholder="Professional Summary..." id="in-summary" oninput="updateResume()"></textarea>
+                            <input type="text" class="glass-input" placeholder="Skills (comma separated)" id="in-skills" oninput="updateResume()">
+                            <button class="glow-btn" onclick="downloadResumePDF()">Download PDF</button>
+                        </div>
+                        <div class="preview-panel">
+                            <div id="resume-preview" class="resume-paper">
+                                <h1 id="res-name">Your Name</h1>
+                                <p id="res-title">Job Title</p>
+                                <hr>
+                                <div id="res-contact"></div>
+                                <h4>Profile</h4>
+                                <p id="res-summary">...</p>
+                                <h4>Skills</h4>
+                                <div id="res-skills" class="tags-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="action-btn" id="dl-bg-btn" disabled>Download HD PNG</button>
-            </div>
-            <div class="main-panel">
-                <div id="bg-processing" class="hidden state-msg"><div class="spinner"></div><p>AI Removing Background...</p></div>
-                <div id="bg-empty-state" class="empty-state"><i class="ri-magic-fill" style="font-size:3rem; opacity:0.3;"></i><p>Upload Image</p></div>
-                <div id="compare-container" class="compare-container hidden">
-                    <div class="img-layer base-layer" id="bg-result-layer"><img id="bg-result-img" src=""></div>
-                    <div class="img-layer overlay-layer" id="bg-overlay-layer"><img id="bg-original-img" src=""></div>
-                    <div class="slider-handle" id="slider-handle"><div class="handle-line"></div><div class="handle-circle"><i class="ri-arrow-left-right-line"></i></div></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div id="resume-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Resume Builder</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel" style="max-height: 80vh; overflow-y: auto;">
-                <h4>Details</h4>
-                <input type="text" class="custom-input" placeholder="Full Name" oninput="updateResume('name', this.value)">
-                <input type="text" class="custom-input" placeholder="Job Title" oninput="updateResume('title', this.value)">
-                <input type="text" class="custom-input" placeholder="Phone" oninput="updateResume('phone', this.value)">
-                <input type="text" class="custom-input" placeholder="Email" oninput="updateResume('email', this.value)">
-                <h4 class="mt-4">Summary</h4>
-                <textarea class="custom-input" rows="3" placeholder="Summary..." oninput="updateResume('summary', this.value)"></textarea>
-                <h4 class="mt-4">Skills (Comma separated)</h4>
-                <input type="text" class="custom-input" placeholder="HTML, CSS, JS..." oninput="updateResume('skills', this.value)">
-                <button class="action-btn mt-4" onclick="downloadResumePDF()">Download Resume PDF</button>
-            </div>
-            <div class="main-panel" style="background: #333; display: flex; justify-content: center; padding: 20px; overflow: auto;">
-                <div id="resume-preview" class="resume-a4">
-                    <div class="res-header"><h1 id="res-name">Your Name</h1><p id="res-title">Professional Title</p></div>
-                    <div class="res-body">
-                        <div class="res-section"><div class="res-contact"><span id="res-phone">+91 0000000000</span> | <span id="res-email">email@example.com</span></div></div>
-                        <div class="res-section"><h3>Profile</h3><p id="res-summary">Your professional summary...</p></div>
-                        <div class="res-section"><h3>Skills</h3><div id="res-skills" class="skills-grid"></div></div>
+                <div id="bg-remover-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('bg-input').click()">
+                            <i class="ri-image-add-line"></i><p>Upload Photo</p>
+                            <input type="file" id="bg-input" accept="image/*">
+                        </div>
+                        <div id="compare-container" class="compare-viewer hidden">
+                            <img id="bg-result-img" class="img-back">
+                            <img id="bg-original-img" class="img-front">
+                            <input type="range" min="0" max="100" value="50" class="slider" oninput="slideCompare(this.value)">
+                        </div>
+                        <button class="glow-btn hidden" id="dl-bg-btn">Download PNG</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div id="img-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Compressor</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel">
-                <div class="upload-box" onclick="document.getElementById('img-input').click()"><i class="ri-image-edit-line"></i><p>Upload Image</p><input type="file" id="img-input" accept="image/*"></div>
-                <div class="control-group"><label>Quality: <span id="q-val">80%</span></label><input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.8" oninput="liveCompress()"></div>
-                <button class="action-btn" id="dl-img-btn" disabled>Download Compressed</button>
-            </div>
-            <div class="main-panel">
-                <div class="image-compare">
-                    <div class="img-container"><span class="label">Original: <b id="orig-size-display">0 KB</b></span><img id="orig-prev" src=""></div>
-                    <div class="img-container result"><span class="label highlight">Result: <b id="comp-size-display">0 KB</b></span><img id="comp-prev" src=""></div>
+                <div id="text-speech-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Text Reader</h2></div>
+                    <div class="ws-body max-600">
+                        <textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea>
+                        <div class="controls-row">
+                            <select id="voice-select" class="glass-input"></select>
+                            <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+                        </div>
+                        <button class="glow-btn" onclick="speakText()">Speak</button>
+                    </div>
                 </div>
+
+                <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract</button></div></div>
+                 <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('img-input').click()"><p>Upload Image</p><input type="file" id="img-input" accept="image/*"></div><input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8"><button class="glow-btn" onclick="liveCompress()">Compress</button><div class="flex-preview"><img id="comp-prev" style="max-width:100%"></div></div></div>
+                 <div id="photo-qr-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Photo QR</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('qr-img-input').click()"><p>Upload</p><input type="file" id="qr-img-input"></div><button class="glow-btn" id="gen-qr-btn">Generate</button><div id="qrcode" style="margin-top:20px; background:white; padding:10px; display:inline-block"></div></div></div>
+                 <div id="speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Voice Type</h2></div><div class="ws-body"><select id="speech-lang" class="glass-input"><option value="en-US">English</option></select><button class="glow-btn" onclick="toggleSpeech()">Start Mic</button><textarea id="speech-output" class="glass-input big-area"></textarea></div></div>
+                 <div id="pass-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Secure Gen</h2></div><div class="ws-body"><h2 id="generated-pass" style="word-break:break-all">...</h2><input type="range" id="pass-len" min="8" max="32" value="12"><button class="glow-btn" onclick="generatePass()">Generate</button></div></div>
+
             </div>
-        </div>
+        </main>
     </div>
 
-    <div id="pdf-excel-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>PDF to Excel</h2></div>
-        <div class="center-panel bordered-dashboard">
-            <div class="upload-box large" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Drop PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div>
-            <button class="action-btn mt-4" onclick="convertPDFtoExcel()">Extract & Download</button>
-        </div>
-    </div>
-
-    <div id="speech-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Voice Typer</h2></div>
-        <div class="center-panel bordered-dashboard" style="max-width: 800px;">
-            <div class="speech-controls">
-                <select id="speech-lang" class="custom-select" style="width: auto;">
-                    <option value="en-US">English (US)</option><option value="en-IN">English (India)</option><option value="hi-IN">Hindi (India)</option>
-                </select>
-                <button id="mic-btn" class="mic-btn" onclick="toggleSpeech()"><i class="ri-mic-line"></i></button>
-                <span id="mic-status">Click Mic</span>
-            </div>
-            <textarea id="speech-output" class="speech-area" placeholder="Start speaking..."></textarea>
-            <div class="action-row mt-4" style="display:flex; gap:10px; justify-content:center;">
-                <button class="action-btn" onclick="copySpeech()">Copy</button><button class="action-btn" onclick="saveTextAsDoc()">Download</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pdf-jpg-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>PDF to JPG</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel">
-                <div class="upload-box" onclick="document.getElementById('pdf-jpg-input').click()"><i class="ri-pages-line"></i><p>Select PDF</p><input type="file" id="pdf-jpg-input" accept=".pdf"></div>
-                <button class="action-btn" onclick="convertPdfToJpg()">Convert All Pages</button>
-            </div>
-            <div class="main-panel"><div id="jpg-preview-grid" class="image-grid-preview"><div class="empty-state">Pages will appear here</div></div></div>
-        </div>
-    </div>
-
-    <div id="jpg-pdf-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>JPG to PDF</h2></div>
-        <div class="center-panel bordered-dashboard">
-            <div class="upload-box large" onclick="document.getElementById('jpg-input').click()"><i class="ri-gallery-upload-fill"></i><p>Select Multiple Images</p><input type="file" id="jpg-input" multiple accept="image/*"></div>
-            <button class="action-btn mt-4" onclick="convertJpgToPdf()">Merge & Download PDF</button>
-        </div>
-    </div>
-
-    <div id="photo-qr-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Photo to QR</h2></div>
-        <div class="split-layout">
-            <div class="sidebar-panel">
-                <div class="upload-box" onclick="document.getElementById('qr-img-input').click()"><i class="ri-share-forward-2-line"></i><p>Upload Photo</p><input type="file" id="qr-img-input" accept="image/*"></div>
-                <button class="action-btn" id="gen-qr-btn" disabled>Generate Link</button>
-            </div>
-            <div class="main-panel center-panel">
-                <div id="qr-loading" class="hidden state-msg"><div class="spinner"></div><p>Uploading...</p></div>
-                <div id="qr-result-box" class="hidden text-center">
-                    <div id="qrcode" style="display:inline-block; padding:15px; background:white; border-radius:10px; margin-bottom:15px;"></div>
-                    <div style="display:flex; gap:10px;"><input type="text" id="img-share-link" class="custom-select" readonly><button class="action-btn" style="width:auto; margin:0;" onclick="copyLink()">Copy</button></div>
-                </div>
-                <div id="qr-empty" class="empty-state"><p>QR Code will appear here</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="pass-tool" class="tool-workspace hidden container">
-        <div class="workspace-header"><button class="back-btn" onclick="showHome()">← Dashboard</button><h2>Secure Gen</h2></div>
-        <div class="center-panel bordered-dashboard">
-            <div class="pass-display" id="generated-pass" onclick="copyPass()">CLICK GENERATE</div>
-            <div class="control-group" style="max-width:400px; margin:20px auto;"><label>Length: <span id="len-val">16</span></label><input type="range" id="pass-len" min="8" max="64" value="16" oninput="document.getElementById('len-val').innerText=this.value"></div>
-            <button class="action-btn" onclick="generatePass()">Generate Key</button>
-        </div>
-    </div>
-
-    <div id="privacy-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closePrivacy()">&times;</span>
-            <h2>Privacy & Security</h2>
-            <p>Your privacy is our priority. All image processing happens locally.</p>
-            <button class="action-btn mt-2" onclick="closePrivacy()">Close</button>
-        </div>
-    </div>
-
-    <footer>
-        <div class="container footer-content">
-            <div class="footer-left"><h4>ToolMaster.ai</h4><p>Version 35.0 (Apex)</p></div>
-            <div class="footer-bottom"><p>Developed by <b>Swapan</b> • <a href="#" onclick="document.getElementById('privacy-modal').classList.remove('hidden')">Privacy</a></p></div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/tools/excel.js"></script>
+    <script src="js/tools/resume.js"></script>
+    <script src="js/tools/image.js"></script>
+    <script src="js/tools/pdf.js"></script>
+    <script src="js/tools/voice.js"></script>
+    <script src="js/tools/security.js"></script>
 </body>
 </html>
