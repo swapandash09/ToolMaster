@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToolMaster AI - Titanium V36</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ToolMaster Titanium - AI Suite</title>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,200 +24,174 @@
 
     <div class="ambient-glow"></div>
     <div id="toast-container"></div>
+    
     <div id="loading-overlay" class="hidden">
-        <div class="spinner-box">
-            <div class="spinner"></div>
-            <p>AI Processing...</p>
+        <div class="loader-box">
+            <div class="loader-circle"></div>
+            <p>Processing...</p>
         </div>
     </div>
 
-    <div class="app-layout">
+    <div class="app-container">
         
-        <aside class="sidebar">
-            <div class="brand">
-                <div class="logo-circle"><i class="ri-infinity-line"></i></div>
-                <span>ToolMaster</span>
+        <aside class="desktop-sidebar">
+            <div class="brand-area">
+                <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
+                <span class="brand-text">ToolMaster</span>
             </div>
             
-            <div class="nav-group">
-                <p class="nav-label">Main</p>
-                <ul class="nav-menu">
-                    <li class="active" onclick="showHome()"><i class="ri-dashboard-3-line"></i> Dashboard</li>
-                    <li onclick="toggleTheme()"><i class="ri-moon-clear-line" id="theme-icon"></i> Appearance</li>
+            <nav class="side-nav">
+                <p class="menu-label">Menu</p>
+                <ul>
+                    <li class="active" onclick="showHome()"><i class="ri-home-5-line"></i> Dashboard</li>
+                    <li onclick="toggleTheme()"><i class="ri-contrast-drop-2-line"></i> Appearance</li>
                 </ul>
-            </div>
 
-            <div class="nav-group">
-                <p class="nav-label">Quick Access</p>
-                <ul class="nav-menu">
-                    <li onclick="openTool('resume-tool')"><i class="ri-user-star-line"></i> Resume Builder</li>
-                    <li onclick="openTool('excel-tool')"><i class="ri-file-excel-2-line"></i> Excel to PDF</li>
-                    <li onclick="openTool('bg-remover-tool')"><i class="ri-magic-line"></i> Magic Eraser</li>
+                <p class="menu-label mt-4">Favorites</p>
+                <ul>
+                    <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume AI</li>
+                    <li onclick="openTool('bg-remover-tool')"><i class="ri-eraser-line"></i> Eraser</li>
+                    <li onclick="openTool('excel-tool')"><i class="ri-file-excel-line"></i> Excel PDF</li>
                 </ul>
-            </div>
+            </nav>
 
-            <div class="sidebar-footer">
-                <div class="user-badge">
-                    <i class="ri-vip-crown-2-fill"></i>
+            <div class="sidebar-bottom">
+                <div class="pro-card">
+                    <i class="ri-vip-diamond-line"></i>
                     <div>
-                        <p class="u-name">Titanium V36</p>
-                        <p class="u-role">Pro Suite</p>
+                        <h4>Titanium</h4>
+                        <p>v36.0 Pro</p>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <main class="main-content">
+        <main class="content-area">
             
-            <div id="home-page" class="fade-in">
-                <header class="glass-header">
-                    <div class="header-text">
-                        <h1>Hello, Creator 👋</h1>
-                        <p>What would you like to build today?</p>
+            <div class="mobile-header">
+                <div class="mh-left">
+                    <div class="logo-icon small"><i class="ri-flashlight-fill"></i></div>
+                    <span class="brand-text">ToolMaster</span>
+                </div>
+                <button class="icon-btn-simple" onclick="toggleTheme()"><i class="ri-contrast-drop-2-line"></i></button>
+            </div>
+
+            <div id="home-page" class="view-section fade-in">
+                
+                <header class="dash-hero">
+                    <div class="hero-content">
+                        <h1>Hello, Creator <span class="wave">👋</span></h1>
+                        <p>Select a tool to boost your productivity.</p>
                     </div>
-                    <div class="search-glass">
-                        <i class="ri-search-2-line"></i>
-                        <input type="text" id="search-bar" placeholder="Search 12+ AI Tools..." onkeyup="filterTools()">
+                    <div class="search-wrapper">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="search-bar" placeholder="Search tools (e.g. PDF, Resume)..." onkeyup="filterTools()">
                     </div>
                 </header>
 
-                <div class="grid-container" id="tools-grid">
-                    <div class="tool-card" onclick="openTool('excel-tool')">
-                        <div class="card-icon green-glow"><i class="ri-file-excel-2-fill"></i></div>
-                        <div class="card-meta"><h3>Excel to PDF</h3><p>Smart A4 Fitting</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
-                    <div class="tool-card" onclick="openTool('pdf-excel-tool')">
-                        <div class="card-icon orange-glow"><i class="ri-table-view"></i></div>
-                        <div class="card-meta"><h3>PDF to Excel</h3><p>Row Extraction</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
-                    <div class="tool-card" onclick="openTool('resume-tool')">
-                        <div class="card-icon blue-glow"><i class="ri-profile-fill"></i></div>
-                        <div class="card-meta"><h3>Resume AI</h3><p>Save & Load JSON</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
-
-                    <div class="tool-card" onclick="openTool('bg-remover-tool')">
-                        <div class="card-icon purple-glow"><i class="ri-magic-fill"></i></div>
-                        <div class="card-meta"><h3>Magic Eraser</h3><p>Auto Remove BG</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
-                    <div class="tool-card" onclick="openTool('img-tool')">
-                        <div class="card-icon red-glow"><i class="ri-file-zip-fill"></i></div>
-                        <div class="card-meta"><h3>Compressor</h3><p>Reduce Size</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
-                    <div class="tool-card" onclick="openTool('photo-qr-tool')">
-                        <div class="card-icon dark-glow"><i class="ri-qr-code-fill"></i></div>
-                        <div class="card-meta"><h3>Photo to QR</h3><p>Cloud Link</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                <div class="tools-wrapper">
+                    
+                    <div class="category-block">
+                        <h3 class="cat-title">📄 Documents</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="openTool('resume-tool')">
+                                <div class="tc-icon c-blue"><i class="ri-article-line"></i></div>
+                                <div class="tc-info"><h4>Resume</h4><p>Builder</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('excel-tool')">
+                                <div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div>
+                                <div class="tc-info"><h4>Excel</h4><p>To PDF</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('pdf-excel-tool')">
+                                <div class="tc-icon c-orange"><i class="ri-file-text-line"></i></div>
+                                <div class="tc-info"><h4>PDF</h4><p>To Excel</p></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="tool-card" onclick="openTool('speech-tool')">
-                        <div class="card-icon pink-glow"><i class="ri-mic-fill"></i></div>
-                        <div class="card-meta"><h3>Voice Type</h3><p>Speech to Text</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+                    <div class="category-block">
+                        <h3 class="cat-title">🖼️ Images</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="openTool('bg-remover-tool')">
+                                <div class="tc-icon c-purple"><i class="ri-magic-line"></i></div>
+                                <div class="tc-info"><h4>Eraser</h4><p>Remove BG</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('img-tool')">
+                                <div class="tc-icon c-red"><i class="ri-file-zip-line"></i></div>
+                                <div class="tc-info"><h4>Compress</h4><p>Reduce Size</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('photo-qr-tool')">
+                                <div class="tc-icon c-dark"><i class="ri-qr-code-line"></i></div>
+                                <div class="tc-info"><h4>QR Gen</h4><p>Make Link</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('jpg-pdf-tool')">
+                                <div class="tc-icon c-pink"><i class="ri-images-line"></i></div>
+                                <div class="tc-info"><h4>Merge</h4><p>JPG to PDF</p></div>
+                            </div>
+                             <div class="t-card" onclick="openTool('pdf-jpg-tool')">
+                                <div class="tc-icon c-cyan"><i class="ri-image-line"></i></div>
+                                <div class="tc-info"><h4>Pages</h4><p>PDF to JPG</p></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="tool-card" onclick="openTool('text-speech-tool')">
-                        <div class="card-icon cyan-glow"><i class="ri-robot-fill"></i></div>
-                        <div class="card-meta"><h3>AI Reader</h3><p>Text to Speech</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
+
+                    <div class="category-block">
+                        <h3 class="cat-title">🤖 AI Tools</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="openTool('speech-tool')">
+                                <div class="tc-icon c-teal"><i class="ri-mic-line"></i></div>
+                                <div class="tc-info"><h4>Dictate</h4><p>Speech 2 Text</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('text-speech-tool')">
+                                <div class="tc-icon c-yellow"><i class="ri-volume-up-line"></i></div>
+                                <div class="tc-info"><h4>Reader</h4><p>Text 2 Speech</p></div>
+                            </div>
+                            <div class="t-card" onclick="openTool('pass-tool')">
+                                <div class="tc-icon c-lime"><i class="ri-key-2-line"></i></div>
+                                <div class="tc-info"><h4>Security</h4><p>Pass Gen</p></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="tool-card" onclick="openTool('pass-tool')">
-                        <div class="card-icon teal-glow"><i class="ri-shield-key-fill"></i></div>
-                        <div class="card-meta"><h3>Secure Gen</h3><p>Passwords</p></div>
-                        <button class="icon-btn"><i class="ri-arrow-right-up-line"></i></button>
-                    </div>
+
                 </div>
+                
+                <div style="height: 80px;" class="mobile-only"></div>
             </div>
 
             <div id="tool-container">
-                
                 <div id="excel-tool" class="tool-workspace hidden">
                     <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Excel to PDF</h2></div>
                     <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('excel-input').click()">
-                            <i class="ri-upload-cloud-2-line"></i><p>Click or Drag Excel File</p>
-                            <input type="file" id="excel-input" accept=".xlsx, .xls">
-                        </div>
-                        <div class="options-bar">
-                            <select id="pdf-orient" class="glass-input"><option value="auto">🤖 Auto Orientation</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select>
-                            <label class="toggle-label"><input type="checkbox" id="pdf-border" checked> Borders</label>
-                        </div>
-                        <button class="glow-btn" onclick="generateUltraHDPDF()">Convert to PDF</button>
-                        <div id="excel-preview-container" class="preview-box"></div>
+                        <div class="upload-zone" onclick="document.getElementById('excel-input').click()"><i class="ri-upload-cloud-2-line"></i><p>Upload Excel</p><input type="file" id="excel-input" accept=".xlsx"></div>
+                        <div class="options-bar"><select id="pdf-orient" class="glass-input"><option value="auto">Auto Orient</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select> <label><input type="checkbox" id="pdf-border" checked> Borders</label></div>
+                        <button class="glow-btn" onclick="generateUltraHDPDF()">Convert</button><div id="excel-preview-container" class="preview-box"></div>
                     </div>
                 </div>
 
-                <div id="resume-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
-                    <div class="split-view">
-                        <div class="editor-panel">
-                            <div class="panel-actions">
-                                <button class="small-btn" onclick="saveResumeJSON()"><i class="ri-save-3-line"></i> Save Data</button>
-                                <button class="small-btn" onclick="document.getElementById('json-load').click()"><i class="ri-upload-2-line"></i> Load Data</button>
-                                <input type="file" id="json-load" accept=".json" style="display:none" onchange="loadResumeJSON(this)">
-                            </div>
-                            <input type="text" class="glass-input" placeholder="Full Name" id="in-name" oninput="updateResume()">
-                            <input type="text" class="glass-input" placeholder="Job Title" id="in-title" oninput="updateResume()">
-                            <input type="text" class="glass-input" placeholder="Phone" id="in-phone" oninput="updateResume()">
-                            <input type="text" class="glass-input" placeholder="Email" id="in-email" oninput="updateResume()">
-                            <textarea class="glass-input" rows="4" placeholder="Professional Summary..." id="in-summary" oninput="updateResume()"></textarea>
-                            <input type="text" class="glass-input" placeholder="Skills (comma separated)" id="in-skills" oninput="updateResume()">
-                            <button class="glow-btn" onclick="downloadResumePDF()">Download PDF</button>
-                        </div>
-                        <div class="preview-panel">
-                            <div id="resume-preview" class="resume-paper">
-                                <h1 id="res-name">Your Name</h1>
-                                <p id="res-title">Job Title</p>
-                                <hr>
-                                <div id="res-contact"></div>
-                                <h4>Profile</h4>
-                                <p id="res-summary">...</p>
-                                <h4>Skills</h4>
-                                <div id="res-skills" class="tags-container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="resume-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume AI</h2></div><div class="split-view"><div class="editor-panel"><div class="panel-actions"><button class="small-btn" onclick="saveResumeJSON()">Save</button><button class="small-btn" onclick="document.getElementById('json-load').click()">Load</button><input type="file" id="json-load" style="display:none" onchange="loadResumeJSON(this)"></div><input type="text" class="glass-input" id="in-name" placeholder="Name" oninput="updateResume()"><input type="text" class="glass-input" id="in-title" placeholder="Job Title" oninput="updateResume()"><input type="text" class="glass-input" id="in-phone" placeholder="Phone" oninput="updateResume()"><input type="text" class="glass-input" id="in-email" placeholder="Email" oninput="updateResume()"><textarea class="glass-input" id="in-summary" placeholder="Summary" oninput="updateResume()"></textarea><input type="text" class="glass-input" id="in-skills" placeholder="Skills" oninput="updateResume()"><button class="glow-btn" onclick="downloadResumePDF()">Download PDF</button></div><div class="preview-panel"><div id="resume-preview" class="resume-paper"><h1 id="res-name">Name</h1><p id="res-title">Title</p><hr><div id="res-contact"></div><h4>Profile</h4><p id="res-summary"></p><h4>Skills</h4><div id="res-skills"></div></div></div></div></div>
 
-                <div id="bg-remover-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('bg-input').click()">
-                            <i class="ri-image-add-line"></i><p>Upload Photo</p>
-                            <input type="file" id="bg-input" accept="image/*">
-                        </div>
-                        <div id="compare-container" class="compare-viewer hidden">
-                            <img id="bg-result-img" class="img-back">
-                            <img id="bg-original-img" class="img-front">
-                            <input type="range" min="0" max="100" value="50" class="slider" oninput="slideCompare(this.value)">
-                        </div>
-                        <button class="glow-btn hidden" id="dl-bg-btn">Download PNG</button>
-                    </div>
-                </div>
-
-                <div id="text-speech-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Text Reader</h2></div>
-                    <div class="ws-body max-600">
-                        <textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea>
-                        <div class="controls-row">
-                            <select id="voice-select" class="glass-input"></select>
-                            <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
-                        </div>
-                        <button class="glow-btn" onclick="speakText()">Speak</button>
-                    </div>
-                </div>
+                <div id="bg-remover-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('bg-input').click()"><p>Upload Photo</p><input type="file" id="bg-input"></div><div id="compare-container" class="compare-viewer hidden"><img id="bg-result-img" class="img-back"><img id="bg-original-img" class="img-front"><input type="range" class="slider" oninput="slideCompare(this.value)"></div><button class="glow-btn hidden" id="dl-bg-btn">Download</button></div></div>
+                
+                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body"><textarea id="tts-input" class="glass-input big-area" placeholder="Type text..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
 
                 <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract</button></div></div>
                  <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('img-input').click()"><p>Upload Image</p><input type="file" id="img-input" accept="image/*"></div><input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8"><button class="glow-btn" onclick="liveCompress()">Compress</button><div class="flex-preview"><img id="comp-prev" style="max-width:100%"></div></div></div>
                  <div id="photo-qr-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Photo QR</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('qr-img-input').click()"><p>Upload</p><input type="file" id="qr-img-input"></div><button class="glow-btn" id="gen-qr-btn">Generate</button><div id="qrcode" style="margin-top:20px; background:white; padding:10px; display:inline-block"></div></div></div>
                  <div id="speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Voice Type</h2></div><div class="ws-body"><select id="speech-lang" class="glass-input"><option value="en-US">English</option></select><button class="glow-btn" onclick="toggleSpeech()">Start Mic</button><textarea id="speech-output" class="glass-input big-area"></textarea></div></div>
                  <div id="pass-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Secure Gen</h2></div><div class="ws-body"><h2 id="generated-pass" style="word-break:break-all">...</h2><input type="range" id="pass-len" min="8" max="32" value="12"><button class="glow-btn" onclick="generatePass()">Generate</button></div></div>
-
+                 <div id="jpg-pdf-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>JPG to PDF</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('jpg-input').click()"><p>Select Images</p><input type="file" id="jpg-input" multiple accept="image/*"></div><button class="glow-btn" onclick="convertJpgToPdf()">Merge PDF</button></div></div>
+                 <div id="pdf-jpg-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to JPG</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-jpg-input').click()"><p>Select PDF</p><input type="file" id="pdf-jpg-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPdfToJpg()">Convert</button></div></div>
             </div>
+
         </main>
+        
+        <nav class="mobile-nav">
+            <a href="#" onclick="showHome()" class="nav-item active"><i class="ri-home-5-line"></i></a>
+            <a href="#" onclick="document.getElementById('search-bar').focus()" class="nav-item"><i class="ri-search-line"></i></a>
+            <div class="nav-fab" onclick="openTool('resume-tool')"><i class="ri-add-line"></i></div> <a href="#" onclick="openTool('bg-remover-tool')" class="nav-item"><i class="ri-magic-line"></i></a>
+            <a href="#" onclick="toggleTheme()" class="nav-item"><i class="ri-user-line"></i></a>
+        </nav>
+
     </div>
 
     <script src="js/main.js"></script>
