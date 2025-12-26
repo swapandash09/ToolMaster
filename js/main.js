@@ -1,5 +1,5 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V39 PRO - MASTER ROUTER
+// ⚡ TOOLMASTER TITANIUM V39 PRO - MASTER JS
 // ==========================================
 
 const App = {
@@ -7,7 +7,7 @@ const App = {
     currentPage: 'home-page',
     
     init: function() {
-        console.log(`%c ToolMaster ${this.version} %c Online `, 
+        console.log(`%c ToolMaster ${this.version} %c Ready `, 
         'background:#6366f1; color:white; padding:2px 5px; border-radius:4px;', 
         'color:#6366f1; font-weight:bold;');
         
@@ -24,7 +24,7 @@ const App = {
         }
     },
 
-    // --- 1. CORE NAVIGATION ROUTER (Fixed Smoothness) ---
+    // --- 1. CORE NAVIGATION (Fixed Opening & Jitter) ---
     navigateTo: function(viewId) {
         const homePage = document.getElementById('home-page');
         const toolContainer = document.getElementById('tool-container');
@@ -46,23 +46,23 @@ const App = {
                 homePage.classList.add('hidden');
                 toolContainer.classList.remove('hidden');
                 
-                // Sabhi active tools ko clean reset karein
+                // Sabhi active tools ko clean reset karein taaki black screen na aaye
                 document.querySelectorAll('.tool-workspace').forEach(el => {
-                    el.classList.add('hidden');
+                    el.style.display = 'none';
                     el.classList.remove('active', 'slide-up');
                 });
                 
                 // Target Tool ko activate karein
-                toolElement.classList.remove('hidden');
+                toolElement.style.display = 'block';
                 
-                // 50ms ka delay animation trigger karne ke liye zaruri hai
+                // 50ms delay transitions ko smooth banata hai
                 setTimeout(() => {
                     toolElement.classList.add('active', 'slide-up');
                 }, 50);
                 
                 this.currentPage = viewId;
                 
-                // Scroll reset
+                // Scroll reset to top
                 const contentArea = document.querySelector('.content-area');
                 if (contentArea) contentArea.scrollTop = 0;
             } else {
@@ -72,7 +72,7 @@ const App = {
         this.updateSidebar(viewId);
     },
 
-    // --- 2. SIDEBAR ACTIVE STATE SYNC ---
+    // --- 2. SIDEBAR SYNC ---
     updateSidebar: function(viewId) {
         document.querySelectorAll('.side-nav li').forEach(li => {
             li.classList.remove('active');
@@ -96,7 +96,7 @@ const App = {
         if(saved === 'light') document.body.classList.add('light-mode');
     },
 
-    // --- 4. TOAST NOTIFICATIONS (Fixed Reliability) ---
+    // --- 4. TOAST SYSTEM ---
     showToast: function(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         if(!container) return;
@@ -109,24 +109,14 @@ const App = {
 
         toast.innerHTML = `<i class="${icon}"></i> <span>${msg}</span>`;
         
-        // Inline styles for V39 high-priority visibility
-        toast.style.cssText = `
-            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(15px);
-            border: 1px solid ${type === 'error' ? '#ef4444' : 'rgba(255,255,255,0.1)'};
-            color: white; padding: 12px 24px; border-radius: 50px; margin-top: 10px;
-            display: flex; align-items: center; gap: 12px; min-width: 280px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5); z-index: 10000;
-        `;
-
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px)';
             setTimeout(() => toast.remove(), 400);
         }, 3000);
     },
 
-    // --- 5. SEARCH ENGINE & GLOBAL LISTENERS ---
+    // --- 5. SEARCH & SHORTCUTS ---
     addGlobalListeners: function() {
         const search = document.getElementById('search-bar');
         if(search) {
@@ -134,13 +124,12 @@ const App = {
                 const term = e.target.value.toLowerCase();
                 document.querySelectorAll('.t-card').forEach(card => {
                     const title = card.querySelector('h4').innerText.toLowerCase();
-                    const desc = card.querySelector('p').innerText.toLowerCase();
-                    card.style.display = (title.includes(term) || desc.includes(term)) ? 'flex' : 'none';
+                    card.style.display = title.includes(term) ? 'flex' : 'none';
                 });
             });
         }
 
-        // Global Keyboard Shortcuts (Ctrl+K to Search)
+        // Ctrl+K Shortcut to Search
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
@@ -150,16 +139,18 @@ const App = {
     }
 };
 
-// --- UNIVERSAL SLIDER SYNC (For Eraser/Enhancer) ---
+// --- UNIVERSAL SLIDER SYNC (Fixed Visibility) ---
 window.slideCompare = (val, type) => {
     const prefix = type === 'enh' ? 'enh' : 'bg';
-    const front = document.getElementById(`${prefix}-front`) || document.getElementById(`${prefix}-original-img`);
+    
+    // Select elements based on tool type (Enhancer vs Eraser)
+    const front = document.getElementById(`${prefix}-front`) || document.getElementById('bg-original-img');
     const line = document.getElementById(`${prefix}-line`);
     const handle = document.getElementById(`${prefix}-handle`);
 
-    if (front) front.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
-    if (line) line.style.left = `${val}%`;
-    if (handle) handle.style.left = `${val}%`;
+    if(front) front.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+    if(line) line.style.left = `${val}%`;
+    if(handle) handle.style.left = `${val}%`;
 };
 
 // --- GLOBAL EXPORTS ---
