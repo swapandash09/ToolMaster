@@ -1,113 +1,85 @@
 /* =========================================
-   TOOLMASTER TITANIUM V39 PRO - CORE CSS
+   TOOLMASTER TITANIUM V39 PRO - CLASSIC BOX
    ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* --- TITANIUM DARK THEME (V39 ENHANCED) --- */
-    --bg: #050507;
-    --sidebar: rgba(13, 13, 18, 0.85);
-    --card: rgba(22, 22, 28, 0.65);
-    --card-hover: rgba(35, 35, 45, 0.85);
-    --border: rgba(255, 255, 255, 0.08);
-    --border-highlight: rgba(255, 255, 255, 0.18);
-    --primary: #6366f1;
-    --primary-glow: rgba(99, 102, 241, 0.45);
-    --accent: #ec4899; 
-    --text: #ffffff;
-    --text-muted: #9ca3af;
-    --font-main: 'Outfit', sans-serif;
-    --font-code: 'JetBrains Mono', monospace;
-    --radius: 20px;
-    --ease: cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother Curve */
-}
-
-body.light-mode {
-    --bg: #f1f5f9;
-    --sidebar: rgba(255, 255, 255, 0.9);
+    --bg: #f8fafc;
+    --sidebar: #ffffff;
     --card: #ffffff;
-    --card-hover: #f8fafc;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-highlight: rgba(0, 0, 0, 0.12);
-    --primary: #4f46e5;
-    --primary-glow: rgba(79, 70, 229, 0.25);
+    --border: #e2e8f0;
+    --primary: #6366f1;
     --text: #0f172a;
     --text-muted: #64748b;
+    --radius: 16px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* --- RESET & PERFORMANCE --- */
-* { 
-    margin: 0; padding: 0; box-sizing: border-box; 
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; height: 100vh; overflow: hidden; }
 
-body {
-    background: var(--bg); color: var(--text); font-family: var(--font-main);
-    height: 100vh; overflow: hidden; font-size: 16px; line-height: 1.6;
-    transition: background 0.4s var(--ease);
-}
-
-/* --- 1. AURORA AMBIENT (GPU OPTIMIZED) --- */
-.ambient-glow {
-    position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background: 
-        radial-gradient(circle at 0% 0%, rgba(99,102,241,0.12), transparent 45%),
-        radial-gradient(circle at 100% 0%, rgba(236,72,153,0.1), transparent 45%),
-        radial-gradient(circle at 50% 100%, rgba(16,185,129,0.05), transparent 50%);
-    animation: auroraMove 15s infinite alternate ease-in-out;
-    transform: translateZ(0); /* Hardware Acceleration */
-}
-
-@keyframes auroraMove {
-    0% { transform: scale(1) rotate(0deg); }
-    100% { transform: scale(1.1) rotate(1.5deg); }
-}
-
-/* --- 2. LAYOUT ENGINE --- */
 .app-container { display: flex; height: 100%; width: 100%; }
 
+/* --- SIDEBAR --- */
 .desktop-sidebar {
-    width: 280px; background: var(--sidebar);
+    width: 260px; background: var(--sidebar);
     border-right: 1px solid var(--border);
-    padding: 24px; display: flex; flex-direction: column;
-    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    z-index: 50; transition: transform 0.3s var(--ease);
+    padding: 24px; display: flex; flex-direction: column; z-index: 50;
 }
+.brand-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+.logo-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: grid; place-items: center; color: white; }
 
-.brand-area { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
-.logo-icon {
-    width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary), var(--accent));
-    border-radius: 14px; display: grid; place-items: center; color: white;
-    font-size: 1.5rem; box-shadow: 0 8px 24px var(--primary-glow);
-}
-
-/* Side Nav Upgrades */
 .side-nav li {
-    padding: 14px 16px; border-radius: 14px; cursor: pointer; color: var(--text-muted);
-    display: flex; align-items: center; gap: 14px; font-weight: 500;
-    transition: all 0.25s var(--ease); position: relative;
-    will-change: transform;
+    padding: 12px 16px; border-radius: 12px; cursor: pointer; color: var(--text-muted);
+    display: flex; align-items: center; gap: 12px; transition: all 0.2s var(--ease);
 }
+.side-nav li:hover, .side-nav li.active { background: #f1f5f9; color: var(--primary); }
 
-.side-nav li:hover { 
-    background: rgba(255,255,255,0.05); color: var(--text); 
-    transform: translateX(6px); 
+/* --- DASHBOARD --- */
+.content-area { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
+.dash-hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 30px; }
+
+.category-block { margin-bottom: 40px; }
+.cat-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; color: var(--text-muted); }
+
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+
+/* THE CLASSIC BOX CARD */
+.t-card {
+    background: var(--card); border: 1px solid var(--border); padding: 24px;
+    border-radius: var(--radius); cursor: pointer; display: flex; align-items: center;
+    gap: 16px; transition: all 0.3s var(--ease); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+.t-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
 
-.side-nav li.active { background: rgba(99,102,241,0.12); color: var(--primary); font-weight: 600; }
-.side-nav li.active::before {
-    content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 4px;
-    background: var(--primary); border-radius: 0 10px 10px 0;
-    box-shadow: 2px 0 10px var(--primary);
-}
+.tc-icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0; }
 
-/* --- 3. CONTENT & GLASS CARDS --- */
-.content-area { flex: 1; overflow-y: auto; padding: 40px; position: relative; scroll-behavior: smooth; }
+/* Colors from your Video */
+.c-blue { background: #eff6ff; color: #3b82f6; }
+.c-green { background: #f0fdf4; color: #22c55e; }
+.c-orange { background: #fff7ed; color: #f97316; }
+.c-gold { background: #fefce8; color: #eab308; }
+.c-pink { background: #fdf2f8; color: #ec4899; }
+.c-purple { background: #faf5ff; color: #a855f7; }
+.c-red { background: #fef2f2; color: #ef4444; }
+.c-cyan { background: #ecfeff; color: #06b6d4; }
 
-.search-wrapper {
-    background: var(--card); border: 1px solid var(--border);
-    padding: 16px 24px; border-radius: 50px; display: flex; align-items: center; gap: 14px;
+.tc-info h4 { font-size: 1.05rem; font-weight: 700; }
+.tc-info p { font-size: 0.85rem; color: var(--text-muted); }
+
+/* --- TOOLS WORKSPACE FIX --- */
+#tool-container { position: relative; width: 100%; z-index: 100; background: var(--bg); }
+.tool-workspace { display: none; opacity: 0; }
+.tool-workspace.active { display: block !important; opacity: 1 !important; animation: fadeIn 0.4s var(--ease); }
+
+/* Sliders */
+.compare-viewer { position: relative; border-radius: 16px; overflow: hidden; background: #000; height: 400px; }
+.slider { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 50; opacity: 0; cursor: ew-resize; }
+.slider-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #fff; z-index: 10; }
+.slider-handle { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; display: grid; place-items: center; color: #000; }
+
+.hidden { display: none !important; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    padding: 16px 24px; border-radius: 50px; display: flex; align-items: center; gap: 14px;
     width: 100%; max-width: 420px; transition: 0.4s var(--ease);
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
