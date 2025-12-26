@@ -1,19 +1,21 @@
 /* =========================================
-   COMMON COMPONENTS (TITANIUM V39 PRO)
+   COMMON COMPONENTS (TITANIUM V40 ULTRA)
    ========================================= */
 
 /* --- 1. WORKSPACE LAYOUT & ANIMATION --- */
 .tool-workspace { 
     width: 100%; 
-    max-width: 1100px; 
+    max-width: 1150px; /* Thoda wide kiya hai modern screens ke liye */
     margin: 0 auto; 
-    animation: workspaceEntry 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+    /* Hardware Acceleration */
+    will-change: transform, opacity;
+    animation: workspaceEntry 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; 
     padding-bottom: 80px;
-    opacity: 0; /* Starts hidden for animation */
+    opacity: 0;
 }
 
 @keyframes workspaceEntry { 
-    from { opacity: 0; transform: translateY(40px) scale(0.96); filter: blur(10px); } 
+    from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(5px); } 
     to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
 }
 
@@ -22,28 +24,31 @@
     align-items: center; 
     gap: 20px; 
     margin-bottom: 30px; 
+    position: relative;
+    z-index: 10;
 }
 
 .ws-head h2 { 
-    font-size: 2rem; 
+    font-size: 2.2rem; 
     font-weight: 800; 
-    color: var(--text); 
     letter-spacing: -1px;
-    background: linear-gradient(to right, #fff, #9ca3af);
+    color: var(--text);
+    /* Titanium Gradient Text */
+    background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    text-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* --- 2. BACK PILL (NAVIGATION) --- */
+/* --- 2. BACK PILL (MAGNETIC EFFECT) --- */
 .back-pill {
-    background: rgba(255, 255, 255, 0.03); 
+    background: rgba(255, 255, 255, 0.05); 
     border: 1px solid var(--border);
     color: var(--text-muted); 
-    padding: 12px 24px; 
+    padding: 10px 20px; 
     border-radius: 50px; 
     cursor: pointer;
-    font-size: 0.9rem; 
+    font-size: 0.95rem; 
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
     display: flex; align-items: center; gap: 8px;
@@ -51,43 +56,44 @@
 }
 
 .back-pill:hover { 
-    background: rgba(99, 102, 241, 0.15); 
+    background: var(--primary); 
     border-color: var(--primary); 
     color: white; 
     transform: translateX(-5px); 
-    box-shadow: 0 0 15px var(--primary-glow);
+    box-shadow: 0 5px 15px var(--primary-glow);
 }
 
 /* --- 3. MAIN GLASS BODY (The "Card") --- */
 .ws-body {
-    background: rgba(20, 20, 25, 0.7); 
-    border: 1px solid var(--border); 
-    border-top: 1px solid rgba(255, 255, 255, 0.1); 
-    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    background: rgba(20, 20, 25, 0.6); 
+    /* Double Border Effect for 3D look */
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.5), /* Inner dark border */
+        0 20px 50px -10px rgba(0,0,0,0.7); /* Deep shadow */
     border-radius: 24px;
-    padding: 50px; 
-    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6); 
+    padding: 40px; 
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
     position: relative;
     overflow: hidden;
 }
 
-/* Optional: Subtle Noise Texture Overlay */
+/* Cinematic Spotlight Effect */
 .ws-body::before {
-    content: ""; position: absolute; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none; opacity: 0.4;
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at center, rgba(99,102,241,0.08), transparent 60%);
+    pointer-events: none; opacity: 0.6;
 }
 
-/* --- 4. INTERACTIVE UPLOAD ZONE --- */
+/* --- 4. INTERACTIVE UPLOAD ZONE (ANIMATED BORDER) --- */
 .upload-zone {
     border: 2px dashed var(--border); 
     border-radius: 20px; 
     padding: 60px 20px;
     text-align: center; 
     cursor: pointer; 
-    transition: all 0.3s ease;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255,255,255,0.01);
     margin-bottom: 30px; 
     position: relative;
 }
@@ -97,110 +103,88 @@
     color: var(--text-muted); 
     margin-bottom: 15px; 
     display: block; 
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.upload-zone p { color: var(--text-muted); font-size: 1rem; transition: color 0.3s; }
-.upload-zone span { color: var(--primary); font-weight: 700; }
-.upload-zone input { display: none; }
-
-/* Upload Hover States */
-.upload-zone:hover, .upload-zone.drag-over { 
+.upload-zone:hover { 
     border-color: var(--primary); 
-    background: rgba(99, 102, 241, 0.05); 
-    box-shadow: 0 0 30px var(--primary-glow), inset 0 0 20px var(--primary-glow);
-    transform: translateY(-2px);
+    background: rgba(99, 102, 241, 0.06); 
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
 }
-.upload-zone:hover i { color: var(--primary); transform: scale(1.1) translateY(-5px); }
-.upload-zone:hover p { color: var(--text); }
+
+.upload-zone:hover i { 
+    color: var(--primary); 
+    transform: scale(1.15) rotate(-5deg); 
+    text-shadow: 0 0 20px var(--primary-glow);
+}
 
 /* --- 5. PREMIUM INPUTS --- */
 .glass-input {
     width: 100%; 
-    background: rgba(0, 0, 0, 0.3); 
+    background: rgba(10, 10, 15, 0.4); 
     border: 1px solid var(--border);
     color: var(--text); 
-    padding: 18px 22px; 
-    border-radius: 16px; 
+    padding: 16px 20px; 
+    border-radius: 14px; 
     outline: none;
     transition: all 0.3s ease; 
     font-size: 1rem; 
     margin-bottom: 20px;
-    font-family: var(--font-main);
 }
 
 .glass-input:focus { 
     border-color: var(--primary); 
-    background: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5), 0 0 0 2px var(--primary-glow);
-    transform: scale(1.01); /* Subtle lift */
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 0 3px var(--primary-glow);
 }
-.glass-input::placeholder { color: rgba(255,255,255,0.25); }
 
+/* TextArea resizing */
+textarea.glass-input { resize: vertical; min-height: 120px; }
 
-/* --- 6. GLOW BUTTONS (SHIMMER EFFECT) --- */
+/* --- 6. GLOW BUTTONS (LIQUID ACTION) --- */
 .glow-btn {
     width: 100%; 
-    padding: 18px; 
+    padding: 16px; 
     background: linear-gradient(135deg, var(--primary), #4f46e5);
     color: white; 
     border: none; 
     border-radius: 16px; 
     font-weight: 700; 
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     cursor: pointer; 
     box-shadow: 0 10px 20px -10px var(--primary-glow); 
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-    margin-top: 20px;
-    letter-spacing: 0.5px;
+    transition: all 0.3s ease; 
+    margin-top: 15px;
     position: relative;
     overflow: hidden;
-    z-index: 1;
 }
 
-/* Shimmer Animation Layer */
-.glow-btn::after {
-    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+/* Shine Effect */
+.glow-btn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: skewX(-20deg);
     transition: 0.5s;
-    z-index: -1;
 }
 
 .glow-btn:hover { 
-    transform: translateY(-4px); 
+    transform: translateY(-3px); 
     box-shadow: 0 20px 40px -10px var(--primary-glow); 
 }
 
-.glow-btn:hover::after { left: 100%; } /* Trigger Shimmer */
+.glow-btn:hover::before { left: 150%; }
 
-.glow-btn:active { 
-    transform: scale(0.98) translateY(-2px); 
-    box-shadow: 0 5px 15px -5px var(--primary-glow);
-}
+.glow-btn:active { transform: scale(0.98); }
 
-/* Disabled State */
-.glow-btn:disabled {
-    background: var(--card);
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-.glow-btn:disabled::after { display: none; }
-
-/* --- 7. MISC UTILS --- */
-/* Pulse Animation for Recording/Active states */
-@keyframes pulse-ring {
-    0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-}
+/* --- 7. UTILS & HELPERS --- */
+.max-600 { max-width: 600px; margin: 0 auto; }
+.text-center { text-align: center; }
 
 /* Mobile Adjustments */
-@media (max-width: 600px) { 
-    .ws-body { padding: 30px 20px; } 
+@media (max-width: 768px) { 
+    .ws-body { padding: 25px 15px; } 
     .upload-zone { padding: 40px 15px; } 
-    .ws-head h2 { font-size: 1.6rem; }
-    .glass-input { padding: 15px; }
+    .ws-head h2 { font-size: 1.5rem; }
+    .glass-input { padding: 14px; }
 }
