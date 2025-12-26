@@ -1,16 +1,15 @@
 // ==========================================
-// 📊 EXCEL TO PDF ENGINE (TITANIUM V40 - BLANK FIX)
+// 📊 EXCEL TO PDF ENGINE (TITANIUM V40 - BLANK FIX FINAL)
 // ==========================================
 
 console.log("Excel Engine V40: Loaded");
 
-// --- 1. FILE HANDLER & PREVIEW GENERATOR ---
+// --- 1. FILE HANDLER & PREVIEW ---
 const excelInput = document.getElementById('excel-input');
 if(excelInput) {
     excelInput.addEventListener('change', (e) => {
         if(!e.target.files.length) return;
 
-        // Loader Start
         if(typeof loader === 'function') loader(true);
         if(typeof showToast === 'function') showToast("Reading Excel File...", "info");
         
@@ -23,14 +22,13 @@ if(excelInput) {
                 const workbook = XLSX.read(data, {type:'array', cellStyles: true});
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 
-                // Convert to HTML
                 const html = XLSX.utils.sheet_to_html(sheet, { id:'excel-table', editable:false });
                 
                 const container = document.getElementById('excel-preview-container');
                 if(container) {
                     container.innerHTML = html;
                     
-                    // Style Preview Table
+                    // Preview Styling
                     const table = container.querySelector('table');
                     if(table) {
                         table.style.width = '100%';
@@ -44,7 +42,6 @@ if(excelInput) {
                             cell.style.color = "#333";
                         });
                         
-                        // Header Style
                         table.querySelectorAll('tr:first-child td').forEach(head => {
                             head.style.backgroundColor = "#f8fafc";
                             head.style.fontWeight = "bold";
@@ -62,7 +59,7 @@ if(excelInput) {
     });
 }
 
-// --- 2. PDF GENERATION (BLANK PAGE FIX) ---
+// --- 2. PDF GENERATION (OVERLAY METHOD - 100% VISIBLE) ---
 window.generateUltraHDPDF = () => {
     const el = document.getElementById('excel-table');
     if(!el) {
@@ -70,21 +67,25 @@ window.generateUltraHDPDF = () => {
         return;
     }
     
+    // Loader ON
     if(typeof loader === 'function') loader(true);
-    if(typeof showToast === 'function') showToast("Generating PDF...", "info");
+    if(typeof showToast === 'function') showToast("Preparing PDF Layout...", "info");
+
+    // Scroll to top to prevent cutting
+    window.scrollTo(0,0);
 
     // --- CONFIG ---
     const useBorder = document.getElementById('pdf-border') ? document.getElementById('pdf-border').checked : true;
     const orientInput = document.getElementById('pdf-orient') ? document.getElementById('pdf-orient').value : 'auto';
     
-    // Orientation Logic
+    // Smart Orientation
     const colCount = el.rows[0]?.cells.length || 0;
     const finalOrientation = orientInput === 'auto' ? (colCount > 8 ? 'landscape' : 'portrait') : orientInput;
 
     // --- CLONE TABLE ---
     const clone = el.cloneNode(true);
     
-    // Strict Styling for PDF
+    // Force Styles for PDF (Black Text on White)
     clone.style.width = '100%'; 
     clone.style.background = '#ffffff';
     clone.style.color = '#000000';
@@ -93,33 +94,34 @@ window.generateUltraHDPDF = () => {
 
     clone.querySelectorAll('td, th').forEach(td => {
         td.style.color = '#000000';
-        td.style.fontSize = colCount > 10 ? '9px' : '11px';
-        td.style.padding = '6px';
-        td.style.border = useBorder ? "1px solid #444" : "none"; 
+        td.style.fontSize = colCount > 10 ? '10px' : '12px';
+        td.style.padding = '8px';
+        td.style.border = useBorder ? "1px solid #000000" : "none"; 
         td.style.whiteSpace = 'normal';
         td.style.wordBreak = 'break-word';
     });
 
-    // --- WRAPPER STRATEGY (THE FIX) ---
-    // Instead of hiding it off-screen (left: -9999px), we place it absolutely
-    // at top:0 but with z-index: -9999. This allows html2canvas to "see" it properly.
+    // --- THE FIX: VISIBLE OVERLAY WRAPPER ---
+    // Hum wrapper ko sabse upar (z-index: 999999) layenge taaki html2canvas use pakka dekh sake.
     const wrapper = document.createElement('div');
     const a4Width = finalOrientation === 'portrait' ? 790 : 1120;
     
-    wrapper.style.width = `${a4Width}px`;
-    wrapper.style.background = '#ffffff';
-    wrapper.style.padding = '20px';
-    wrapper.style.position = 'absolute'; // Changed from fixed
+    // Positioning ON TOP of everything (White Screen Effect)
+    wrapper.style.position = 'absolute'; 
     wrapper.style.top = '0';
     wrapper.style.left = '0';
-    wrapper.style.zIndex = '-9999'; // Hide behind app
-    wrapper.style.visibility = 'visible'; // Must be visible for capture
+    wrapper.style.width = `${a4Width}px`;
+    wrapper.style.minHeight = '100vh';
+    wrapper.style.background = '#ffffff'; 
+    wrapper.style.zIndex = '999999'; // Highest priority
+    wrapper.style.padding = '20px';
     
-    // Add Header
+    // Add Branding
     const header = document.createElement('div');
-    header.innerHTML = `<h3 style="margin-bottom:15px; font-family:sans-serif; color:#333;">Excel Export</h3>`;
+    header.innerHTML = `<h2 style="margin-bottom:10px; color:#000;">Excel Export</h2><p style="margin-bottom:20px; color:#555; font-size:12px;">Generated by ToolMaster</p>`;
     wrapper.appendChild(header);
     wrapper.appendChild(clone);
+    
     document.body.appendChild(wrapper);
 
     // --- HTML2PDF CONFIG ---
@@ -128,11 +130,11 @@ window.generateUltraHDPDF = () => {
         filename: `Excel_Export_${new Date().getTime()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
-            scale: 2, // Slightly reduced scale for stability
+            scale: 2, 
             useCORS: true, 
-            scrollY: 0, // Reset scroll for capture
-            windowWidth: a4Width, // Force correct width
-            logging: false
+            scrollY: 0,
+            windowWidth: a4Width,
+            logging: false 
         },
         jsPDF: { 
             unit: 'mm', 
@@ -143,19 +145,19 @@ window.generateUltraHDPDF = () => {
     };
 
     // --- GENERATE ---
-    // Scroll to top ensures no clipping
-    window.scrollTo(0, 0);
-
+    // Thoda delay dete hain taaki DOM render ho jaye
     setTimeout(() => {
         html2pdf().set(opt).from(wrapper).save().then(() => {
+            // Success: Remove Wrapper
             document.body.removeChild(wrapper);
             if(typeof loader === 'function') loader(false);
-            if(typeof showToast === 'function') showToast("PDF Downloaded!", "success");
+            if(typeof showToast === 'function') showToast("PDF Saved Successfully!", "success");
         }).catch(err => {
             console.error("PDF Error:", err);
-            document.body.removeChild(wrapper);
+            // Error: Remove Wrapper anyway
+            if(document.body.contains(wrapper)) document.body.removeChild(wrapper);
             if(typeof loader === 'function') loader(false);
-            if(typeof showToast === 'function') showToast("Error generating PDF.", "error");
+            if(typeof showToast === 'function') showToast("PDF Generation Failed.", "error");
         });
-    }, 500); // Wait for DOM render
+    }, 800); // 800ms delay for stability
 };
