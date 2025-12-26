@@ -1,104 +1,167 @@
-// EXCEL TO PDF LOGIC (Ultra HD Quality Fix)
+// ==========================================
+// 📊 EXCEL TO PDF ENGINE (TITANIUM V40)
+// ==========================================
 
+console.log("Excel Engine V40: Loaded");
+
+// --- 1. FILE HANDLER & PREVIEW GENERATOR ---
 const excelInput = document.getElementById('excel-input');
 if(excelInput) {
     excelInput.addEventListener('change', (e) => {
-        // Show loader
+        if(!e.target.files.length) return;
+
+        // Show Global Loader
         if(typeof loader === 'function') loader(true);
+        if(typeof showToast === 'function') showToast("Reading Excel File...", "info");
         
         const reader = new FileReader();
         reader.readAsArrayBuffer(e.target.files[0]);
         
         reader.onload = (ev) => {
-            const data = new Uint8Array(ev.target.result);
-            const workbook = XLSX.read(data, {type:'array', cellStyles: true});
-            
-            // Get first sheet
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            
-            // Convert to HTML
-            const html = XLSX.utils.sheet_to_html(sheet, { id:'excel-table' });
-            
-            // Inject into preview container
-            const container = document.getElementById('excel-preview-container');
-            if(container) {
-                container.innerHTML = html;
-                // Add internal padding to cells for better look
-                container.querySelectorAll('td, th').forEach(cell => {
-                    cell.style.padding = "4px 8px";
-                    cell.style.border = "1px solid #ccc";
-                });
+            try {
+                const data = new Uint8Array(ev.target.result);
+                // Read workbook with cell styles enabled
+                const workbook = XLSX.read(data, {type:'array', cellStyles: true});
+                
+                // Get the first sheet
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                
+                // Convert to HTML Table
+                const html = XLSX.utils.sheet_to_html(sheet, { id:'excel-table', editable:false });
+                
+                // Inject into preview container
+                const container = document.getElementById('excel-preview-container');
+                if(container) {
+                    container.innerHTML = html;
+                    
+                    // --- STYLE THE TABLE FOR PREVIEW ---
+                    const table = container.querySelector('table');
+                    if(table) {
+                        table.style.width = '100%';
+                        table.style.borderCollapse = 'collapse';
+                        table.style.fontFamily = 'Arial, sans-serif';
+                        table.style.fontSize = '12px';
+                        
+                        // Style headers and cells
+                        table.querySelectorAll('td, th').forEach(cell => {
+                            cell.style.padding = "8px 12px";
+                            cell.style.border = "1px solid #e2e8f0";
+                            cell.style.textAlign = "left";
+                            cell.style.color = "#333";
+                        });
+                        
+                        // Header specific style
+                        table.querySelectorAll('tr:first-child td').forEach(head => {
+                            head.style.backgroundColor = "#f8fafc";
+                            head.style.fontWeight = "bold";
+                            head.style.color = "#0f172a";
+                        });
+                    }
+                }
+                if(typeof showToast === 'function') showToast("Excel Loaded Successfully!", "success");
+            } catch (error) {
+                console.error(error);
+                if(typeof showToast === 'function') showToast("Error reading Excel file", "error");
+            } finally {
+                // Hide Loader
+                if(typeof loader === 'function') loader(false);
             }
-            
-            // Hide loader
-            if(typeof loader === 'function') loader(false);
         };
     });
 }
 
+// --- 2. PDF GENERATION (SMART FIT ENGINE) ---
 window.generateUltraHDPDF = () => {
     const el = document.getElementById('excel-table');
-    if(!el) return alert("Please Upload Excel file first.");
+    if(!el) {
+        if(typeof showToast === 'function') showToast("Please upload an Excel file first!", "error");
+        return;
+    }
     
     if(typeof loader === 'function') loader(true);
+    if(typeof showToast === 'function') showToast("Generating PDF... Please wait", "info");
 
-    // 1. Create a Clone for High-Res Rendering
-    const clone = el.cloneNode(true);
+    // --- CONFIGURATION ---
     const useBorder = document.getElementById('pdf-border') ? document.getElementById('pdf-border').checked : true;
-    const orient = document.getElementById('pdf-orient') ? document.getElementById('pdf-orient').value : 'landscape';
-    const orientationVal = orient === 'auto' ? 'landscape' : orient;
+    const orientInput = document.getElementById('pdf-orient') ? document.getElementById('pdf-orient').value : 'auto';
+    
+    // Auto-detect orientation based on column count (Approximate logic)
+    // If table is very wide (>8 cols), force landscape
+    const colCount = el.rows[0]?.cells.length || 0;
+    const finalOrientation = orientInput === 'auto' ? (colCount > 8 ? 'landscape' : 'portrait') : orientInput;
 
-    // 2. FORCE STYLING (Black Text on White Background)
+    // --- CLONE & PREPARE FOR PRINT ---
+    // We clone the table to style it specifically for PDF without messing up the preview
+    const clone = el.cloneNode(true);
+    
+    // PDF Styling (Black & White, High Contrast)
     clone.style.width = '100%'; 
     clone.style.background = '#ffffff';
     clone.style.color = '#000000';
-    clone.style.fontFamily = 'Arial, sans-serif'; // Clean font for PDF
+    clone.style.fontFamily = 'Arial, sans-serif';
+    clone.style.borderCollapse = 'collapse';
 
-    // Apply strict styling to cells
     clone.querySelectorAll('td, th').forEach(td => {
         td.style.color = '#000000';
-        td.style.fontSize = '11px'; // Slightly larger for clarity
-        td.style.padding = '5px';
-        td.style.border = useBorder ? "1px solid #000000" : "none"; // Black borders
-        td.style.whiteSpace = 'normal';
+        td.style.fontSize = colCount > 10 ? '9px' : '11px'; // Auto-shrink font for wide tables
+        td.style.padding = '6px';
+        td.style.border = useBorder ? "1px solid #444" : "none"; 
+        td.style.whiteSpace = 'normal'; // Allow wrapping
         td.style.wordBreak = 'break-word';
     });
 
-    // 3. Create a temporary wrapper for the clone
+    // Create invisible wrapper
     const wrapper = document.createElement('div');
-    // Set width based on A4 width to ensure fit
-    wrapper.style.width = (orientationVal === 'portrait' ? 750 : 1050) + 'px';
+    // Set fixed width to simulate A4 paper pixels (approx) to ensure consistent rendering
+    const a4Width = finalOrientation === 'portrait' ? 790 : 1120;
+    wrapper.style.width = `${a4Width}px`;
     wrapper.style.background = '#ffffff';
     wrapper.style.padding = '20px';
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px'; // Hide off-screen
+    wrapper.style.top = '0';
+    
+    // Add Branding Header (Optional)
+    const header = document.createElement('div');
+    header.innerHTML = `<h3 style="margin-bottom:15px; font-family:sans-serif; color:#333;">Excel Export</h3>`;
+    wrapper.appendChild(header);
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
-    // 4. PDF CONFIGURATION (The Quality Fix)
+    // --- HTML2PDF CONFIG ---
     const opt = {
-        margin: [5, 5, 5, 5],
-        filename: 'ToolMaster_UltraHD.pdf',
-        // USE PNG instead of JPEG for text sharpness
-        image: { type: 'png', quality: 1.0 }, 
+        margin: [10, 10, 10, 10], // mm
+        filename: `Excel_Export_${new Date().getTime()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 }, // JPEG is faster for documents
         html2canvas: { 
-            scale: 4, // 4x Resolution (Ultra HD)
+            scale: 3, // 3x Quality (Sharp Text)
             useCORS: true, 
-            letterRendering: true, // Better text rendering
-            backgroundColor: '#ffffff'
+            letterRendering: true,
+            scrollY: 0,
+            windowWidth: a4Width // Crucial for correct layout
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: orientationVal }
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: finalOrientation 
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Try not to cut rows
     };
 
-    // 5. Generate
-    html2pdf().set(opt).from(wrapper).save().then(() => {
-        document.body.removeChild(wrapper);
-        if(typeof loader === 'function') loader(false);
-        // Trigger confetti if function exists
-        if(typeof triggerConfetti === 'function') triggerConfetti();
-        if(typeof showToast === 'function') showToast("PDF Downloaded (Ultra HD)");
-    }).catch(err => {
-        console.error(err);
-        document.body.removeChild(wrapper);
-        if(typeof loader === 'function') loader(false);
-        alert("Error generating PDF");
-    });
-} Good work but little upgrades and extra row jo zarurat na ho cut out kar de
+    // --- GENERATE ---
+    // We use a small timeout to let the DOM render the off-screen element
+    setTimeout(() => {
+        html2pdf().set(opt).from(wrapper).save().then(() => {
+            // Cleanup
+            document.body.removeChild(wrapper);
+            if(typeof loader === 'function') loader(false);
+            if(typeof showToast === 'function') showToast("PDF Downloaded Successfully!", "success");
+        }).catch(err => {
+            console.error("PDF Gen Error:", err);
+            document.body.removeChild(wrapper);
+            if(typeof loader === 'function') loader(false);
+            if(typeof showToast === 'function') showToast("Conversion Failed. Try fewer rows.", "error");
+        });
+    }, 500);
+};
