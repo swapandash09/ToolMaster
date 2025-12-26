@@ -1,90 +1,86 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V39 - MATCHING JS
+// ⚡ TOOLMASTER V39 - FINAL FIXED JS
 // ==========================================
 
 const App = {
     version: 'V39 Pro',
 
     init: function() {
-        console.log("System Initialized");
+        console.log("System Ready");
         this.loadTheme();
         this.setupSearch();
 
-        // 1. LOADER REMOVAL (Fast & Smooth)
+        // LOADER FIX
         const loader = document.getElementById('loading-overlay');
         if(loader) {
             setTimeout(() => {
                 loader.style.opacity = '0';
                 setTimeout(() => {
-                    loader.style.display = 'none'; // Force remove
+                    loader.classList.add('hidden'); // Class add karke hide karein
+                    loader.style.display = 'none';
                 }, 500);
             }, 800);
         }
     },
 
-    // --- 2. NAVIGATION SYSTEM (Fixed for New IDs) ---
+    // --- 1. NAVIGATION (THE FIX) ---
     navigateTo: function(viewId) {
         const homePage = document.getElementById('home-page');
         const toolContainer = document.getElementById('tool-container');
 
-        // Critical Safety Check
-        if (!homePage || !toolContainer) {
-            console.error("Critical Error: Main containers missing in HTML.");
-            return;
-        }
+        if (!homePage || !toolContainer) return;
 
-        // SCENARIO A: GO HOME
+        // SCENARIO 1: GO HOME
         if (viewId === 'home-page') {
+            // Tools chupao
             toolContainer.classList.add('hidden');
+            
+            // Home dikhao
             homePage.classList.remove('hidden');
             
-            // Scroll reset
             window.scrollTo(0, 0);
             this.updateSidebar('home');
         } 
-        // SCENARIO B: OPEN TOOL
+        // SCENARIO 2: OPEN TOOL
         else {
             const toolElement = document.getElementById(viewId);
             
             if (toolElement) {
+                // 1. Home ko chupao (Add hidden)
                 homePage.classList.add('hidden');
+                
+                // 2. Tool Container ko dikhao (Remove hidden)
                 toolContainer.classList.remove('hidden');
 
-                // Step 1: Hide ALL other tools first (Clean Slate)
+                // 3. Pehle SAARE tools ko band karo (Reset)
                 document.querySelectorAll('.tool-workspace').forEach(el => {
-                    el.classList.add('hidden');
+                    el.classList.add('hidden'); // Important: Hidden wapas lagao
                     el.classList.remove('active');
                 });
 
-                // Step 2: Show Target Tool
+                // 4. Target Tool ko dikhao (Remove hidden)
+                // YAHAN FIX HAI: Hidden hatana zaroori hai
                 toolElement.classList.remove('hidden');
                 
-                // Animation Delay
+                // Animation ke liye active class
                 setTimeout(() => {
                     toolElement.classList.add('active');
-                }, 50);
+                }, 10);
 
-                // Sidebar Active State Sync
                 this.updateSidebar(viewId);
-                
-                // Scroll Top
-                const content = document.querySelector('.content-area');
-                if(content) content.scrollTop = 0;
+                window.scrollTo(0, 0);
 
             } else {
-                this.showToast(`Error: Tool ID "${viewId}" not found.`, 'error');
-                console.error(`ID "${viewId}" HTML mein nahi mila.`);
+                console.error(`Error: Tool ID "${viewId}" HTML mein nahi mila.`);
+                this.showToast("Tool Under Construction 🛠️", "info");
             }
         }
     },
 
-    // --- 3. SIDEBAR SYNC ---
+    // --- 2. SIDEBAR SYNC ---
     updateSidebar: function(activeId) {
-        // Remove active class from all items
         document.querySelectorAll('.side-nav li, .mobile-nav .nav-item').forEach(li => {
             li.classList.remove('active');
-            
-            // Logic to check if this button opens the active tool
             const clickAttr = li.getAttribute('onclick');
             if (activeId === 'home' && clickAttr && clickAttr.includes('showHome')) {
                 li.classList.add('active');
@@ -94,12 +90,11 @@ const App = {
         });
     },
 
-    // --- 4. THEME ENGINE ---
+    // --- 3. THEME ENGINE ---
     toggleTheme: function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         localStorage.setItem('tm_theme', isLight ? 'light' : 'dark');
-        this.showToast(isLight ? "Light Mode Active" : "Dark Mode Active", "info");
     },
 
     loadTheme: function() {
@@ -107,52 +102,35 @@ const App = {
         if(saved === 'light') document.body.classList.add('light-mode');
     },
 
-    // --- 5. SEARCH ENGINE (Real-time Filter) ---
+    // --- 4. SEARCH ---
     setupSearch: function() {
         const searchInput = document.getElementById('search-bar');
         if(searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
-                
-                // Filter Cards
                 document.querySelectorAll('.t-card').forEach(card => {
                     const title = card.querySelector('h4').innerText.toLowerCase();
                     const desc = card.querySelector('p')?.innerText.toLowerCase() || "";
-                    
                     if(title.includes(term) || desc.includes(term)) {
-                        card.style.display = 'flex'; // Show matched
+                        card.style.display = 'flex';
                     } else {
-                        card.style.display = 'none'; // Hide unmatched
+                        card.style.display = 'none';
                     }
                 });
-            });
-
-            // Shortcut Ctrl+K
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    searchInput.focus();
-                }
             });
         }
     },
 
-    // --- 6. TOAST NOTIFICATIONS ---
+    // --- 5. TOAST ---
     showToast: function(msg, type = 'success') {
         let container = document.getElementById('toast-container');
-        if(!container) return; // HTML mein div hona chahiye
-
+        if(!container) return;
         const toast = document.createElement('div');
         toast.className = 'toast';
-        
-        // Icon Logic
         const icon = type === 'error' ? 'ri-error-warning-fill' : 'ri-checkbox-circle-fill';
         const color = type === 'error' ? '#ef4444' : '#10b981';
-
         toast.innerHTML = `<i class="${icon}" style="color:${color}"></i> <span>${msg}</span>`;
         container.appendChild(toast);
-
-        // Auto Remove
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
@@ -160,24 +138,10 @@ const App = {
     }
 };
 
-// --- 7. SLIDER LOGIC (For Magic Eraser Tool) ---
-window.slideCompare = (val) => {
-    const container = document.getElementById('compare-container');
-    if(!container) return;
-    
-    // HTML mein IDs check karein: bg-original-img (front)
-    const frontImg = document.getElementById('bg-original-img');
-    
-    if(frontImg) {
-        frontImg.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
-    }
-};
-
-// --- GLOBAL EXPORTS (HTML OnClick Support) ---
+// --- GLOBAL EXPORTS ---
 window.showHome = () => App.navigateTo('home-page');
 window.openTool = (id) => App.navigateTo(id);
 window.toggleTheme = () => App.toggleTheme();
 window.showToast = (m, t) => App.showToast(m, t);
 
-// START APP
 document.addEventListener('DOMContentLoaded', () => App.init());
