@@ -1,111 +1,99 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V40 (STABLE CORE)
+// ⚡ TOOLMASTER TITANIUM V39 PRO - COMPLETE MASTER JS
 // ==========================================
 
 const App = {
-    version: 'V40 Pro',
+    version: 'V39 Pro Final',
     
+    // --- INITIALIZATION ---
     init: function() {
-        console.log(`%c ToolMaster ${this.version} %c System Online `, 
-            'background:#000; color:#fff; padding:4px; border-radius:4px;', 
-            'color:#6366f1; font-weight:bold;');
-
-        this.loadTheme();
-        this.addGlobalListeners();
-
-        // FAILSAFE: Force loader removal after 800ms to prevent infinite loading screen
-        setTimeout(() => {
-            const loader = document.getElementById('loading-overlay');
-            if(loader) {
+        console.log(`%c ToolMaster ${this.version} %c Ready `, 
+        'background:#6366f1; color:white; padding:2px 5px; border-radius:4px;', 
+        'color:#6366f1; font-weight:bold;');
+        
+        this.loadTheme();       // Theme load karega
+        this.addGlobalListeners(); // Search aur Shortcuts enable karega
+        
+        // Loader Handling (Black Screen Fix)
+        const loader = document.getElementById('loading-overlay');
+        if(loader) {
+            // 600ms baad loader hata dega
+            setTimeout(() => {
                 loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none'; // Force removal
-                    loader.classList.add('hidden');
-                }, 500);
-            }
-        }, 800);
+                setTimeout(() => loader.classList.add('hidden'), 500);
+            }, 600);
+        }
     },
 
-    // --- 1. NAVIGATION SYSTEM (BLACK SCREEN FIX) ---
+    // --- 1. SMART NAVIGATION SYSTEM (Black Screen Fixed) ---
     navigateTo: function(viewId) {
         const homePage = document.getElementById('home-page');
         const toolContainer = document.getElementById('tool-container');
 
-        // Validation: If core elements are missing, stop immediately
+        // Safety Check: Agar HTML elements nahi mile toh rok dega
         if (!homePage || !toolContainer) {
-            console.error("Critical Error: Core DOM elements missing.");
+            console.error("Critical: Home or Tool Container missing in HTML");
             return;
         }
 
-        // SCENARIO 1: GOING HOME
+        // SCENARIO 1: GO TO HOME
         if (viewId === 'home-page') {
-            toolContainer.classList.add('hidden'); // Hide tools
-            toolContainer.style.display = 'none';  // Double ensure hidden
+            toolContainer.classList.add('hidden'); // Tools chupao
+            homePage.classList.remove('hidden');   // Home dikhao
+            homePage.classList.add('fade-in');     // Animation
             
-            homePage.classList.remove('hidden');   // Show home
-            homePage.style.display = 'block';      // Force display
-            homePage.classList.add('fade-in');
-            
-            this.resetSidebar();
+            // Scroll reset
+            const content = document.querySelector('.content-area');
+            if(content) content.scrollTop = 0;
         } 
-        // SCENARIO 2: OPENING A TOOL
+        // SCENARIO 2: OPEN A TOOL
         else {
             const toolElement = document.getElementById(viewId);
             
-            // Safety Fallback: If tool ID doesn't exist, go home instead of black screen
-            if (!toolElement) {
-                this.showToast(`Error: Tool "${viewId}" unavailable.`, 'error');
-                this.navigateTo('home-page');
-                return;
+            if (toolElement) {
+                homePage.classList.add('hidden');       // Home chupao
+                toolContainer.classList.remove('hidden'); // Tool container dikhao
+                
+                // Pehle saare tools ko band karo (Reset)
+                document.querySelectorAll('.tool-workspace').forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('active', 'slide-up');
+                });
+                
+                // Ab sirf target tool ko open karo
+                toolElement.style.display = 'block'; 
+                
+                // Animation trigger (Smoothness ke liye delay)
+                setTimeout(() => {
+                    toolElement.classList.add('active', 'slide-up');
+                }, 50);
+                
+                // Scroll top par le jao
+                const content = document.querySelector('.content-area');
+                if(content) content.scrollTop = 0;
+                
+            } else {
+                this.showToast("Error: Tool ID not found!", "error");
             }
-
-            homePage.classList.add('hidden');
-            homePage.style.display = 'none';
-
-            toolContainer.classList.remove('hidden');
-            toolContainer.style.display = 'block';
-
-            // Hide all other tools first
-            document.querySelectorAll('.tool-workspace').forEach(el => {
-                el.style.display = 'none';
-                el.classList.remove('active');
-            });
-
-            // Show target tool
-            toolElement.style.display = 'block';
-            
-            // Small delay to allow CSS transition to catch the 'display:block'
-            setTimeout(() => {
-                toolElement.classList.add('active');
-            }, 10);
-
-            // Scroll to top
-            const content = document.querySelector('.content-area');
-            if(content) content.scrollTop = 0;
-
-            this.updateSidebar(viewId);
         }
+        this.updateSidebar(viewId);
     },
 
-    // --- 2. SIDEBAR LOGIC ---
-    updateSidebar: function(activeId) {
-        // Remove active class from all
-        document.querySelectorAll('.side-nav li').forEach(li => li.classList.remove('active'));
-        
-        // Add active class to clicked item (if it exists)
-        // Checks for onclick attributes containing the ID
-        const activeLink = document.querySelector(`.side-nav li[onclick*="'${activeId}'"]`);
-        if(activeLink) activeLink.classList.add('active');
+    // --- 2. SIDEBAR SYNC (Desktop & Mobile) ---
+    updateSidebar: function(viewId) {
+        // Saare active classes hatao
+        document.querySelectorAll('.side-nav li, .mobile-nav .nav-item').forEach(li => {
+            li.classList.remove('active');
+            
+            // Check karo agar ye button wahi tool kholta hai
+            const action = li.getAttribute('onclick');
+            if (action && action.includes(viewId)) {
+                li.classList.add('active');
+            }
+        });
     },
 
-    resetSidebar: function() {
-        document.querySelectorAll('.side-nav li').forEach(li => li.classList.remove('active'));
-        // Activate the first item (Dashboard)
-        const dash = document.querySelector('.side-nav li:first-child');
-        if(dash) dash.classList.add('active');
-    },
-
-    // --- 3. THEME ENGINE ---
+    // --- 3. THEME ENGINE (Light/Dark) ---
     toggleTheme: function() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
@@ -115,72 +103,91 @@ const App = {
 
     loadTheme: function() {
         const saved = localStorage.getItem('tm_theme');
-        if (saved === 'dark') document.body.classList.add('dark-mode');
+        if(saved === 'dark') document.body.classList.add('dark-mode');
     },
 
-    // --- 4. SEARCH ENGINE (Layout Safe) ---
+    // --- 4. UNIQUE SEARCH ENGINE (Title + Description) ---
     addGlobalListeners: function() {
-        const search = document.getElementById('search-bar');
-        if (search) {
-            search.addEventListener('input', (e) => {
+        const searchInput = document.getElementById('search-bar');
+        
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
+                
                 document.querySelectorAll('.t-card').forEach(card => {
+                    // Tool ka naam aur description scan karo
                     const title = card.querySelector('h4').innerText.toLowerCase();
-                    // Use flex for matches, none for non-matches
-                    card.style.display = title.includes(term) ? 'flex' : 'none';
+                    const desc = card.querySelector('p')?.innerText.toLowerCase() || "";
+                    
+                    // Match hone par dikhao, warna chupao
+                    if (title.includes(term) || desc.includes(term)) {
+                        card.style.display = 'flex'; // Box layout maintain rahega
+                        card.classList.add('fade-in');
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
             });
         }
 
-        // Ctrl+K Shortcut
+        // Desktop Shortcut: Ctrl+K
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
-                search?.focus();
+                searchInput?.focus();
             }
         });
     },
 
-    // --- 5. TOAST NOTIFICATIONS ---
+    // --- 5. TOAST NOTIFICATIONS (Popup Messages) ---
     showToast: function(msg, type = 'success') {
         let container = document.getElementById('toast-container');
-        if (!container) {
+        if(!container) {
+            // Agar container nahi hai toh banao
             container = document.createElement('div');
             container.id = 'toast-container';
             document.body.appendChild(container);
         }
 
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type} fade-in`;
+        toast.className = `toast toast-${type}`;
         
-        // Icons based on type
-        const iconMap = {
-            success: 'ri-checkbox-circle-fill',
-            error: 'ri-error-warning-fill',
-            info: 'ri-information-fill'
-        };
-        const icon = iconMap[type] || iconMap.success;
+        // Icons set karo
+        const icon = type === 'error' ? 'ri-error-warning-fill' : 
+                     type === 'info' ? 'ri-information-fill' : 'ri-checkbox-circle-fill';
 
-        toast.innerHTML = `<i class="${icon}"></i><span>${msg}</span>`;
+        toast.innerHTML = `<i class="${icon}"></i> <span>${msg}</span>`;
         container.appendChild(toast);
-
-        // Auto remove
+        
+        // 3 second baad hata do
         setTimeout(() => {
             toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
+            setTimeout(() => toast.remove(), 400);
         }, 3000);
     }
 };
 
-// --- GLOBAL EXPORTS ---
+// --- 6. UNIVERSAL SLIDER LOGIC (For Image Tools) ---
+window.slideCompare = (val, type) => {
+    // Determine tool type (Enhancer vs Eraser)
+    const prefix = type === 'enh' ? 'enh' : 'bg';
+    
+    // Elements dhundo
+    const front = document.getElementById(`${prefix}-front`) || document.getElementById('bg-original-img');
+    const line = document.getElementById(`${prefix}-line`);
+    const handle = document.getElementById(`${prefix}-handle`);
+
+    // CSS update karo
+    if(front) front.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+    if(line) line.style.left = `${val}%`;
+    if(handle) handle.style.left = `${val}%`;
+};
+
+// --- GLOBAL EXPORTS (HTML ke liye zaruri) ---
 window.showHome = () => App.navigateTo('home-page');
 window.openTool = (id) => App.navigateTo(id);
 window.toggleTheme = () => App.toggleTheme();
 window.showToast = (m, t) => App.showToast(m, t);
-window.loader = (state) => {
-    const l = document.getElementById('loading-overlay');
-    if(l) l.style.display = state ? 'flex' : 'none';
-};
 
-// Initialize
+// App Start Karo
 document.addEventListener('DOMContentLoaded', () => App.init());
