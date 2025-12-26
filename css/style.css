@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-    /* --- TITANIUM DARK THEME --- */
+    /* --- TITANIUM DARK THEME (V39 ENHANCED) --- */
     --bg: #050507;
     --sidebar: rgba(13, 13, 18, 0.85);
     --card: rgba(22, 22, 28, 0.65);
@@ -48,7 +48,7 @@ body {
     transition: background 0.4s var(--ease);
 }
 
-/* --- AURORA AMBIENT (OPTIMIZED) --- */
+/* --- 1. AURORA AMBIENT (GPU OPTIMIZED) --- */
 .ambient-glow {
     position: fixed; inset: 0; z-index: -1; pointer-events: none;
     background: 
@@ -56,15 +56,15 @@ body {
         radial-gradient(circle at 100% 0%, rgba(236,72,153,0.1), transparent 45%),
         radial-gradient(circle at 50% 100%, rgba(16,185,129,0.05), transparent 50%);
     animation: auroraMove 15s infinite alternate ease-in-out;
-    transform: translateZ(0); /* Force GPU */
+    transform: translateZ(0); /* Hardware Acceleration */
 }
 
 @keyframes auroraMove {
     0% { transform: scale(1) rotate(0deg); }
-    100% { transform: scale(1.1) rotate(1deg); }
+    100% { transform: scale(1.1) rotate(1.5deg); }
 }
 
-/* --- LAYOUT ENGINE --- */
+/* --- 2. LAYOUT ENGINE --- */
 .app-container { display: flex; height: 100%; width: 100%; }
 
 .desktop-sidebar {
@@ -82,6 +82,7 @@ body {
     font-size: 1.5rem; box-shadow: 0 8px 24px var(--primary-glow);
 }
 
+/* Side Nav Upgrades */
 .side-nav li {
     padding: 14px 16px; border-radius: 14px; cursor: pointer; color: var(--text-muted);
     display: flex; align-items: center; gap: 14px; font-weight: 500;
@@ -101,13 +102,9 @@ body {
     box-shadow: 2px 0 10px var(--primary);
 }
 
-/* --- CONTENT ENGINE --- */
-.content-area { 
-    flex: 1; overflow-y: auto; padding: 40px; position: relative; 
-    scroll-behavior: smooth; 
-}
+/* --- 3. CONTENT & GLASS CARDS --- */
+.content-area { flex: 1; overflow-y: auto; padding: 40px; position: relative; scroll-behavior: smooth; }
 
-/* Command Search */
 .search-wrapper {
     background: var(--card); border: 1px solid var(--border);
     padding: 16px 24px; border-radius: 50px; display: flex; align-items: center; gap: 14px;
@@ -121,16 +118,13 @@ body {
     box-shadow: 0 15px 35px var(--primary-glow); 
 }
 
-.search-wrapper input { background: transparent; border: none; outline: none; color: var(--text); width: 100%; font-size: 1.05rem; }
-
-/* --- GLASS CARDS (UPGRADED) --- */
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
 
 .t-card {
     background: var(--card); border: 1px solid var(--border); padding: 28px;
     border-radius: var(--radius); cursor: pointer; transition: all 0.4s var(--ease);
     display: flex; flex-direction: column; gap: 18px; position: relative;
-    backdrop-filter: blur(12px); transform: translateZ(0);
+    backdrop-filter: blur(12px); transform: translateZ(0); /* GPU Fix */
 }
 
 .t-card:hover {
@@ -140,16 +134,9 @@ body {
     box-shadow: 0 25px 50px -10px rgba(0,0,0,0.45);
 }
 
-.tc-icon {
-    width: 58px; height: 58px; border-radius: 16px; display: grid; place-items: center;
-    font-size: 1.7rem; color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-/* --- MOBILE NAVIGATION --- */
+/* --- 4. MOBILE NAVIGATION (PRO) --- */
 @media (max-width: 768px) {
     .content-area { padding: 25px 20px 110px 20px; }
-    
-    .tool-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
     
     .mobile-nav {
         display: flex; position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
@@ -169,13 +156,10 @@ body {
         transform: translateY(-28px); 
         box-shadow: 0 10px 25px rgba(236,72,153,0.5);
         border: 4px solid var(--bg);
-        transition: 0.4s var(--ease);
     }
-    
-    .nav-fab:active { transform: translateY(-28px) scale(0.9); }
 }
 
-/* --- UTILS --- */
+/* --- 5. ANIMATIONS --- */
 .fade-in { animation: fadeIn 0.6s var(--ease) forwards; }
 .slide-up { animation: slideUp 0.6s var(--ease) forwards; }
 
