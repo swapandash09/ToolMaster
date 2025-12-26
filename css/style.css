@@ -1,60 +1,162 @@
 /* =========================================
-   TOOLMASTER TITANIUM V39 PRO - CLASSIC BOX
+   TOOLMASTER TITANIUM V39 PRO - FINAL CSS
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
+    /* Classic Light Theme (Default) */
     --bg: #f8fafc;
     --sidebar: #ffffff;
     --card: #ffffff;
     --border: #e2e8f0;
     --primary: #6366f1;
+    --primary-light: #eef2ff;
     --text: #0f172a;
     --text-muted: #64748b;
     --radius: 16px;
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; height: 100vh; overflow: hidden; }
+/* --- BLACK/DARK THEME ENGINE --- */
+body.dark-mode {
+    --bg: #050507;
+    --sidebar: #0f0f12;
+    --card: #16161a;
+    --border: rgba(255,255,255,0.08);
+    --primary-light: rgba(99, 102, 241, 0.1);
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    transition: background 0.3s var(--ease);
+}
 
 .app-container { display: flex; height: 100%; width: 100%; }
 
-/* --- SIDEBAR --- */
+/* --- SIDEBAR UPGRADE --- */
 .desktop-sidebar {
-    width: 260px; background: var(--sidebar);
+    width: 270px;
+    background: var(--sidebar);
     border-right: 1px solid var(--border);
-    padding: 24px; display: flex; flex-direction: column; z-index: 50;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    transition: background 0.3s var(--ease);
 }
-.brand-area { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
-.logo-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: grid; place-items: center; color: white; }
+
+.logo-icon {
+    width: 42px; height: 42px; 
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    border-radius: 12px;
+    display: grid; place-items: center; color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
 
 .side-nav li {
-    padding: 12px 16px; border-radius: 12px; cursor: pointer; color: var(--text-muted);
-    display: flex; align-items: center; gap: 12px; transition: all 0.2s var(--ease);
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 6px;
+    transition: all 0.25s var(--ease);
 }
-.side-nav li:hover, .side-nav li.active { background: #f1f5f9; color: var(--primary); }
 
-/* --- DASHBOARD --- */
-.content-area { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
-.dash-hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 30px; }
+.side-nav li:hover, .side-nav li.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(4px);
+}
 
-.category-block { margin-bottom: 40px; }
-.cat-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; color: var(--text-muted); }
+/* --- DASHBOARD & SEARCH (MOBILE FRIENDLY) --- */
+.content-area { flex: 1; overflow-y: auto; padding: 40px; position: relative; scroll-behavior: smooth; }
 
-.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.dash-hero { margin-bottom: 40px; display: flex; flex-direction: column; gap: 20px; }
+.dash-hero h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; }
 
-/* THE CLASSIC BOX CARD */
+/* Fixed Search Bar */
+.search-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 450px;
+    transition: all 0.3s var(--ease);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.search-wrapper:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+}
+
+.search-wrapper input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    width: 100%;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+/* --- SMART TOOL CARDS --- */
+.category-block { margin-bottom: 40px; animation: slideUp 0.6s var(--ease); }
+.cat-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; color: var(--text-muted); font-weight: 700; }
+
+.tool-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+    gap: 20px; 
+}
+
 .t-card {
-    background: var(--card); border: 1px solid var(--border); padding: 24px;
-    border-radius: var(--radius); cursor: pointer; display: flex; align-items: center;
-    gap: 16px; transition: all 0.3s var(--ease); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    transition: all 0.3s var(--ease);
+    position: relative;
+    overflow: hidden;
 }
-.t-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
 
-.tc-icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0; }
+.t-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
 
-/* Colors from your Video */
+/* Smart Style Icons */
+.tc-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    transition: transform 0.3s var(--ease);
+}
+
+.t-card:hover .tc-icon { transform: scale(1.1) rotate(-5deg); }
+
+/* Icon Smart Colors */
 .c-blue { background: #eff6ff; color: #3b82f6; }
 .c-green { background: #f0fdf4; color: #22c55e; }
 .c-orange { background: #fff7ed; color: #f97316; }
@@ -64,84 +166,24 @@ body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-se
 .c-red { background: #fef2f2; color: #ef4444; }
 .c-cyan { background: #ecfeff; color: #06b6d4; }
 
-.tc-info h4 { font-size: 1.05rem; font-weight: 700; }
+/* Dark mode icon adjustments */
+body.dark-mode .tc-icon { background: rgba(255,255,255,0.05) !important; }
+
+.tc-info h4 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
 .tc-info p { font-size: 0.85rem; color: var(--text-muted); }
 
-/* --- TOOLS WORKSPACE FIX --- */
-#tool-container { position: relative; width: 100%; z-index: 100; background: var(--bg); }
-.tool-workspace { display: none; opacity: 0; }
-.tool-workspace.active { display: block !important; opacity: 1 !important; animation: fadeIn 0.4s var(--ease); }
-
-/* Sliders */
-.compare-viewer { position: relative; border-radius: 16px; overflow: hidden; background: #000; height: 400px; }
-.slider { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 50; opacity: 0; cursor: ew-resize; }
-.slider-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #fff; z-index: 10; }
-.slider-handle { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; display: grid; place-items: center; color: #000; }
-
-.hidden { display: none !important; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    padding: 16px 24px; border-radius: 50px; display: flex; align-items: center; gap: 14px;
-    width: 100%; max-width: 420px; transition: 0.4s var(--ease);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
-
-.search-wrapper:focus-within { 
-    border-color: var(--primary); 
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px var(--primary-glow); 
-}
-
-.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
-
-.t-card {
-    background: var(--card); border: 1px solid var(--border); padding: 28px;
-    border-radius: var(--radius); cursor: pointer; transition: all 0.4s var(--ease);
-    display: flex; flex-direction: column; gap: 18px; position: relative;
-    backdrop-filter: blur(12px); transform: translateZ(0); /* GPU Fix */
-}
-
-.t-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    border-color: var(--border-highlight);
-    background: var(--card-hover); 
-    box-shadow: 0 25px 50px -10px rgba(0,0,0,0.45);
-}
-
-/* --- 4. MOBILE NAVIGATION (PRO) --- */
+/* --- RESPONSIVE FIXES --- */
 @media (max-width: 768px) {
-    .content-area { padding: 25px 20px 110px 20px; }
-    
-    .mobile-nav {
-        display: flex; position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-        width: 92%; max-width: 440px; height: 72px;
-        background: rgba(18, 18, 24, 0.95); backdrop-filter: blur(25px);
-        border: 1px solid rgba(255,255,255,0.15); border-radius: 50px;
-        justify-content: space-evenly; align-items: center; z-index: 100;
-        box-shadow: 0 15px 45px rgba(0,0,0,0.6);
-    }
-
-    .nav-item { color: var(--text-muted); font-size: 1.5rem; transition: 0.3s var(--ease); }
-    .nav-item.active { color: #fff; transform: translateY(-3px); text-shadow: 0 0 15px var(--primary); }
-
-    .nav-fab {
-        width: 62px; height: 62px; background: linear-gradient(135deg, var(--accent), var(--primary));
-        border-radius: 50%; display: grid; place-items: center; color: white; font-size: 1.8rem;
-        transform: translateY(-28px); 
-        box-shadow: 0 10px 25px rgba(236,72,153,0.5);
-        border: 4px solid var(--bg);
-    }
+    .desktop-sidebar { display: none; }
+    .content-area { padding: 20px 20px 100px 20px; }
+    .dash-hero h1 { font-size: 1.8rem; }
+    .search-wrapper { max-width: 100%; } /* Mobile friendly search */
+    .tool-grid { grid-template-columns: 1fr; }
+    .t-card { padding: 20px; }
 }
 
-/* --- 5. ANIMATIONS --- */
-.fade-in { animation: fadeIn 0.6s var(--ease) forwards; }
-.slide-up { animation: slideUp 0.6s var(--ease) forwards; }
-
+/* Animations */
+.slide-up { animation: slideUp 0.5s var(--ease) forwards; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.4s var(--ease) forwards; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { 
-    from { opacity: 0; transform: translateY(30px); } 
-    to { opacity: 1; transform: translateY(0); } 
-}
-
-/* Scrollbar V39 */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }
