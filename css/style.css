@@ -25,7 +25,6 @@
     --shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
     
     /* Liquid Physics Curves */
-    --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-liquid: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -52,27 +51,6 @@ body, .desktop-sidebar, .t-card, .search-wrapper, .mobile-nav, h1, h2, span, i {
     transition: background 0.4s var(--ease-liquid), color 0.3s var(--ease-liquid), border-color 0.3s ease;
 }
 
-/* Page Transitions */
-.view-section, .tool-workspace {
-    transition: transform 0.5s var(--ease-liquid), opacity 0.4s ease;
-    will-change: transform, opacity;
-    position: relative; /* Stability */
-}
-
-/* States */
-.view-exit {
-    opacity: 0 !important;
-    transform: translateY(20px) scale(0.98) !important;
-    pointer-events: none;
-}
-
-.view-enter {
-    opacity: 1 !important;
-    transform: translateY(0) scale(1) !important;
-}
-
-.force-gone { display: none !important; }
-
 /* --- BASE LAYOUT --- */
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -80,11 +58,11 @@ body {
     background: var(--bg); color: var(--text);
     font-family: 'Outfit', sans-serif;
     height: 100vh; overflow: hidden;
-    /* Noise Texture */
+    /* Noise Texture for Premium Feel */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
-/* Ambient Background */
+/* Ambient Background Glow */
 .ambient-glow {
     position: fixed; inset: 0; z-index: -1; pointer-events: none;
     background: 
@@ -182,6 +160,7 @@ body {
     .desktop-sidebar { display: none; }
     .content-area { padding: 20px 20px 120px; }
     .mobile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    
     .mobile-nav {
         display: flex; position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
         width: 85%; max-width: 400px; height: 70px;
