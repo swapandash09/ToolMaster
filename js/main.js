@@ -1,152 +1,167 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V42 - CORE ENGINE
+// ⚡ TOOLMASTER TITANIUM V43 - HYPERION ENGINE
 // ==========================================
 
 const App = {
-    version: 'V42 Ultimate',
+    version: 'V43 Hyperion',
+    config: {
+        animDuration: 350,
+        reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    },
     state: {
         currentView: 'home-page',
-        history: [],
-        isLoading: false
+        isLoading: false,
+        searchDebounce: null
     },
+    dom: {}, // Cache frequently used elements
 
     init: function() {
         // console.clear();
-        console.log(`%c ${this.version} %c System Online `, 
+        console.log(`%c ${this.version} %c Core Online `, 
             'background:#6366f1; color:white; padding: 3px 6px; border-radius: 4px; font-weight:bold;', 
             'color:#6366f1; font-weight:bold; font-family:sans-serif;');
         
+        this.cacheDOM();
         this.loadTheme();
         this.setupSearch();
         this.setupShortcuts();
-        this.setupRouter(); // Enable Browser Back Button
+        this.setupRouter();
 
-        // 🚀 SMOOTH LAUNCH SEQUENCE
+        // 🚀 CINEMATIC LAUNCH
         window.addEventListener('load', () => {
-            const loader = document.getElementById('loading-overlay');
-            if(loader) {
+            if (this.dom.loader) {
+                // Force GPU layer for smoothness
+                this.dom.loader.style.willChange = 'opacity, transform';
+                
                 setTimeout(() => {
-                    loader.style.opacity = '0';
-                    loader.style.transform = 'scale(1.1)'; // Subtle zoom out
+                    this.dom.loader.style.opacity = '0';
+                    this.dom.loader.style.transform = 'scale(1.05)'; 
+                    this.dom.loader.style.filter = 'blur(10px)'; // Blur out effect
+                    
                     setTimeout(() => {
-                        loader.style.display = 'none';
-                        document.body.classList.add('app-loaded'); // Trigger CSS animations
+                        this.dom.loader.style.display = 'none';
+                        document.body.classList.add('app-ready');
                     }, 500);
-                }, 400); // Faster load feel
+                }, 300);
             }
         });
     },
 
-    // --- 1. ADVANCED ROUTING & NAVIGATION ---
-    navigateTo: function(viewId, addToHistory = true) {
-        if(this.state.isLoading) return; // Prevent spam clicks
-        
-        const homePage = document.getElementById('home-page');
-        const toolContainer = document.getElementById('tool-container');
-        
-        if (!homePage || !toolContainer) return;
+    cacheDOM: function() {
+        this.dom = {
+            homePage: document.getElementById('home-page'),
+            toolContainer: document.getElementById('tool-container'),
+            searchBar: document.getElementById('search-bar'),
+            loader: document.getElementById('loading-overlay'),
+            toastContainer: document.getElementById('toast-container')
+        };
+    },
 
-        // Save State for Back Button
-        if (addToHistory && viewId !== this.state.currentView) {
+    // --- 1. NEXT-GEN ROUTING ENGINE (View Transitions) ---
+    navigateTo: function(viewId, addToHistory = true) {
+        if(this.state.isLoading || viewId === this.state.currentView) return;
+
+        // 1. Lifecycle: Clean up previous tool
+        if (this.state.currentView !== 'home-page') {
+            window.dispatchEvent(new CustomEvent('toolClosed', { detail: { toolId: this.state.currentView } }));
+        }
+
+        // 2. History Management
+        if (addToHistory) {
             history.pushState({ viewId }, "", `#${viewId.replace('-tool', '')}`);
         }
+        
+        const prevView = this.state.currentView;
         this.state.currentView = viewId;
+        const isGoingHome = viewId === 'home-page';
 
-        // SCENARIO 1: GO HOME
-        if (viewId === 'home-page' || viewId === '') {
-            // Animation Out
-            if(!toolContainer.classList.contains('hidden')) {
-                toolContainer.style.opacity = '0';
-                toolContainer.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    toolContainer.classList.add('hidden');
-                    homePage.classList.remove('hidden');
-                    // Animation In
-                    requestAnimationFrame(() => {
-                        homePage.style.opacity = '1';
-                        homePage.style.transform = 'translateY(0)';
-                    });
-                }, 300);
-            } else {
-                // Initial Load
-                homePage.classList.remove('hidden');
-            }
+        // 3. THE TRANSITION LOGIC
+        // Use Native View Transitions if supported (Chrome/Edge/Arc)
+        if (document.startViewTransition && !this.config.reducedMotion) {
+            document.startViewTransition(() => {
+                this._updateDOMForRoute(viewId, prevView);
+            });
+        } 
+        // Fallback for Safari/Firefox (CSS Transitions)
+        else {
+            this._fallbackTransition(viewId, isGoingHome);
+        }
+    },
+
+    // Internal: Actual DOM Swapping
+    _updateDOMForRoute: function(viewId, prevView) {
+        window.scrollTo({ top: 0 }); // Instant scroll reset
+
+        if (viewId === 'home-page') {
+            this.dom.toolContainer.classList.add('hidden');
+            this.dom.homePage.classList.remove('hidden');
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Clear Search
+            if(this.dom.searchBar) { this.dom.searchBar.value = ''; this.filterTools(''); }
+            
             document.title = "ToolMaster Titanium - Dashboard";
             this.updateSidebar('home');
-
-            // Clear Search
-            const search = document.getElementById('search-bar');
-            if(search) { search.value = ''; this.filterTools(''); }
-        } 
-        // SCENARIO 2: OPEN TOOL
-        else {
+        } else {
             const toolElement = document.getElementById(viewId);
-            
-            if (toolElement) {
-                // Animation Swap
-                homePage.style.opacity = '0';
-                homePage.style.transform = 'scale(0.98)';
-                
-                setTimeout(() => {
-                    homePage.classList.add('hidden');
-                    toolContainer.classList.remove('hidden');
-                    
-                    // Reset Transition Props
-                    toolContainer.style.opacity = '0';
-                    toolContainer.style.transform = 'translateY(10px)';
-
-                    // Reset all workspaces
-                    document.querySelectorAll('.tool-workspace').forEach(el => {
-                        el.classList.add('hidden');
-                        el.style.display = 'none'; // Force layout reset
-                    });
-
-                    // Activate Target
-                    toolElement.classList.remove('hidden');
-                    toolElement.style.display = 'block';
-                    
-                    // Smooth Fade In
-                    requestAnimationFrame(() => {
-                        toolContainer.style.transition = 'all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                        toolContainer.style.opacity = '1';
-                        toolContainer.style.transform = 'translateY(0)';
-                    });
-
-                    this.updateSidebar(viewId);
-                    window.scrollTo(0, 0);
-
-                    // ⚡ DISPATCH EVENT (Crucial for Resume/Charts)
-                    setTimeout(() => {
-                        window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: viewId } }));
-                    }, 100);
-
-                    // Update Title
-                    const toolName = toolElement.querySelector('h2')?.innerText || "Tool";
-                    document.title = `ToolMaster - ${toolName}`;
-
-                }, 200); // Fast transition
-
-            } else {
-                this.showToast(`Tool "${viewId}" module missing.`, "error");
-                this.navigateTo('home-page', false);
+            if (!toolElement) {
+                this.showToast(`Module "${viewId}" not installed.`, "error");
+                return this.navigateTo('home-page', false);
             }
+
+            this.dom.homePage.classList.add('hidden');
+            this.dom.toolContainer.classList.remove('hidden');
+
+            // Hide all other workspaces
+            document.querySelectorAll('.tool-workspace').forEach(el => el.classList.add('hidden'));
+            
+            // Show target
+            toolElement.classList.remove('hidden');
+
+            // ⚡ Lifecycle: Initialize new tool
+            window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: viewId } }));
+
+            const toolName = toolElement.querySelector('h2')?.innerText || "Tool";
+            document.title = `ToolMaster - ${toolName}`;
+            this.updateSidebar(viewId);
         }
+    },
+
+    // Internal: Fallback Animation (Manual CSS manipulation)
+    _fallbackTransition: function(viewId, isGoingHome) {
+        const container = isGoingHome ? this.dom.toolContainer : this.dom.homePage;
+        
+        // 1. Fade Out
+        container.style.opacity = '0';
+        container.style.transform = isGoingHome ? 'translateY(15px)' : 'scale(0.98)';
+        
+        setTimeout(() => {
+            this._updateDOMForRoute(viewId);
+            
+            // 2. Fade In New View
+            const newContainer = isGoingHome ? this.dom.homePage : this.dom.toolContainer;
+            
+            // Prepare for entry
+            newContainer.style.opacity = '0';
+            newContainer.style.transform = isGoingHome ? 'scale(0.98)' : 'translateY(15px)';
+            newContainer.style.transition = 'none'; // Prevent lag
+            
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    newContainer.style.transition = `all ${this.config.animDuration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
+                    newContainer.style.opacity = '1';
+                    newContainer.style.transform = isGoingHome ? 'scale(1)' : 'translateY(0)';
+                });
+            });
+        }, 200);
     },
 
     setupRouter: function() {
-        // Handle Browser Back/Forward Buttons
         window.addEventListener('popstate', (event) => {
-            if (event.state && event.state.viewId) {
-                this.navigateTo(event.state.viewId, false);
-            } else {
-                this.navigateTo('home-page', false);
-            }
+            const target = (event.state && event.state.viewId) ? event.state.viewId : 'home-page';
+            this.navigateTo(target, false);
         });
 
-        // Handle Initial Hash Load (e.g. site.com/#resume)
+        // Handle Deep Links (e.g., #resume-tool)
         const hash = window.location.hash.substring(1);
         if(hash) {
             const toolId = hash.includes('-tool') ? hash : hash + '-tool';
@@ -154,130 +169,114 @@ const App = {
         }
     },
 
-    // --- 2. SIDEBAR & NAV SYNC ---
+    // --- 2. SIDEBAR STATE SYNC ---
     updateSidebar: function(activeId) {
         document.querySelectorAll('.side-nav li, .mobile-nav .nav-item').forEach(li => {
-            li.classList.remove('active');
+            const action = li.getAttribute('onclick') || li.getAttribute('href') || "";
+            const isTarget = (activeId === 'home-page' && (action.includes('showHome') || action === '#')) ||
+                             (activeId !== 'home-page' && action.includes(activeId));
             
-            // Safe attribute check
-            const onClick = li.getAttribute('onclick') || "";
-            const href = li.getAttribute('href') || "";
-            
-            // Match Logic
-            const isHome = activeId === 'home-page';
-            const matchesHome = isHome && (onClick.includes('showHome') || href === '#');
-            const matchesTool = !isHome && (onClick.includes(activeId) || href.includes(activeId));
-
-            if (matchesHome || matchesTool) {
+            if (isTarget) {
                 li.classList.add('active');
-                // Add tiny bounce effect
-                li.style.transform = 'scale(0.95)';
-                setTimeout(() => li.style.transform = '', 150);
+                if(!this.config.reducedMotion) {
+                    // Micro-interaction bounce
+                    li.animate([
+                        { transform: 'scale(0.95)' },
+                        { transform: 'scale(1.05)' },
+                        { transform: 'scale(1)' }
+                    ], { duration: 300, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
+                }
+            } else {
+                li.classList.remove('active');
             }
         });
     },
 
-    // --- 3. THEME ENGINE (Zero Flash) ---
+    // --- 3. THEME ENGINE (Instant Switch) ---
     toggleTheme: function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         localStorage.setItem('tm_theme', isLight ? 'light' : 'dark');
         
-        // Dispatch event for charts/canvas tools to redraw colors
+        // Notify components (Charts, Canvases need redraws on theme change)
         window.dispatchEvent(new Event('themeChanged'));
         
-        this.showToast(isLight ? "Light Mode Active ☀️" : "Dark Mode Active 🌙", "info");
+        this.showToast(isLight ? "Light Mode Active" : "Dark Mode Active", "info");
     },
 
     loadTheme: function() {
-        const saved = localStorage.getItem('tm_theme');
-        if (saved === 'light') document.body.classList.add('light-mode');
+        if (localStorage.getItem('tm_theme') === 'light') document.body.classList.add('light-mode');
     },
 
-    // --- 4. SMART SEARCH (Debounced) ---
+    // --- 4. SMART SEARCH (Debounced + Empty State) ---
     setupSearch: function() {
-        const searchInput = document.getElementById('search-bar');
-        if(!searchInput) return;
-
-        let timeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
+        if(!this.dom.searchBar) return;
+        
+        this.dom.searchBar.addEventListener('input', (e) => {
+            clearTimeout(this.state.searchDebounce);
+            this.state.searchDebounce = setTimeout(() => {
                 this.filterTools(e.target.value.toLowerCase().trim());
-            }, 50); // 50ms debounce for performance
+            }, 60); // 60ms debounce (1 frame @ 60fps)
         });
     },
 
     filterTools: function(term) {
         const cards = document.querySelectorAll('.t-card');
-        let found = 0;
+        const categories = document.querySelectorAll('.category-block');
+        let totalFound = 0;
 
+        // 1. Filter Cards
         cards.forEach(card => {
             const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
             const desc = card.querySelector('p')?.innerText.toLowerCase() || "";
-            const matches = title.includes(term) || desc.includes(term);
+            const match = title.includes(term) || desc.includes(term);
             
-            if(matches) {
-                card.style.display = 'flex';
-                // Trigger reflow for staggered animation
-                card.style.animation = 'none';
-                card.offsetHeight; 
+            card.style.display = match ? 'flex' : 'none';
+            if(match) {
                 card.style.animation = 'fadeIn 0.4s ease forwards';
-                found++;
+                totalFound++;
+            }
+        });
+
+        // 2. Hide Empty Categories
+        categories.forEach(cat => {
+            const visibleCards = cat.querySelectorAll('.t-card[style="display: flex;"]');
+            cat.style.display = visibleCards.length > 0 ? 'block' : 'none';
+        });
+
+        // 3. Handle No Results
+        const noResId = 'no-results-msg';
+        let noResMsg = document.getElementById(noResId);
+        
+        if(totalFound === 0 && term !== "") {
+            if(!noResMsg) {
+                noResMsg = document.createElement('div');
+                noResMsg.id = noResId;
+                noResMsg.style.cssText = "text-align:center; padding:40px; color:var(--text-muted); font-size:1.1rem;";
+                noResMsg.innerHTML = `<i class="ri-search-eye-line" style="font-size:3rem; display:block; margin-bottom:10px; opacity:0.5;"></i>No tools found for "${term}"`;
+                document.querySelector('.tools-wrapper').appendChild(noResMsg);
             } else {
-                card.style.display = 'none';
+                noResMsg.innerHTML = `<i class="ri-search-eye-line" style="font-size:3rem; display:block; margin-bottom:10px; opacity:0.5;"></i>No tools found for "${term}"`;
+                noResMsg.style.display = 'block';
             }
-        });
-
-        // Show "No Results" message if needed
-        // (You can add a hidden div in HTML with id 'no-results' to toggle here)
+        } else if (noResMsg) {
+            noResMsg.style.display = 'none';
+        }
     },
 
-    // --- 5. GLOBAL SHORTCUTS ---
-    setupShortcuts: function() {
-        document.addEventListener('keydown', (e) => {
-            // Ctrl + K = Search
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                if(document.getElementById('home-page').classList.contains('hidden')) {
-                    this.navigateTo('home-page');
-                }
-                setTimeout(() => document.getElementById('search-bar')?.focus(), 150);
-            }
-            // Esc = Home / Close Modal
-            if (e.key === 'Escape') {
-                this.navigateTo('home-page');
-                // Also close any active modals if you implement them
-            }
-            // Ctrl + Shift + L = Toggle Theme
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {
-                e.preventDefault();
-                this.toggleTheme();
-            }
-        });
-    },
-
-    // --- 6. ADVANCED TOASTS (Stackable) ---
+    // --- 5. INTERACTIVE NOTIFICATIONS (Hover Pause) ---
     showToast: function(msg, type = 'success') {
-        let container = document.getElementById('toast-container');
-        if(!container) {
-            // Create container if missing
-            container = document.createElement('div');
-            container.id = 'toast-container';
-            document.body.appendChild(container);
+        if(!this.dom.toastContainer) {
+            this.dom.toastContainer = document.createElement('div');
+            this.dom.toastContainer.id = 'toast-container';
+            document.body.appendChild(this.dom.toastContainer);
         }
 
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         
-        const icons = {
-            success: 'ri-checkbox-circle-fill',
-            error: 'ri-error-warning-fill',
-            info: 'ri-information-fill',
-            loading: 'ri-loader-4-line'
-        };
+        const icons = { success: 'ri-check-line', error: 'ri-alert-line', info: 'ri-information-line', loading: 'ri-loader-4-line' };
         
-        // Modern Glass Style injected directly or via CSS
         toast.innerHTML = `
             <div class="toast-content">
                 <i class="${icons[type] || icons.success} ${type === 'loading' ? 'spin' : ''}"></i>
@@ -286,20 +285,58 @@ const App = {
             <div class="toast-progress"></div>
         `;
         
-        container.appendChild(toast);
+        this.dom.toastContainer.appendChild(toast);
 
-        // Slide In Animation
+        // Animation In
         requestAnimationFrame(() => {
-            toast.style.transform = 'translateX(0)';
+            toast.style.transform = 'translateY(0) scale(1)';
             toast.style.opacity = '1';
         });
 
-        // Auto Dismiss
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-20px) scale(0.9)';
-            setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        // Auto Dismiss Logic with Pause on Hover
+        let timeout;
+        const startDismiss = () => {
+            timeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px) scale(0.95)';
+                setTimeout(() => toast.remove(), 350);
+            }, 4000);
+        };
+
+        toast.addEventListener('mouseenter', () => { clearTimeout(timeout); toast.style.transform = 'scale(1.02)'; });
+        toast.addEventListener('mouseleave', () => { toast.style.transform = 'scale(1)'; startDismiss(); });
+        
+        startDismiss();
+    }
+};
+
+// --- SHORTCUTS ENGINE ---
+const Shortcuts = {
+    init() {
+        document.addEventListener('keydown', (e) => {
+            // Meta key is Cmd on Mac, Ctrl on Windows
+            const cmd = e.ctrlKey || e.metaKey;
+
+            // Ctrl + K: Search
+            if (cmd && e.key === 'k') {
+                e.preventDefault();
+                if(App.state.currentView !== 'home-page') App.navigateTo('home-page');
+                setTimeout(() => App.dom.searchBar?.focus(), 100);
+            }
+            // Esc: Home / Blur
+            if (e.key === 'Escape') {
+                if(document.activeElement === App.dom.searchBar) {
+                    App.dom.searchBar.blur();
+                } else {
+                    App.navigateTo('home-page');
+                }
+            }
+            // Ctrl + / : Toggle Theme
+            if (cmd && e.key === '/') {
+                e.preventDefault();
+                App.toggleTheme();
+            }
+        });
     }
 };
 
@@ -310,36 +347,41 @@ window.openTool = (id) => App.navigateTo(id);
 window.toggleTheme = () => App.toggleTheme();
 window.showToast = (m, t) => App.showToast(m, t);
 
-// --- GLOBAL LOADER API ---
+// --- GLOBAL LOADER ---
 window.loader = (show, text = "PROCESSING...") => {
-    const l = document.getElementById('loading-overlay');
+    const l = App.dom.loader;
     if(!l) return;
     
     const p = l.querySelector('p');
-    
     if(show) {
         l.style.display = 'flex';
+        // Reset state for entry
         l.style.opacity = '0';
+        l.style.transform = 'scale(0.95)';
         if(p) p.innerText = text;
         
         requestAnimationFrame(() => {
             l.style.opacity = '1';
-            l.style.backdropFilter = 'blur(10px)'; // Heavy blur for focus
+            l.style.transform = 'scale(1)';
+            l.style.backdropFilter = 'blur(15px)';
         });
     } else {
         l.style.opacity = '0';
+        l.style.transform = 'scale(1.05)';
         l.style.backdropFilter = 'blur(0px)';
-        setTimeout(() => l.style.display = 'none', 300);
+        setTimeout(() => l.style.display = 'none', 350);
     }
 };
 
-// --- ERROR GUARD (Prevents app crash) ---
-window.onerror = function(message, source, lineno, colno, error) {
-    console.error("Titanium Core Error:", error);
-    App.showToast("System Error. Check console.", "error");
-    // Only return true if you want to suppress the default browser error
-    return false; 
+// --- ERROR GUARD ---
+window.onerror = (msg, src, line, col, error) => {
+    console.warn("Titanium Guard Caught:", error);
+    App.showToast("An error occurred. Check console.", "error");
+    return false;
 };
 
-// Start Engines
-document.addEventListener('DOMContentLoaded', () => App.init());
+// --- BOOTSTRAP ---
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+    Shortcuts.init();
+});
