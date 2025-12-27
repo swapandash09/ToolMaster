@@ -1,26 +1,70 @@
 // ==========================================
-// 📄 RESUME BUILDER MODULE (FINAL FIXED)
+// 📄 RESUME BUILDER MODULE (TITANIUM V40 ULTRA)
 // ==========================================
 
 let resumeData = {
-    name: "", title: "", email: "", phone: "", address: "", website: "",
-    summary: "", company: "", dates: "", jobdesc: "", skills: "",
+    // Personal & Header
+    profileImage: "", name: "", title: "", 
+    email: "", phone: "", address: "", website: "",
+    
+    // Details
+    fathersName: "", nationality: "",
+
+    // Main Content
+    summary: "", 
+    
+    // Experience
+    company: "", dates: "", jobdesc: "", 
+    
+    // Education
+    degree: "", school: "", eduYear: "",
+
+    // Skills
+    skills: "",
+    
     theme: "theme-blue"
 };
 
-// 1. Live Update Logic
+// --- 1. IMAGE HANDLER (NEW) ---
+function handleProfilePhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            resumeData.profileImage = e.target.result; // Store as Base64
+            renderResume();
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// --- 2. LIVE UPDATE LOGIC ---
 function updateResume() {
-    // Capture Inputs safely
+    // Basic Info
     resumeData.name = getValue('in-name');
     resumeData.title = getValue('in-title');
     resumeData.email = getValue('in-email');
     resumeData.phone = getValue('in-phone');
     resumeData.address = getValue('in-address');
     resumeData.website = getValue('in-web');
+    
+    // Personal Details (New)
+    resumeData.fathersName = getValue('in-father');
+    resumeData.nationality = getValue('in-nation');
+
+    // Content
     resumeData.summary = getValue('in-summary');
+    
+    // Experience
     resumeData.company = getValue('in-company');
     resumeData.dates = getValue('in-dates');
     resumeData.jobdesc = getValue('in-job-desc');
+    
+    // Education (New)
+    resumeData.degree = getValue('in-degree');
+    resumeData.school = getValue('in-school');
+    resumeData.eduYear = getValue('in-edu-year');
+
+    // Skills
     resumeData.skills = getValue('in-skills');
 
     renderResume();
@@ -31,32 +75,66 @@ function getValue(id) {
     return el ? el.value : "";
 }
 
+// --- 3. RENDER ENGINE (DESIGN UPGRADE) ---
 function renderResume() {
-    // Header
+    // 1. Profile Photo
+    const imgEl = document.getElementById('res-photo-img');
+    const imgContainer = document.getElementById('res-photo-container');
+    
+    if (resumeData.profileImage) {
+        imgEl.src = resumeData.profileImage;
+        imgContainer.style.display = 'block';
+    } else {
+        imgContainer.style.display = 'none';
+    }
+
+    // 2. Header Name/Title
     setText('res-name', resumeData.name || "YOUR NAME");
     setText('res-title', resumeData.title || "PROFESSIONAL TITLE");
     
-    // Contact Bar
-    const locationHTML = resumeData.address ? `<i class="ri-map-pin-line"></i> ${resumeData.address}` : '';
-    const phoneHTML = resumeData.phone ? `<i class="ri-phone-line"></i> ${resumeData.phone}` : '';
-    const emailHTML = resumeData.email ? `<i class="ri-mail-line"></i> ${resumeData.email}` : '';
-    const webHTML = resumeData.website ? `<i class="ri-global-line"></i> ${resumeData.website}` : '';
+    // 3. Contact Info (Sidebar)
+    const contactBox = document.getElementById('res-contact-box');
+    let contactHTML = "";
+    if(resumeData.phone) contactHTML += `<div class="icon-text"><i class="ri-phone-fill"></i> ${resumeData.phone}</div>`;
+    if(resumeData.email) contactHTML += `<div class="icon-text"><i class="ri-mail-fill"></i> ${resumeData.email}</div>`;
+    if(resumeData.address) contactHTML += `<div class="icon-text"><i class="ri-map-pin-fill"></i> ${resumeData.address}</div>`;
+    if(resumeData.website) contactHTML += `<div class="icon-text"><i class="ri-global-line"></i> ${resumeData.website}</div>`;
+    if(contactBox) contactBox.innerHTML = contactHTML;
+
+    // 4. Personal Details (Father's Name, etc.)
+    const personalBox = document.getElementById('res-personal-box');
+    let personalHTML = "";
+    if(resumeData.fathersName) personalHTML += `<li><strong>Father's Name:</strong> ${resumeData.fathersName}</li>`;
+    if(resumeData.nationality) personalHTML += `<li><strong>Nationality:</strong> ${resumeData.nationality}</li>`;
     
-    const contactBar = document.querySelector('.header-contact');
-    if(contactBar) {
-        contactBar.innerHTML = `${locationHTML} ${phoneHTML} ${emailHTML} ${webHTML}`;
+    const personalSection = document.getElementById('res-personal-section');
+    if(personalSection) {
+        if(personalHTML) {
+            personalSection.style.display = 'block';
+            personalBox.innerHTML = `<ul>${personalHTML}</ul>`;
+        } else {
+            personalSection.style.display = 'none';
+        }
     }
 
-    // Summary
-    setText('res-summary', resumeData.summary || "Your professional profile summary will appear here.");
+    // 5. Main Content
+    setText('res-summary', resumeData.summary || "Professional summary goes here...");
 
     // Experience
     setText('res-company', resumeData.company || "Company Name");
     setText('res-dates', resumeData.dates || "2020 - Present");
-    
     const jobDescEl = document.getElementById('res-job-desc');
-    if(jobDescEl) {
-        jobDescEl.innerHTML = resumeData.jobdesc ? resumeData.jobdesc.replace(/\n/g, '<br>') : "• Describe your responsibilities here.";
+    if(jobDescEl) jobDescEl.innerHTML = resumeData.jobdesc ? resumeData.jobdesc.replace(/\n/g, '<br>') : "• Describe your responsibilities here.";
+
+    // Education (New)
+    const eduSection = document.getElementById('res-edu-section');
+    if(resumeData.degree || resumeData.school) {
+        eduSection.style.display = 'block';
+        setText('res-degree', resumeData.degree || "Degree Name");
+        setText('res-school', resumeData.school || "University / School");
+        setText('res-edu-year', resumeData.eduYear || "Year");
+    } else {
+        eduSection.style.display = 'none';
     }
 
     // Skills
@@ -67,13 +145,11 @@ function renderResume() {
             resumeData.skills.split(',').forEach(s => {
                 if(s.trim()) {
                     const tag = document.createElement('span');
-                    tag.className = 'res-skill-tag';
+                    tag.className = 'res-skill-pill';
                     tag.innerText = s.trim();
                     skillsContainer.appendChild(tag);
                 }
             });
-        } else {
-            skillsContainer.innerHTML = '<span class="res-skill-tag">Skill 1</span><span class="res-skill-tag">Skill 2</span>';
         }
     }
 }
@@ -83,140 +159,86 @@ function setText(id, val) {
     if(el) el.innerText = val;
 }
 
-// 2. AI SUMMARY GENERATOR
+// --- 4. AI & UTILS ---
 function generateAISummary() {
     const title = getValue('in-title').toLowerCase();
     const box = document.getElementById('in-summary');
+    if(!title) return showToast("Enter Job Title first!", "error");
     
-    if(!title) {
-        if(typeof showToast === 'function') showToast("Enter Job Title first!", "error");
-        return;
-    }
+    let aiText = `Experienced ${title} with a proven track record of success. Skilled in problem-solving and dedicated to optimizing results.`;
     
-    // Simple Logic-based AI
-    let aiText = "";
-    if(title.includes('developer') || title.includes('coder')) {
-        aiText = `Innovative ${title} with a passion for building scalable software solutions. Proficient in modern coding practices and dedicated to optimizing user experience.`;
-    } else if (title.includes('designer') || title.includes('artist')) {
-        aiText = `Visionary ${title} with a strong eye for aesthetics and user-centered design. Experienced in transforming complex concepts into intuitive designs.`;
-    } else if (title.includes('manager') || title.includes('lead')) {
-        aiText = `Results-oriented ${title} with extensive experience in leading teams and driving business growth. Skilled in strategic planning and fostering a collaborative culture.`;
-    } else {
-        aiText = `Dedicated ${title} with a strong work ethic and a commitment to excellence. Eager to leverage skills in a challenging environment.`;
-    }
-
-    // Typewriter Animation
+    // Typewriter
     box.value = "";
     let i = 0;
     function typeWriter() {
-        if (i < aiText.length) {
-            box.value += aiText.charAt(i);
-            i++;
-            setTimeout(typeWriter, 15);
-        } else {
-            updateResume();
-        }
+        if (i < aiText.length) { box.value += aiText.charAt(i); i++; setTimeout(typeWriter, 15); }
+        else { updateResume(); }
     }
     typeWriter();
 }
 
-// 3. COLOR THEME
 function setThemeColor(themeName) {
     const paper = document.getElementById('resume-preview');
     if(!paper) return;
-    
-    // Remove old themes
-    paper.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-gold', 'theme-dark');
-    // Add new theme
-    paper.classList.add(`theme-${themeName}`);
+    paper.className = `resume-paper theme-${themeName}`; // Reset classes
     resumeData.theme = `theme-${themeName}`;
 }
 
-// 4. JSON SAVE & LOAD
+// --- 5. EXPORT LOGIC ---
+function downloadResumePDF() {
+    const element = document.getElementById('resume-preview');
+    if(typeof loader === 'function') loader(true);
+
+    const safeName = (resumeData.name || 'Resume').replace(/[^a-z0-9]/gi, '_');
+
+    const opt = {
+        margin: 0,
+        filename: `${safeName}_CV.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 1200 }, // Fix for images
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        if(typeof loader === 'function') loader(false);
+        if(typeof showToast === 'function') showToast("Resume Saved!", "success");
+    });
+}
+
 function saveResumeJSON() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resumeData));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", `Resume_Data_${resumeData.name || 'Draft'}.json`);
-    document.body.appendChild(dlAnchorElem);
-    dlAnchorElem.click();
-    dlAnchorElem.remove();
-    if(typeof showToast === 'function') showToast("Data Saved!", "success");
+    const dl = document.createElement('a');
+    dl.href = dataStr;
+    dl.download = `Resume_Data.json`;
+    dl.click();
 }
 
 function loadResumeJSON(input) {
     const file = input.files[0];
     if(!file) return;
-    
     const reader = new FileReader();
     reader.onload = function(e) {
-        try {
-            resumeData = JSON.parse(e.target.result);
-            // Fill fields
-            document.getElementById('in-name').value = resumeData.name || "";
-            document.getElementById('in-title').value = resumeData.title || "";
-            document.getElementById('in-email').value = resumeData.email || "";
-            document.getElementById('in-phone').value = resumeData.phone || "";
-            document.getElementById('in-address').value = resumeData.address || "";
-            document.getElementById('in-web').value = resumeData.website || "";
-            document.getElementById('in-summary').value = resumeData.summary || "";
-            document.getElementById('in-company').value = resumeData.company || "";
-            document.getElementById('in-dates').value = resumeData.dates || "";
-            document.getElementById('in-job-desc').value = resumeData.jobdesc || "";
-            document.getElementById('in-skills').value = resumeData.skills || "";
-            
-            if(resumeData.theme) setThemeColor(resumeData.theme.replace('theme-', ''));
-            
-            renderResume();
-            if(typeof showToast === 'function') showToast("Resume Loaded!", "success");
-        } catch(err) {
-            if(typeof showToast === 'function') showToast("Invalid JSON File", "error");
+        resumeData = JSON.parse(e.target.result);
+        
+        // Fill UI Inputs
+        const fields = {
+            'in-name': resumeData.name, 'in-title': resumeData.title,
+            'in-email': resumeData.email, 'in-phone': resumeData.phone,
+            'in-address': resumeData.address, 'in-web': resumeData.website,
+            'in-father': resumeData.fathersName, 'in-nation': resumeData.nationality,
+            'in-summary': resumeData.summary, 'in-company': resumeData.company,
+            'in-dates': resumeData.dates, 'in-job-desc': resumeData.jobdesc,
+            'in-degree': resumeData.degree, 'in-school': resumeData.school,
+            'in-edu-year': resumeData.eduYear, 'in-skills': resumeData.skills
+        };
+
+        for (let id in fields) {
+            const el = document.getElementById(id);
+            if(el) el.value = fields[id] || "";
         }
+        
+        renderResume();
+        showToast("Resume Loaded!", "success");
     };
     reader.readAsText(file);
-}
-
-// 5. PDF DOWNLOAD (MOBILE FIX APPLIED)
-function downloadResumePDF() {
-    const element = document.getElementById('resume-preview');
-    
-    if (!element) {
-        if(typeof showToast === 'function') showToast("Error: Resume preview not found.", "error");
-        return;
-    }
-
-    // Check if library is loaded
-    if (typeof html2pdf === 'undefined') {
-        alert("Error: PDF Library is missing. Please check your internet connection.");
-        return;
-    }
-
-    if(typeof loader === 'function') loader(true); // Show Spinner
-
-    const safeName = (resumeData.name || 'My_Resume').replace(/[^a-z0-9]/gi, '_');
-
-    // === CRITICAL FIX SETTINGS ===
-    const opt = {
-        margin: 0,
-        filename: `${safeName}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 }, 
-        html2canvas: { 
-            scale: 2,           // High Definition
-            useCORS: true,      // Load Images
-            scrollY: 0,
-            windowWidth: 1200   // <--- THE MAGIC FIX: Forces Desktop Layout on Mobile
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save()
-        .then(() => {
-            if(typeof loader === 'function') loader(false);
-            if(typeof showToast === 'function') showToast("Resume Downloaded Successfully!", "success");
-        })
-        .catch(err => {
-            console.error(err);
-            if(typeof loader === 'function') loader(false);
-            if(typeof showToast === 'function') showToast("Error generating PDF.", "error");
-        });
 }
