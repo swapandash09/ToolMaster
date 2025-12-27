@@ -1,5 +1,5 @@
 /* =========================================
-   RESUME BUILDER - TITANIUM V40 DESIGN
+   RESUME BUILDER - TITANIUM V41 STYLE
    ========================================= */
 
 /* --- 1. EDITOR LAYOUT (Split View) --- */
@@ -13,7 +13,7 @@
 /* Left Panel - The Controls */
 .editor-panel {
     flex: 1; 
-    min-width: 350px;
+    min-width: 340px;
     background: var(--card); 
     padding: 30px; 
     border-radius: 20px; 
@@ -27,13 +27,12 @@
 
 /* Custom Scrollbar for Editor */
 .editor-panel::-webkit-scrollbar { width: 6px; }
-.editor-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 .editor-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 .editor-panel::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 .panel-actions { display: flex; gap: 10px; margin-bottom: 25px; }
 .small-btn {
-    padding: 10px 14px; 
+    padding: 10px; 
     background: rgba(255, 255, 255, 0.05); 
     border: 1px solid var(--border);
     color: var(--text-muted); 
@@ -45,273 +44,137 @@
 }
 .small-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-/* Input Groups */
+/* Input Styling */
 .input-group { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 25px; }
 .input-group:last-child { border-bottom: none; }
 .group-title { 
-    color: var(--primary); 
-    font-size: 0.85rem; 
-    font-weight: 700; 
-    margin-bottom: 15px; 
-    text-transform: uppercase; 
-    letter-spacing: 1px;
+    color: var(--primary); font-size: 0.85rem; font-weight: 700; 
+    margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
     display: flex; align-items: center; justify-content: space-between;
 }
-
 .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+.input-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; display: block; font-weight: 600; }
 
-/* AI Magic Button */
-.ai-box { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-.glow-btn.small { padding: 8px 16px; font-size: 0.85rem; width: auto; margin: 0; }
-
-/* Color Picker */
-.color-picker-row { display: flex; gap: 15px; margin-top: 10px; padding: 5px; }
-.c-dot { 
-    width: 36px; height: 36px; 
-    border-radius: 50%; 
-    cursor: pointer; 
-    border: 3px solid rgba(255,255,255,0.1); 
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-    position: relative;
+/* Photo Upload */
+.upload-zone.small-zone {
+    padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 1px dashed var(--border); margin: 0; height: 100%; cursor: pointer; transition: 0.3s;
 }
-.c-dot:hover { transform: scale(1.2); border-color: white; z-index: 10; }
+.upload-zone.small-zone:hover { border-color: var(--primary); background: rgba(99,102,241,0.1); }
+#photo-preview-box {
+    width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1);
+    display: grid; place-items: center; font-size: 1.2rem; color: var(--text);
+}
 
-/* --- 2. PREVIEW PANEL (Background) --- */
+/* Color Dots */
+.color-picker-row { display: flex; gap: 10px; margin-top: 5px; }
+.c-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: 0.3s; }
+.c-dot:hover { transform: scale(1.2); border-color: white; }
+
+/* --- 2. PREVIEW PANEL (SMART SCALER) --- */
 .preview-panel {
-    flex: 1.2; 
+    flex: 1.4; 
     min-width: 350px;
-    background: #0f0f10; /* Dark contrast for paper */
-    padding: 40px; 
+    background: #18181b; 
+    padding: 0;
     border-radius: 20px; 
     border: 1px solid var(--border);
-    display: flex; 
-    justify-content: center; 
-    align-items: flex-start;
-    overflow: hidden; /* Important for scaling */
+    height: 850px; 
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden; 
     position: relative;
     box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
 }
 
-/* --- 3. RESUME PAPER (A4 PHYSICAL DIMENSIONS) --- */
-.resume-paper {
-    width: 210mm;
-    min-height: 297mm;
-    background: white;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 32% 68%; /* THE SPLIT LAYOUT */
-    color: #333;
-    overflow: hidden;
-    position: relative;
-    font-family: 'Outfit', sans-serif;
-    transform-origin: top center;
+#scale-wrapper {
+    transform-origin: center center;
+    transition: transform 0.3s ease;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 
-/* --- 4. COLOR GRADING SYSTEM (CSS VARIABLES) --- */
+/* --- 3. RESUME PAPER --- */
+.resume-paper {
+    width: 210mm; min-height: 297mm;
+    background: white; color: #333;
+    display: grid; grid-template-columns: 32% 68%;
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Fonts */
+.resume-paper.font-sans { font-family: 'Outfit', sans-serif; }
+.resume-paper.font-serif { font-family: 'Georgia', serif; }
+.resume-paper.font-mono { font-family: 'Courier New', monospace; letter-spacing: -0.5px; }
+
+/* Sidebar */
+.paper-sidebar {
+    background: var(--theme-main); color: white;
+    padding: 40px 25px; text-align: center;
+    border-right: 1px solid rgba(0,0,0,0.05);
+}
+#res-photo-container {
+    width: 140px; height: 140px; margin: 0 auto 25px;
+    border-radius: 50%; border: 5px solid rgba(255,255,255,0.3);
+    overflow: hidden; display: none; background: white;
+}
+#res-photo-img { width: 100%; height: 100%; object-fit: cover; }
+
+.sb-section { margin-top: 35px; text-align: left; }
+.sb-title {
+    font-size: 0.95rem; text-transform: uppercase; font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 6px; margin-bottom: 12px;
+    letter-spacing: 1px; opacity: 0.95;
+}
+
+/* Contacts */
+.icon-text { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; margin-bottom: 10px; line-height: 1.4; }
+.icon-text i { opacity: 0.8; font-size: 1rem; }
+.res-skill-pill { 
+    display: inline-block; background: rgba(255,255,255,0.2); 
+    padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; margin: 0 5px 5px 0; 
+}
+
+/* Content */
+.paper-content { padding: 50px 40px; background: white; }
+
+.main-header { margin-bottom: 40px; }
+#res-name { font-size: 2.6rem; font-weight: 800; line-height: 1; color: var(--theme-dark); text-transform: uppercase; letter-spacing: -1px; }
+#res-title { font-size: 1.2rem; color: var(--theme-main); font-weight: 600; margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
+
+.main-section { margin-bottom: 35px; }
+.sec-head {
+    font-size: 1.1rem; font-weight: 700; color: var(--theme-dark);
+    border-bottom: 2px solid var(--theme-light); padding-bottom: 6px; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px;
+}
+.sec-head i { color: var(--theme-main); }
+
+.item-block { margin-bottom: 20px; border-left: 3px solid var(--theme-light); padding-left: 18px; position: relative; }
+.item-title { font-weight: 800; font-size: 1.15rem; color: #111; }
+.item-sub { color: var(--theme-main); font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+.item-date { float: right; font-size: 0.8rem; background: var(--theme-light); color: var(--theme-dark); padding: 3px 8px; border-radius: 4px; font-weight: 700; }
+.item-desc { font-size: 0.95rem; color: #4b5563; margin-top: 6px; line-height: 1.6; white-space: pre-wrap; }
+
+/* Themes */
 .theme-blue   { --theme-main: #2563eb; --theme-light: #eff6ff; --theme-dark: #1e3a8a; }
 .theme-green  { --theme-main: #059669; --theme-light: #ecfdf5; --theme-dark: #064e3b; }
 .theme-purple { --theme-main: #7c3aed; --theme-light: #f5f3ff; --theme-dark: #4c1d95; }
 .theme-gold   { --theme-main: #d97706; --theme-light: #fffbeb; --theme-dark: #78350f; }
 .theme-dark   { --theme-main: #1f2937; --theme-light: #f3f4f6; --theme-dark: #000000; }
 
-/* --- 5. LEFT SIDEBAR (Personal Info) --- */
-.paper-sidebar {
-    background: var(--theme-main);
-    color: white;
-    padding: 40px 25px;
-    text-align: center;
-    position: relative;
-    border-right: 1px solid rgba(0,0,0,0.1);
-}
-
-/* Profile Photo (New) */
-#res-photo-container {
-    width: 150px; height: 150px;
-    margin: 0 auto 30px;
-    border-radius: 50%;
-    border: 5px solid rgba(255,255,255,0.25);
-    overflow: hidden;
-    display: none; /* JS toggles this */
-    background: rgba(255,255,255,0.1);
-}
-#res-photo-img { width: 100%; height: 100%; object-fit: cover; }
-
-/* Sidebar Sections */
-.sb-section { margin-top: 35px; text-align: left; }
-.sb-title {
-    font-size: 1rem; 
-    text-transform: uppercase;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 8px; 
-    margin-bottom: 15px; 
-    letter-spacing: 1.5px;
-    font-weight: 700;
-    opacity: 0.9;
-}
-
-/* Sidebar List Items (Details) */
-#res-personal-box ul { list-style: none; padding: 0; }
-#res-personal-box li { 
-    font-size: 0.9rem; 
-    margin-bottom: 8px; 
-    border-bottom: 1px dashed rgba(255,255,255,0.1); 
-    padding-bottom: 4px; 
-}
-#res-personal-box strong { font-weight: 600; opacity: 0.8; margin-right: 5px; }
-
-/* Contacts */
-.icon-text { 
-    display: flex; align-items: flex-start; gap: 12px; 
-    font-size: 0.9rem; margin-bottom: 15px; 
-    word-break: break-word; line-height: 1.4;
-}
-.icon-text i { font-size: 1.1rem; opacity: 0.7; margin-top: 2px; }
-
-/* Skills (Pills) */
-.res-skill-pill {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    padding: 6px 12px; 
-    border-radius: 6px;
-    font-size: 0.85rem; 
-    margin: 0 6px 8px 0;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* --- 6. RIGHT CONTENT (Main Body) --- */
-.paper-content {
-    padding: 50px 40px;
-    background: white;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Gradient Top Bar */
-.paper-content::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px;
-    background: linear-gradient(90deg, var(--theme-main), var(--theme-light));
-}
-
-/* Main Header */
-.main-header { margin-bottom: 40px; }
-#res-name { 
-    font-size: 2.8rem; 
-    font-weight: 800; 
-    color: var(--theme-dark); 
-    line-height: 1; 
-    text-transform: uppercase; 
-    letter-spacing: -1px;
-}
-#res-title { 
-    font-size: 1.3rem; 
-    color: var(--theme-main); 
-    font-weight: 600; 
-    letter-spacing: 2px; 
-    margin-top: 8px; 
-    text-transform: uppercase;
-}
-
-/* Content Sections */
-.main-section { margin-bottom: 35px; }
-.sec-head {
-    font-size: 1.1rem; 
-    font-weight: 800; 
-    color: var(--theme-dark);
-    border-bottom: 3px solid var(--theme-light);
-    padding-bottom: 8px; 
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    display: flex; align-items: center; gap: 10px;
-}
-/* Optional Icon in Header (JS can add this if needed) */
-.sec-head::before {
-    content: ''; display: block; width: 8px; height: 8px; 
-    background: var(--theme-main); transform: rotate(45deg);
-}
-
-/* Item Blocks (Jobs/Edu) */
-.item-block { 
-    margin-bottom: 20px; 
-    position: relative; 
-    padding-left: 15px; 
-    border-left: 2px solid var(--theme-light);
-}
-.item-title { font-weight: 800; font-size: 1.15rem; color: #1f2937; }
-.item-sub { color: var(--theme-main); font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
-.item-date { 
-    float: right; 
-    font-size: 0.85rem; 
-    color: white; 
-    background: var(--theme-main);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-}
-.item-desc { 
-    font-size: 0.95rem; 
-    color: #4b5563; 
-    margin-top: 8px; 
-    line-height: 1.6; 
-    white-space: pre-wrap; /* Keeps line breaks */
-}
-
-/* --- 7. RESPONSIVE SCALE (Phone View) --- */
-@media (max-width: 1024px) {
-    .resume-paper {
-        transform: scale(0.6); 
-        margin-top: -150px; 
-        margin-bottom: -300px;
-    }
-}
-
-@media (max-width: 600px) {
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
     .split-view { flex-direction: column; }
-    .editor-panel { width: 100%; max-height: none; position: relative; top: 0; }
+    .editor-panel { width: 100%; position: relative; top: 0; max-height: none; }
     
-    .preview-panel { 
-        width: 100%; 
-        height: 500px; /* Fixed height window */
-        overflow: hidden; 
-        background: #000;
-        padding: 10px;
-    }
-    
-    .resume-paper {
-        transform: scale(0.38); /* Tiny scale for mobile */
-        margin-top: -240px; 
-        transform-origin: top center;
-    }
+    .preview-panel { width: 100%; height: 550px; padding: 10px; background: #000; }
 }
 
-/* --- 8. PRINT SETTINGS (Clean Output) --- */
 @media print {
-    body, .app-container { 
-        background: white !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        overflow: visible !important;
-    }
-    .desktop-sidebar, .mobile-nav, .mobile-header, .ws-head, .editor-panel { 
-        display: none !important; 
-    }
-    .preview-panel { 
-        background: none !important; 
-        border: none !important; 
-        padding: 0 !important; 
-        display: block !important;
-        box-shadow: none !important;
-    }
-    .resume-paper { 
-        box-shadow: none !important; 
-        transform: none !important; 
-        margin: 0 !important; 
-        width: 100% !important;
-        height: auto !important;
-        min-height: auto !important;
-    }
-    /* Force Background Colors in Print */
+    body, .app-container { background: white !important; display: block !important; overflow: visible !important; }
+    .desktop-sidebar, .ws-head, .editor-panel, .mobile-nav, .mobile-header { display: none !important; }
+    .preview-panel { border: none; height: auto; display: block; padding: 0; margin: 0; }
+    #scale-wrapper { transform: none !important; box-shadow: none !important; }
+    .resume-paper { margin: 0; width: 100%; box-shadow: none; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 }
