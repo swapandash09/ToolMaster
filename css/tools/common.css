@@ -1,190 +1,140 @@
 /* =========================================
-   COMMON COMPONENTS (TITANIUM V40 ULTRA)
+   COMMON COMPONENTS (TITANIUM V41 ULTIMATE)
    ========================================= */
 
 /* --- 1. WORKSPACE LAYOUT & ANIMATION --- */
 .tool-workspace { 
     width: 100%; 
-    max-width: 1150px; /* Thoda wide kiya hai modern screens ke liye */
+    max-width: 1200px; 
     margin: 0 auto; 
-    /* Hardware Acceleration */
-    will-change: transform, opacity;
-    animation: workspaceEntry 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; 
+    /* Smooth Entry Animation */
+    animation: workspaceEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; 
     padding-bottom: 80px;
     opacity: 0;
+    will-change: transform, opacity;
 }
 
 @keyframes workspaceEntry { 
-    from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(5px); } 
+    from { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(10px); } 
     to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
 }
 
+/* --- 2. HEADERS & TITLES --- */
 .ws-head { 
-    display: flex; 
-    align-items: center; 
-    gap: 20px; 
-    margin-bottom: 30px; 
-    position: relative;
-    z-index: 10;
+    display: flex; align-items: center; gap: 20px; 
+    margin-bottom: 30px; position: relative; z-index: 10;
 }
 
 .ws-head h2 { 
-    font-size: 2.2rem; 
-    font-weight: 800; 
-    letter-spacing: -1px;
-    color: var(--text);
-    /* Titanium Gradient Text */
+    font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
     background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     text-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* --- 2. BACK PILL (MAGNETIC EFFECT) --- */
+/* --- 3. NAVIGATION PILL (MAGNETIC) --- */
 .back-pill {
     background: rgba(255, 255, 255, 0.05); 
     border: 1px solid var(--border);
     color: var(--text-muted); 
-    padding: 10px 20px; 
-    border-radius: 50px; 
-    cursor: pointer;
-    font-size: 0.95rem; 
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    padding: 10px 20px; border-radius: 50px; 
+    cursor: pointer; font-weight: 600; font-size: 0.9rem;
     display: flex; align-items: center; gap: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     backdrop-filter: blur(10px);
 }
-
 .back-pill:hover { 
-    background: var(--primary); 
-    border-color: var(--primary); 
-    color: white; 
-    transform: translateX(-5px); 
+    background: var(--primary); border-color: var(--primary); 
+    color: white; transform: translateX(-5px); 
     box-shadow: 0 5px 15px var(--primary-glow);
 }
 
-/* --- 3. MAIN GLASS BODY (The "Card") --- */
+/* --- 4. GLASS CARDS (THE CONTAINER) --- */
 .ws-body {
     background: rgba(20, 20, 25, 0.6); 
-    /* Double Border Effect for 3D look */
     border: 1px solid rgba(255, 255, 255, 0.08); 
+    /* Complex shadow for depth */
     box-shadow: 
-        0 0 0 1px rgba(0, 0, 0, 0.5), /* Inner dark border */
-        0 20px 50px -10px rgba(0,0,0,0.7); /* Deep shadow */
-    border-radius: 24px;
-    padding: 40px; 
-    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    position: relative;
-    overflow: hidden;
+        0 20px 50px -10px rgba(0,0,0,0.7), 
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+    border-radius: 24px; padding: 40px; 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    position: relative; overflow: hidden;
+    transform: translateZ(0);
 }
 
-/* Cinematic Spotlight Effect */
-.ws-body::before {
-    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at center, rgba(99,102,241,0.08), transparent 60%);
-    pointer-events: none; opacity: 0.6;
-}
-
-/* --- 4. INTERACTIVE UPLOAD ZONE (ANIMATED BORDER) --- */
+/* --- 5. INTERACTIVE UPLOAD ZONES --- */
 .upload-zone {
     border: 2px dashed var(--border); 
-    border-radius: 20px; 
-    padding: 60px 20px;
-    text-align: center; 
-    cursor: pointer; 
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(255,255,255,0.01);
-    margin-bottom: 30px; 
+    border-radius: 20px; padding: 50px 20px;
+    text-align: center; cursor: pointer; 
+    /* V41 Gradient Fade */
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
     position: relative;
-}
-
-.upload-zone i { 
-    font-size: 3.5rem; 
-    color: var(--text-muted); 
-    margin-bottom: 15px; 
-    display: block; 
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .upload-zone:hover { 
     border-color: var(--primary); 
-    background: rgba(99, 102, 241, 0.06); 
+    background: rgba(99, 102, 241, 0.08); 
     transform: translateY(-4px);
-    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3);
+    box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.2);
 }
 
+.upload-zone i { 
+    font-size: 3rem; color: var(--text-muted); margin-bottom: 15px; display: block; 
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 .upload-zone:hover i { 
     color: var(--primary); 
     transform: scale(1.15) rotate(-5deg); 
     text-shadow: 0 0 20px var(--primary-glow);
 }
 
-/* --- 5. PREMIUM INPUTS --- */
+/* --- 6. NEON INPUTS --- */
 .glass-input {
     width: 100%; 
-    background: rgba(10, 10, 15, 0.4); 
+    background: rgba(10, 10, 15, 0.6); 
     border: 1px solid var(--border);
-    color: var(--text); 
-    padding: 16px 20px; 
-    border-radius: 14px; 
-    outline: none;
-    transition: all 0.3s ease; 
-    font-size: 1rem; 
-    margin-bottom: 20px;
+    color: var(--text); padding: 16px 20px; 
+    border-radius: 14px; outline: none;
+    transition: 0.3s; font-size: 1rem;
 }
-
 .glass-input:focus { 
     border-color: var(--primary); 
-    background: rgba(0, 0, 0, 0.8);
     box-shadow: 0 0 0 3px var(--primary-glow);
+    background: rgba(0, 0, 0, 0.8);
 }
+.glass-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+textarea.glass-input { resize: vertical; min-height: 120px; line-height: 1.6; }
 
-/* TextArea resizing */
-textarea.glass-input { resize: vertical; min-height: 120px; }
-
-/* --- 6. GLOW BUTTONS (LIQUID ACTION) --- */
+/* --- 7. LIQUID BUTTONS --- */
 .glow-btn {
-    width: 100%; 
-    padding: 16px; 
+    width: 100%; padding: 16px; 
     background: linear-gradient(135deg, var(--primary), #4f46e5);
-    color: white; 
-    border: none; 
-    border-radius: 16px; 
-    font-weight: 700; 
-    font-size: 1.05rem;
-    cursor: pointer; 
-    box-shadow: 0 10px 20px -10px var(--primary-glow); 
-    transition: all 0.3s ease; 
-    margin-top: 15px;
-    position: relative;
-    overflow: hidden;
+    color: white; border: none; border-radius: 16px; 
+    font-weight: 700; font-size: 1.05rem; letter-spacing: 0.5px;
+    cursor: pointer; position: relative; overflow: hidden;
+    box-shadow: 0 10px 20px -10px var(--primary-glow);
+    transition: all 0.3s ease;
 }
-
 /* Shine Effect */
 .glow-btn::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transform: skewX(-20deg);
-    transition: 0.5s;
+    transform: skewX(-20deg); transition: 0.5s;
 }
-
-.glow-btn:hover { 
-    transform: translateY(-3px); 
-    box-shadow: 0 20px 40px -10px var(--primary-glow); 
-}
-
+.glow-btn:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -10px var(--primary-glow); }
 .glow-btn:hover::before { left: 150%; }
-
 .glow-btn:active { transform: scale(0.98); }
 
-/* --- 7. UTILS & HELPERS --- */
+/* --- 8. UTILS --- */
 .max-600 { max-width: 600px; margin: 0 auto; }
-.text-center { text-align: center; }
+.hidden { display: none !important; }
 
-/* Mobile Adjustments */
+/* Mobile Optimizations */
 @media (max-width: 768px) { 
-    .ws-body { padding: 25px 15px; } 
-    .upload-zone { padding: 40px 15px; } 
-    .ws-head h2 { font-size: 1.5rem; }
-    .glass-input { padding: 14px; }
+    .ws-body { padding: 25px 20px; } 
+    .upload-zone { padding: 30px 15px; } 
+    .ws-head h2 { font-size: 1.6rem; }
 }
