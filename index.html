@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050507">
-    <title>ToolMaster Titanium - V41 Ultimate</title>
+    <title>ToolMaster Titanium - V43 Ultimate</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,9 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.3.0/dist/imgly-background-removal.min.js"></script>
     
     <script>
-        // PDF Worker Optimization
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
@@ -30,10 +30,10 @@
     <link rel="stylesheet" href="css/tools/utils.css">
 
     <style>
+        /* Essential Inline Styles for New Tools */
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: opacity; }
         
-        /* Smooth Loader */
         #loading-overlay {
             position: fixed; inset: 0; background: #050507; z-index: 9999;
             display: flex; justify-content: center; align-items: center;
@@ -47,13 +47,19 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Background Palette Dots */
+        .bg-palette { display: flex; gap: 10px; margin-top: 15px; justify-content: center; margin-bottom: 15px; }
+        .bg-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); transition: 0.2s; }
+        .bg-dot:hover { transform: scale(1.1); border-color: white; }
+        .bg-dot.active { border-color: #6366f1; box-shadow: 0 0 10px #6366f1; }
     </style>
 </head>
 <body>
 
     <div class="ambient-glow"></div>
-    
     <div id="toast-container"></div>
+    
     <div id="loading-overlay">
         <div class="loader-box">
             <div class="loader-circle"></div>
@@ -68,7 +74,6 @@
                 <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
                 <span class="brand-text">ToolMaster</span>
             </div>
-            
             <nav class="side-nav">
                 <p class="menu-label">Main</p>
                 <ul>
@@ -78,15 +83,14 @@
                 <p class="menu-label">Top Tools</p>
                 <ul>
                     <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume Studio</li>
-                    <li onclick="openTool('ai-image-tool')"><i class="ri-openai-line"></i> AI Art Gen</li>
+                    <li onclick="openTool('bg-remover-tool')"><i class="ri-magic-line"></i> Magic Eraser</li>
                     <li onclick="openTool('subtitle-tool')"><i class="ri-closed-captioning-line"></i> SubMaster</li>
                 </ul>
             </nav>
-
             <div class="sidebar-bottom">
                 <div class="pro-card">
                     <i class="ri-vip-diamond-line"></i>
-                    <div><h4>Titanium</h4><p>V41 Ultimate</p></div>
+                    <div><h4>Titanium</h4><p>V43 Ultimate</p></div>
                 </div>
             </div>
         </aside>
@@ -117,7 +121,7 @@
                     <div class="category-block">
                         <h3 class="cat-title"><i class="ri-file-text-line"></i> Documents</h3>
                         <div class="tool-grid">
-                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>V41 Builder</p></div></div>
+                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>V42 Extended</p></div></div>
                             <div class="t-card" onclick="openTool('excel-tool')"><div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div><div class="tc-info"><h4>Excel</h4><p>To PDF</p></div></div>
                             <div class="t-card" onclick="openTool('pdf-excel-tool')"><div class="tc-icon c-orange"><i class="ri-file-text-line"></i></div><div class="tc-info"><h4>PDF</h4><p>To Excel</p></div></div>
                         </div>
@@ -126,12 +130,10 @@
                     <div class="category-block">
                         <h3 class="cat-title"><i class="ri-palette-line"></i> Creative Suite</h3>
                         <div class="tool-grid">
-                            <div class="t-card" onclick="openTool('enhancer-tool')"><div class="tc-icon c-gold"><i class="ri-hd-line"></i></div><div class="tc-info"><h4>Enhance</h4><p>Upscale Image</p></div></div>
-                            <div class="t-card" onclick="openTool('ai-image-tool')"><div class="tc-icon c-pink"><i class="ri-openai-fill"></i></div><div class="tc-info"><h4>AI Art</h4><p>Text to Image</p></div></div>
-                            <div class="t-card" onclick="openTool('bg-remover-tool')"><div class="tc-icon c-purple"><i class="ri-magic-line"></i></div><div class="tc-info"><h4>Eraser</h4><p>Remove BG</p></div></div>
                             <div class="t-card" onclick="openTool('img-tool')"><div class="tc-icon c-red"><i class="ri-file-zip-line"></i></div><div class="tc-info"><h4>Compress</h4><p>Reduce Size</p></div></div>
-                            <div class="t-card" onclick="openTool('jpg-pdf-tool')"><div class="tc-icon c-blue"><i class="ri-stack-line"></i></div><div class="tc-info"><h4>Merge</h4><p>JPG to PDF</p></div></div>
-                            <div class="t-card" onclick="openTool('pdf-jpg-tool')"><div class="tc-icon c-cyan"><i class="ri-image-line"></i></div><div class="tc-info"><h4>Pages</h4><p>PDF to JPG</p></div></div>
+                            <div class="t-card" onclick="openTool('bg-remover-tool')"><div class="tc-icon c-purple"><i class="ri-magic-line"></i></div><div class="tc-info"><h4>Eraser</h4><p>Custom BG</p></div></div>
+                            <div class="t-card" onclick="openTool('enhancer-tool')"><div class="tc-icon c-gold"><i class="ri-hd-line"></i></div><div class="tc-info"><h4>Enhance</h4><p>Upscale</p></div></div>
+                            <div class="t-card" onclick="openTool('ai-image-tool')"><div class="tc-icon c-pink"><i class="ri-openai-fill"></i></div><div class="tc-info"><h4>AI Art</h4><p>Generator</p></div></div>
                         </div>
                     </div>
 
@@ -141,19 +143,17 @@
                             <div class="t-card" onclick="openTool('subtitle-tool')"><div class="tc-icon c-red"><i class="ri-closed-captioning-line"></i></div><div class="tc-info"><h4>SubMaster</h4><p>Auto Subtitles</p></div></div>
                             <div class="t-card" onclick="openTool('speech-tool')"><div class="tc-icon c-teal"><i class="ri-mic-line"></i></div><div class="tc-info"><h4>Dictate</h4><p>Voice Type</p></div></div>
                             <div class="t-card" onclick="openTool('text-speech-tool')"><div class="tc-icon c-yellow"><i class="ri-volume-up-line"></i></div><div class="tc-info"><h4>Reader</h4><p>Text Speech</p></div></div>
-                            <div class="t-card" onclick="openTool('pass-tool')"><div class="tc-icon c-lime"><i class="ri-key-2-line"></i></div><div class="tc-info"><h4>Security</h4><p>Pass Gen</p></div></div>
+                            <div class="t-card" onclick="openTool('jpg-pdf-tool')"><div class="tc-icon c-blue"><i class="ri-stack-line"></i></div><div class="tc-info"><h4>Merge</h4><p>JPG to PDF</p></div></div>
                         </div>
                     </div>
                 </div>
-                
                 <div style="height: 100px;" class="mobile-only"></div>
             </div>
-
 
             <div id="tool-container" class="hidden">
                 
                 <div id="resume-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio Pro</h2></div>
                     <div class="split-view">
                         <div class="editor-panel">
                             <div class="panel-actions">
@@ -163,7 +163,7 @@
                             </div>
 
                             <div class="input-group">
-                                <div class="group-title"><span>Identity & Style</span> <i class="ri-user-smile-line"></i></div>
+                                <div class="group-title"><span>Identity</span> <i class="ri-user-smile-line"></i></div>
                                 <div class="input-grid">
                                      <div class="upload-zone small-zone" onclick="document.getElementById('photo-in').click()">
                                         <div id="photo-preview-box"><i class="ri-camera-line"></i></div>
@@ -171,9 +171,8 @@
                                         <input type="file" id="photo-in" accept="image/*" onchange="handleProfilePhoto(this)">
                                     </div>
                                     <div>
-                                        <label class="input-label">Font Style</label>
+                                        <label class="input-label">Font & Theme</label>
                                         <select id="in-font" class="glass-input" onchange="updateResume()"><option value="font-sans">Modern</option><option value="font-serif">Classic</option><option value="font-mono">Tech</option></select>
-                                        <label class="input-label">Theme Color</label>
                                         <div class="color-picker-row">
                                             <div class="c-dot c-blue" onclick="setThemeColor('blue')"></div>
                                             <div class="c-dot c-green" onclick="setThemeColor('green')"></div>
@@ -194,13 +193,13 @@
 
                             <div class="input-group">
                                 <div class="group-title"><span>Social Links</span> <i class="ri-share-line"></i></div>
-                                <div class="input-grid"><input type="text" class="glass-input" id="in-linkedin" placeholder="LinkedIn" oninput="updateResume()"><input type="text" class="glass-input" id="in-github" placeholder="GitHub/Portfolio" oninput="updateResume()"></div>
+                                <div class="input-grid"><input type="text" class="glass-input" id="in-linkedin" placeholder="LinkedIn" oninput="updateResume()"><input type="text" class="glass-input" id="in-github" placeholder="GitHub" oninput="updateResume()"></div>
                             </div>
 
                             <div class="input-group">
-                                <div class="group-title"><span>Professional Summary</span> <i class="ri-text"></i></div>
+                                <div class="group-title"><span>Summary</span> <i class="ri-text"></i></div>
                                 <div class="ai-box"><button class="glow-btn small" onclick="generateAISummary()"><i class="ri-magic-line"></i> AI Write</button></div>
-                                <textarea class="glass-input" id="in-summary" rows="4" placeholder="Write a short professional summary..." oninput="updateResume()"></textarea>
+                                <textarea class="glass-input" id="in-summary" rows="3" placeholder="Professional summary..." oninput="updateResume()"></textarea>
                             </div>
 
                             <div class="input-group">
@@ -211,8 +210,15 @@
                             </div>
                             
                             <div class="input-group">
+                                <div class="group-title"><span>Key Project</span> <i class="ri-folder-open-line"></i></div>
+                                <input type="text" class="glass-input" id="in-proj-title" placeholder="Project Name" oninput="updateResume()">
+                                <textarea class="glass-input" id="in-proj-desc" rows="2" placeholder="What did you build?" oninput="updateResume()"></textarea>
+                            </div>
+
+                            <div class="input-group">
                                 <div class="group-title"><span>Skills & Edu</span> <i class="ri-tools-line"></i></div>
                                 <input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma separated)" oninput="updateResume()">
+                                <input type="text" class="glass-input" id="in-languages" placeholder="Languages (e.g. English, Hindi)" oninput="updateResume()" style="margin-top:10px;">
                                 <div class="input-grid" style="margin-top:10px;"><input type="text" class="glass-input" id="in-degree" placeholder="Degree" oninput="updateResume()"><input type="text" class="glass-input" id="in-school" placeholder="University" oninput="updateResume()"></div>
                             </div>
 
@@ -227,15 +233,104 @@
                                         <div class="sb-section"><div class="sb-title">Contact</div><div id="res-contact-box"></div></div>
                                         <div class="sb-section" id="res-socials-section" style="display:none;"><div class="sb-title">Social</div><div id="res-socials-box"></div></div>
                                         <div class="sb-section"><div class="sb-title">Skills</div><div id="res-skills"></div></div>
+                                        <div class="sb-section" id="res-lang-section" style="display:none;"><div class="sb-title">Languages</div><div id="res-languages" style="font-size:0.85rem; opacity:0.9;"></div></div>
                                     </div>
                                     <div class="paper-content">
                                         <div class="main-header"><h1 id="res-name">YOUR NAME</h1><p id="res-title">PROFESSIONAL TITLE</p></div>
                                         <div class="main-section"><div class="sec-head"><i class="ri-user-line"></i> Profile</div><p id="res-summary"></p></div>
                                         <div class="main-section"><div class="sec-head"><i class="ri-briefcase-line"></i> Experience</div><div class="item-block"><span class="item-date" id="res-dates"></span><div class="item-title" id="res-company"></div><div class="item-sub" id="res-role"></div><div class="item-desc" id="res-job-desc"></div></div></div>
+                                        <div class="main-section" id="res-proj-section" style="display:none;"><div class="sec-head"><i class="ri-lightbulb-line"></i> Project</div><div class="item-block"><div class="item-title" id="res-proj-title"></div><div class="item-desc" id="res-proj-desc"></div></div></div>
                                         <div class="main-section" id="res-edu-section" style="display:none;"><div class="sec-head"><i class="ri-graduation-cap-line"></i> Education</div><div class="item-block"><span class="item-date" id="res-edu-year"></span><div class="item-title" id="res-degree"></div><div class="item-sub" id="res-school"></div></div></div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bg-remover-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('bg-input').click()">
+                            <i class="ri-magic-line"></i><p>Upload Photo to Remove BG</p>
+                            <input type="file" id="bg-input" accept="image/*" onchange="handleBgUpload(this)">
+                        </div>
+                        <div id="compare-container" class="compare-viewer hidden">
+                            <div class="bg-palette">
+                                <div class="bg-dot active" style="background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2P8///3f3qbAQXt7e3/6WwGJGGEa6S3GVA0AwC01xN1u79ZagAAAABJRU5ErkJggg==');" onclick="changeBg(this, 'transparent')" title="Transparent"></div>
+                                <div class="bg-dot" style="background: #ffffff;" onclick="changeBg(this, '#ffffff')" title="White"></div>
+                                <div class="bg-dot" style="background: #000000;" onclick="changeBg(this, '#000000')" title="Black"></div>
+                                <div class="bg-dot" style="background: #ef4444;" onclick="changeBg(this, '#ef4444')" title="Red"></div>
+                                <div class="bg-dot" style="background: #3b82f6;" onclick="changeBg(this, '#3b82f6')" title="Blue"></div>
+                                <div class="bg-dot" style="background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);" onclick="changeBg(this, 'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)')" title="Gradient"></div>
+                            </div>
+                            <div class="comp-label lbl-orig">ORIGINAL</div>
+                            <div class="comp-label lbl-res">RESULT</div>
+                            <div class="img-back-container" style="position:absolute; width:100%; height:100%; top:0; left:0; overflow:hidden; z-index:1;">
+                                <img id="bg-result-img" style="width:100%; height:100%; object-fit:contain;">
+                            </div>
+                            <img id="bg-original-img" class="img-front">
+                            <div class="slider-line-deco" id="slider-line"></div>
+                            <div class="slider-handle-deco" id="slider-handle"><i class="ri-arrow-left-right-line"></i></div>
+                            <input type="range" class="slider" min="0" max="100" value="50" oninput="slideCompare(this.value)">
+                        </div>
+                        <button class="glow-btn hidden" id="dl-bg-btn" onclick="downloadBgImage()">Download HD PNG</button>
+                    </div>
+                </div>
+
+                <div id="img-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Image Compressor</h2></div>
+                    <div class="ws-body">
+                        <div class="split-view" style="flex-direction: column; align-items: center; gap: 20px;">
+                            <div class="upload-zone" onclick="document.getElementById('comp-input').click()">
+                                <i class="ri-file-zip-line"></i><p>Upload Image to Compress</p>
+                                <input type="file" id="comp-input" accept="image/*" onchange="handleCompressUpload(this)">
+                            </div>
+                            <div id="comp-controls" class="hidden" style="width: 100%; max-width: 500px;">
+                                <div class="options-bar" style="margin-bottom: 20px; flex-direction: column; gap: 15px;">
+                                    <div style="width:100%; display:flex; justify-content:space-between;">
+                                        <label>Quality: <span id="qual-val" style="color:#6366f1;">80%</span></label>
+                                        <select id="comp-format" class="glass-input" style="width:auto; padding: 5px 10px;"><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option><option value="image/png">PNG</option></select>
+                                    </div>
+                                    <input type="range" id="comp-quality" min="10" max="100" value="80" style="width:100%;" oninput="document.getElementById('qual-val').innerText = this.value + '%'">
+                                </div>
+                                <button class="glow-btn" onclick="processCompression()">Compress Now</button>
+                            </div>
+                            <div id="comp-result" class="hidden" style="text-align: center; width: 100%; max-width: 500px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                                <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+                                    <div><p style="font-size:0.8rem; opacity:0.7;">Original</p><p id="orig-size" style="font-weight:bold;">0 KB</p></div>
+                                    <div><i class="ri-arrow-right-line"></i></div>
+                                    <div><p style="font-size:0.8rem; opacity:0.7;">Compressed</p><p id="comp-size" style="color:#10b981; font-weight:bold;">0 KB</p></div>
+                                </div>
+                                <img id="comp-preview-img" style="max-width: 100%; max-height: 300px; border-radius: 10px; margin-bottom: 15px;">
+                                <button class="glow-btn" id="dl-comp-btn">Download</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="subtitle-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster AI</h2></div>
+                    <div class="ws-body">
+                         <div class="t-card" style="display: block; padding: 0; overflow: hidden; margin-bottom: 20px;">
+                            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
+                                <input type="file" id="video-input" accept="video/*" hidden onchange="/* Handled in subtitle.js */">
+                                <label for="video-input" class="glow-btn" style="cursor: pointer; display: inline-block; width: auto; padding: 10px 20px;">
+                                    <i class="ri-upload-cloud-line"></i> Upload Video
+                                </label>
+                                <span id="video-name" style="margin-left: 10px; font-size: 0.9rem; color: var(--text-muted);">No file selected</span>
+                            </div>
+                            <div style="background: black; width: 100%; height: 300px; display: flex; align-items: center; justify-content: center;">
+                                <video id="main-video" controls style="max-width: 100%; max-height: 100%; width: 100%;"></video>
+                            </div>
+                            <div style="padding: 15px; display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="startCaptioning()" class="glow-btn" style="background:#10b981;">Start</button>
+                                <button onclick="stopCaptioning()" class="glow-btn" style="background:#ef4444;">Stop</button>
+                            </div>
+                        </div>
+                        <div id="caption-box" style="height: 200px; overflow-y: auto; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--border); font-family: monospace;">Waiting for audio...</div>
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button onclick="downloadSubtitle('srt')" class="glow-btn" style="flex: 1;">Download .SRT</button>
+                            <button onclick="downloadSubtitle('vtt')" class="glow-btn" style="flex: 1;">Download .VTT</button>
                         </div>
                     </div>
                 </div>
@@ -248,114 +343,23 @@
                             <select id="pdf-orient" class="glass-input"><option value="auto">Auto Orient</option><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select> 
                             <label class="toggle-label"><input type="checkbox" id="pdf-border" checked> Borders</label>
                         </div>
-                        <button class="glow-btn" onclick="generateUltraHDPDF()">Convert</button>
-                        <div id="excel-preview-container" class="preview-box"></div>
+                        <button class="glow-btn" onclick="generateUltraHDPDF()">Convert to PDF</button>
                     </div>
                 </div>
 
-                <div id="enhancer-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Enhancer</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('enhance-input').click()">
-                            <i class="ri-hd-line"></i><p>Upload Low-Res Image</p>
-                            <input type="file" id="enhance-input" accept="image/*">
-                        </div>
-                        </div>
-                </div>
-
-                <div id="subtitle-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster AI</h2></div>
-                    <div class="ws-body">
-                         <div class="t-card" style="display: block; padding: 0; overflow: hidden; margin-bottom: 20px;">
-                            <div style="padding: 20px; border-bottom: 1px solid var(--border);">
-                                <input type="file" id="video-input" accept="video/*" class="file-input-hidden" hidden>
-                                
-                          <label for="video-input" class="glow-btn" style="cursor: pointer; display: inline-block; width: auto; padding: 10px 20px;">
-                                    <i class="ri-upload-cloud-line"></i> Upload Video
-                                </label>
-                                <span id="video-name" style="margin-left: 10px; font-size: 0.9rem; color: var(--text-muted);">No file selected</span>
-                            </div>
-                            <div style="background: black; width: 100%; height: 300px; display: flex; align-items: center; justify-content: center;">
-                                <video id="main-video" controls style="max-width: 100%; max-height: 100%; width: 100%;"></video>
-                            </div>
-                            <div style="padding: 15px; display: flex; gap: 10px; justify-content: center;">
-                                <button id="btn-start-cap" onclick="startCaptioning()" class="glow-btn" style="background:#10b981;">Start</button>
-                                <button onclick="stopCaptioning()" class="glow-btn" style="background:#ef4444;">Stop</button>
-                            </div>
-                        </div>
-                        <div id="caption-box" style="height: 200px; overflow-y: auto; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--border); font-family: monospace;">Waiting for audio...</div>
-                        <div style="margin-top: 15px; display: flex; gap: 10px;">
-                            <button onclick="downloadSubtitle('srt')" class="glow-btn" style="flex: 1;">Download .SRT</button>
-                            <button onclick="downloadSubtitle('vtt')" class="glow-btn" style="flex: 1;">Download .VTT</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="ai-image-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Art Generator</h2></div>
-                    <div class="ws-body">
-                        <div class="input-group">
-                            <textarea class="glass-input big-area" id="ai-img-prompt" placeholder="A futuristic city..."></textarea>
-                        </div>
-                        <div class="controls-row">
-                            <select id="ai-style" class="glass-input"><option value="">Realistic</option><option value="anime">Anime</option><option value="3d-model">3D</option><option value="painting">Painting</option></select>
-                            <select id="ai-ratio" class="glass-input"><option value="square">Square</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
-                            <button class="glow-btn" onclick="generateAIImage()">Generate ✨</button>
-                        </div>
-                        <div id="ai-result-box" class="hidden" style="text-align:center; margin-top:30px;">
-                            <div class="loading-scan hidden" id="ai-loading">Generating...</div>
-                            <img id="ai-generated-img" style="max-width:100%; border-radius:15px;">
-                            <br><button class="small-btn" onclick="downloadAIImage()" style="margin-top:15px;">Download HD</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="bg-remover-tool" class="tool-workspace hidden">
-    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
-    <div class="ws-body">
-        
-        <div class="upload-zone" onclick="document.getElementById('bg-input').click()">
-            <i class="ri-magic-line"></i><p>Upload Photo to Remove BG</p>
-            <input type="file" id="bg-input" accept="image/*" onchange="handleBgUpload(this)">
-        </div>
-
-        <div id="compare-container" class="compare-viewer hidden">
-            <div class="comp-label lbl-orig">ORIGINAL</div>
-            <div class="comp-label lbl-res">REMOVED</div>
-            
-            <img id="bg-result-img" class="img-back">
-            <img id="bg-original-img" class="img-front">
-            
-            <div class="slider-line-deco" id="slider-line"></div>
-            <div class="slider-handle-deco" id="slider-handle"><i class="ri-arrow-left-right-line"></i></div>
-            
-            <input type="range" class="slider" min="0" max="100" value="50" oninput="slideCompare(this.value)">
-        </div>
-
-        <button class="glow-btn hidden" id="dl-bg-btn" onclick="downloadBgImage()">Download HD PNG</button>
-    </div>
-</div>
-            <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body max-600"><textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
-                
-                <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract</button></div></div>
-                
+                <div id="enhancer-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Enhancer</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('enhance-input').click()"><i class="ri-hd-line"></i><p>Upload Low-Res Image</p><input type="file" id="enhance-input" accept="image/*"></div></div></div>
+                <div id="ai-image-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Art Generator</h2></div><div class="ws-body"><div class="input-group"><textarea class="glass-input big-area" id="ai-img-prompt" placeholder="A futuristic city..."></textarea></div><div class="controls-row"><select id="ai-style" class="glass-input"><option value="">Realistic</option><option value="anime">Anime</option></select><button class="glow-btn" onclick="generateAIImage()">Generate ✨</button></div><div id="ai-result-box" class="hidden" style="text-align:center; margin-top:30px;"><img id="ai-generated-img" style="max-width:100%; border-radius:15px;"></div></div></div>
+                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body max-600"><textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
+                <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract Data</button></div></div>
                 <div id="speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Voice Type</h2></div><div class="ws-body"><div class="controls-row"><select id="speech-lang" class="glass-input"><option value="en-US">English</option></select></div><button class="glow-btn" onclick="toggleSpeech()">Start/Stop</button><textarea id="speech-output" class="glass-input big-area"></textarea></div></div>
-                
-                <div id="pass-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Security</h2></div><div class="ws-body max-600"><div class="pass-display" id="generated-pass">...</div><input type="range" id="pass-len" min="8" max="32" value="12"><button class="glow-btn" onclick="generatePass()">Generate</button></div></div>
-                
                 <div id="jpg-pdf-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>JPG to PDF</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('jpg-input').click()"><i class="ri-images-line"></i><p>Select Images</p><input type="file" id="jpg-input" multiple accept="image/*"></div><button class="glow-btn" onclick="convertJpgToPdf()">Merge PDF</button></div></div>
-                
-                <div id="pdf-jpg-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to JPG</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-jpg-input').click()"><i class="ri-image-line"></i><p>Select PDF</p><input type="file" id="pdf-jpg-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPdfToJpg()">Convert</button><div id="jpg-preview-grid" class="image-grid-preview"></div></div></div>
-
             </div>
         </main>
         
         <nav class="mobile-nav">
             <a href="#" onclick="showHome()" class="nav-item active"><i class="ri-home-5-line"></i></a>
-            <a href="#" onclick="document.getElementById('search-bar').focus()" class="nav-item"><i class="ri-search-line"></i></a>
             <div class="nav-fab" onclick="openTool('resume-tool')"><i class="ri-add-line"></i></div>
-            <a href="#" onclick="openTool('ai-image-tool')" class="nav-item"><i class="ri-openai-line"></i></a>
-            <a href="#" onclick="toggleTheme()" class="nav-item"><i class="ri-user-line"></i></a>
+            <a href="#" onclick="openTool('bg-remover-tool')" class="nav-item"><i class="ri-magic-line"></i></a>
         </nav>
     </div>
 
@@ -364,8 +368,49 @@
     <script src="js/tools/resume.js"></script>
     <script src="js/tools/image.js"></script>
     <script src="js/tools/pdf.js"></script>
-    <script src="js/tools/voice.js"></script>
-    <script src="js/tools/security.js"></script>
     <script src="js/tools/subtitle.js"></script>
+    <script src="js/tools/voice.js"></script>
+
+    <script>
+        // 1. Resume Update Override (Projects & Languages Support)
+        const originalUpdate = window.updateResume || function(){};
+        window.updateResume = function() {
+            if(typeof originalUpdate === 'function') originalUpdate();
+            
+            // New Projects Logic
+            const projTitle = document.getElementById('in-proj-title').value;
+            const projDesc = document.getElementById('in-proj-desc').value;
+            const projSec = document.getElementById('res-proj-section');
+            if(projTitle) {
+                projSec.style.display = 'block';
+                document.getElementById('res-proj-title').innerText = projTitle;
+                document.getElementById('res-proj-desc').innerText = projDesc;
+            } else if(projSec) { projSec.style.display = 'none'; }
+
+            // New Languages Logic
+            const langs = document.getElementById('in-languages').value;
+            const langSec = document.getElementById('res-lang-section');
+            if(langs) {
+                langSec.style.display = 'block';
+                document.getElementById('res-languages').innerText = langs;
+            } else if(langSec) { langSec.style.display = 'none'; }
+        };
+
+        // 2. Background Color Changer
+        function changeBg(el, color) {
+            document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            const img = document.getElementById('bg-result-img');
+            if(img) img.style.background = color;
+        }
+
+        // 3. Close Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+            }, 800);
+        });
+    </script>
 </body>
 </html>
