@@ -311,14 +311,30 @@
                 </div>
 
                 <div id="bg-remover-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('bg-input').click()"><i class="ri-image-add-line"></i><p>Upload Photo</p><input type="file" id="bg-input" accept="image/*"></div>
-                        <div id="compare-container" class="compare-viewer hidden"><img id="bg-result-img" class="img-back"><img id="bg-original-img" class="img-front"><input type="range" class="slider" oninput="slideCompare(this.value)"></div>
-                        <button class="glow-btn hidden" id="dl-bg-btn">Download</button>
-                    </div>
-                </div>
-            </div>
+    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
+    <div class="ws-body">
+        
+        <div class="upload-zone" onclick="document.getElementById('bg-input').click()">
+            <i class="ri-magic-line"></i><p>Upload Photo to Remove BG</p>
+            <input type="file" id="bg-input" accept="image/*" onchange="handleBgUpload(this)">
+        </div>
+
+        <div id="compare-container" class="compare-viewer hidden">
+            <div class="comp-label lbl-orig">ORIGINAL</div>
+            <div class="comp-label lbl-res">REMOVED</div>
+            
+            <img id="bg-result-img" class="img-back">
+            <img id="bg-original-img" class="img-front">
+            
+            <div class="slider-line-deco" id="slider-line"></div>
+            <div class="slider-handle-deco" id="slider-handle"><i class="ri-arrow-left-right-line"></i></div>
+            
+            <input type="range" class="slider" min="0" max="100" value="50" oninput="slideCompare(this.value)">
+        </div>
+
+        <button class="glow-btn hidden" id="dl-bg-btn" onclick="downloadBgImage()">Download HD PNG</button>
+    </div>
+</div>
             <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body max-600"><textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
                 
                 <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract</button></div></div>
