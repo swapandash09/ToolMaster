@@ -54,8 +54,7 @@ window.slideCompare = (val, type = 'bg') => {
     }
 };
 
-
-// --- 3. MAGIC ERASER (BACKGROUND REMOVER) ---
+// --- 3. MAGIC ERASER (REAL AI BACKGROUND REMOVER) ---
 
 const bgInput = document.getElementById('bg-input');
 
@@ -66,7 +65,7 @@ if (bgInput) {
 
         // UI Setup
         if(typeof loader === 'function') loader(true);
-        if(typeof showToast === 'function') showToast("AI Engine: Identifying Subject...", "info");
+        if(typeof showToast === 'function') showToast("AI Engine: Removing Background (Please Wait)...", "info");
         
         const container = document.getElementById('compare-container');
         const dlBtn = document.getElementById('dl-bg-btn');
@@ -74,43 +73,52 @@ if (bgInput) {
         const resImg = document.getElementById('bg-result-img');
 
         try {
-            // 1. Load Original
-            const url = URL.createObjectURL(file);
-            origImg.src = url;
+            // 1. Show Original Image immediately
+            const originalUrl = URL.createObjectURL(file);
+            origImg.src = originalUrl;
 
-            // 2. Process (Simulation of AI Removal)
-            // In a real app, you would send 'file' to an API here.
-            // For V41 Demo: We simulate "Perfect Removal" by using a pre-processed logic 
-            // or simply alerting the user if no API key is present.
+            // 2. RUN REAL AI (imgly library)
+            // Note: Pehli baar run karne mein 5-10 second lag sakte hain (models download hote hain)
             
-            // Simulating processing delay
-            await new Promise(r => setTimeout(r, 2000));
+            // imglyRemoveBackground global function aa jayega script tag se
+            const blob = await imglyRemoveBackground(file);
             
-            // For Demo purposes, we might just invert/filter the image to show *something* happened
-            // or stick to the original logic if an API was hooked up.
-            // Here, we'll generate a "Ghost" version to prove the slider works.
-            const processedUrl = await generateGhostVariant(await loadImage(url));
+            // 3. Convert Result Blob to URL
+            const processedUrl = URL.createObjectURL(blob);
             resImg.src = processedUrl;
 
-            // 3. Reveal UI
+            // 4. Reveal UI
             container.classList.remove('hidden');
             dlBtn.classList.remove('hidden');
             
-            // Reset Slider
+            // Reset Slider to Center
             const slider = container.querySelector('.slider');
             if(slider) {
                 slider.value = 50;
-                slideCompare(50, 'bg');
+                // Agar slideCompare function main.js mein hai to call karein
+                if(typeof slideCompare === 'function') {
+                    slideCompare(50, 'bg');
+                } else {
+                    // Fallback agar function nahi mila
+                    origImg.style.width = '50%'; 
+                }
             }
 
-            // Setup Download
-            window.downloadBgImage = () => downloadImage(processedUrl, `MagicEraser_${Date.now()}`);
+            // Setup Download Function
+            window.downloadBgImage = () => {
+                const a = document.createElement('a');
+                a.href = processedUrl;
+                a.download = `NoBG_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
 
-            if(typeof showToast === 'function') showToast("Background Removed!", "success");
+            if(typeof showToast === 'function') showToast("Background Removed Successfully!", "success");
 
         } catch (err) {
-            console.error(err);
-            if(typeof showToast === 'function') showToast("AI Processing Failed", "error");
+            console.error("AI Error:", err);
+            if(typeof showToast === 'function') showToast("Failed to remove background. Check Console.", "error");
         } finally {
             if(typeof loader === 'function') loader(false);
         }
