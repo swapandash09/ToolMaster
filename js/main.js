@@ -1,254 +1,218 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V44 - STABLE CORE
+// 💧 TOOLMASTER TITANIUM V46 - LIQUID CORE
 // ==========================================
 
 const App = {
-    version: 'V44 Stable',
-    state: {
-        currentView: 'home-page',
-        isLoading: false
-    },
-    dom: {}, 
-
+    version: 'V46 Liquid',
+    
     init: function() {
-        console.log(`%c ${this.version} %c System Online `, 
-            'background:#10b981; color:white; padding: 3px 6px; border-radius: 4px; font-weight:bold;', 
-            'color:#10b981; font-weight:bold;');
+        console.log(`%c ${this.version} %c Smooth System Online `, 
+            'background:#6366f1; color:white; border-radius:4px;', 'color:#6366f1; font-weight:bold;');
         
-        this.cacheDOM();
         this.loadTheme();
         this.setupSearch();
-        this.setupShortcuts();
         this.setupRouter();
-
-        // 🚀 SAFE LAUNCH SEQUENCE
+        
+        // 🚀 SMOOTH LAUNCH
         window.addEventListener('load', () => {
             const loader = document.getElementById('loading-overlay');
             if(loader) {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                        document.body.classList.add('app-loaded');
-                    }, 500);
-                }, 300);
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 600);
             }
-            // Force Home Visibility on Load
-            this.navigateTo('home-page', false, true); 
+            this.navigateTo('home-page', false, true); // Instant load
         });
     },
 
-    cacheDOM: function() {
-        this.dom = {
-            homePage: document.getElementById('home-page'),
-            toolContainer: document.getElementById('tool-container'),
-            searchBar: document.getElementById('search-bar')
-        };
-    },
-
-    // --- 1. BULLETPROOF NAVIGATION ---
-    navigateTo: function(viewId, addToHistory = true, forceInstant = false) {
-        if(this.state.isLoading && !forceInstant) return;
+    // --- 1. LIQUID NAVIGATION ENGINE ---
+    navigateTo: function(viewId, addToHistory = true, instant = false) {
+        const home = document.getElementById('home-page');
+        const toolsContainer = document.getElementById('tool-container');
         
-        // 1. Lifecycle Cleanup (Stop Cameras/Videos)
-        if (this.state.currentView !== 'home-page') {
-            window.dispatchEvent(new CustomEvent('toolClosed', { detail: { toolId: this.state.currentView } }));
+        if(!home || !toolsContainer) return;
+
+        // 1. Lifecycle Cleanup
+        if(this.currentView && this.currentView !== 'home-page') {
+            window.dispatchEvent(new CustomEvent('toolClosed'));
         }
 
         // 2. History
         if (addToHistory) {
             history.pushState({ viewId }, "", `#${viewId.replace('-tool', '')}`);
         }
-        this.state.currentView = viewId;
+        this.currentView = viewId;
 
-        const isGoingHome = viewId === 'home-page';
+        const isGoingHome = viewId === 'home-page' || viewId === '';
 
-        // --- INSTANT SWITCH (No Animation - Safety Mode) ---
-        if(forceInstant) {
-            this._swapViews(viewId);
+        // --- INSTANT MODE (Initial Load) ---
+        if(instant) {
+            if(isGoingHome) {
+                this._setVisible(home);
+                this._setHidden(toolsContainer);
+            } else {
+                const tool = document.getElementById(viewId);
+                if(tool) {
+                    this._setHidden(home);
+                    this._setVisible(toolsContainer);
+                    this._showTool(viewId);
+                }
+            }
             return;
         }
 
-        // --- ANIMATED SWITCH ---
-        const activeContainer = isGoingHome ? this.dom.toolContainer : this.dom.homePage;
-        
-        // Step 1: Fade Out Active
-        activeContainer.style.opacity = '0';
-        activeContainer.style.transform = isGoingHome ? 'translateY(15px)' : 'scale(0.95)';
-        
-        setTimeout(() => {
-            // Step 2: Swap DOM (Hide Old, Show New)
-            this._swapViews(viewId);
-            
-            // Step 3: Fade In New
-            const newContainer = isGoingHome ? this.dom.homePage : this.dom.toolContainer;
-            
-            // Prepare for entry
-            newContainer.style.opacity = '0';
-            newContainer.style.transform = isGoingHome ? 'scale(0.98)' : 'translateY(15px)';
-            
-            requestAnimationFrame(() => {
-                newContainer.style.transition = 'all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
-                newContainer.style.opacity = '1';
-                newContainer.style.transform = 'translateY(0) scale(1)';
+        // --- ANIMATED MODE ---
+        if (isGoingHome) {
+            // Tools Exit -> Home Enter
+            this._animateSwitch(toolsContainer, home, () => {
+                this.resetSearch();
+                document.title = "ToolMaster - Dashboard";
+                this.updateSidebar('home');
             });
-
-        }, 200); // Wait for fade out
-    },
-
-    // INTERNAL: Handles CSS Classes (The "Fix")
-    _swapViews: function(viewId) {
-        window.scrollTo(0, 0);
-
-        if (viewId === 'home-page') {
-            // SHOW HOME
-            this.dom.toolContainer.classList.add('hidden');
-            this.dom.toolContainer.style.display = 'none'; // Force hide
-            
-            this.dom.homePage.classList.remove('hidden');
-            this.dom.homePage.style.display = 'block'; // Force block
-            this.dom.homePage.style.opacity = '1'; // Force visible
-            
-            // Cleanup Search
-            if(this.dom.searchBar) { this.dom.searchBar.value = ''; this.filterTools(''); }
-            document.title = "ToolMaster Titanium - Dashboard";
-            this.updateSidebar('home');
-
         } else {
-            // SHOW TOOL
-            const toolElement = document.getElementById(viewId);
-            if (!toolElement) {
-                this.showToast(`Error: Tool "${viewId}" not found.`, "error");
-                return this.navigateTo('home-page', false, true);
-            }
+            const toolEl = document.getElementById(viewId);
+            if (!toolEl) return this.navigateTo('home-page', false);
 
-            this.dom.homePage.classList.add('hidden');
-            this.dom.homePage.style.display = 'none'; // Force hide
+            // Home Exit -> Tools Enter
+            this._animateSwitch(home, toolsContainer, () => {
+                // Hide other tools immediately
+                document.querySelectorAll('.tool-workspace').forEach(el => el.classList.add('hidden'));
+                
+                // Show specific tool
+                toolEl.classList.remove('hidden');
+                
+                // Trigger Tool Load Animation
+                toolEl.style.opacity = '0';
+                toolEl.style.transform = 'translateY(20px)';
+                requestAnimationFrame(() => {
+                    toolEl.style.transition = 'all 0.4s ease';
+                    toolEl.style.opacity = '1';
+                    toolEl.style.transform = 'translateY(0)';
+                });
 
-            this.dom.toolContainer.classList.remove('hidden');
-            this.dom.toolContainer.style.display = 'block'; // Force block
-            
-            // Hide all workspaces first
-            document.querySelectorAll('.tool-workspace').forEach(el => {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            });
-            
-            // Show Target Tool
-            toolElement.classList.remove('hidden');
-            toolElement.style.display = 'block';
-            toolElement.style.opacity = '1';
-
-            // Lifecycle Event
-            setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: viewId } }));
-            }, 50);
-
-            const name = toolElement.querySelector('h2')?.innerText || "Tool";
-            document.title = `ToolMaster - ${name}`;
-            this.updateSidebar(viewId);
+                
+                const title = toolEl.querySelector('h2')?.innerText || "Tool";
+                document.title = `ToolMaster - ${title}`;
+                this.updateSidebar(viewId);
+            });
         }
     },
 
-    // --- 2. BROWSER BACK BUTTON FIX ---
+    // --- ANIMATION HELPER (The Magic) ---
+    _animateSwitch: function(elementOut, elementIn, callback) {
+        // 1. Lock Interaction
+        document.body.style.pointerEvents = 'none';
+
+        // 2. Animate OUT
+        elementOut.classList.remove('view-enter');
+        elementOut.classList.add('view-exit');
+
+        setTimeout(() => {
+            // 3. Hide Old
+            elementOut.classList.add('force-gone'); // display: none
+            
+            // 4. Prepare New
+            elementIn.classList.remove('force-gone'); // display: block
+            elementIn.classList.add('view-exit'); // Start slightly off-screen
+            
+            // Run Logic (Show specific tool etc.)
+            if(callback) callback();
+
+            // 5. Animate IN (Double RAF for browser paint)
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    elementIn.classList.remove('view-exit');
+                    elementIn.classList.add('view-enter');
+                    
+                    // Unlock Interaction
+                    setTimeout(() => {
+                        document.body.style.pointerEvents = 'all';
+                    }, 400);
+                });
+            });
+
+        }, 300); // Wait for exit animation (300ms)
+    },
+
+    // Simple Helpers
+    _setVisible: function(el) {
+        el.classList.remove('force-gone', 'hidden', 'view-exit');
+        el.classList.add('view-enter');
+        el.style.display = 'block';
+    },
+    _setHidden: function(el) {
+        el.classList.add('force-gone', 'view-exit');
+        el.classList.remove('view-enter');
+        el.style.display = 'none';
+    },
+    _showTool: function(id) {
+        document.querySelectorAll('.tool-workspace').forEach(el => el.classList.add('hidden'));
+        const t = document.getElementById(id);
+        if(t) t.classList.remove('hidden');
+    },
+
+    // --- 2. ROUTER & SIDEBAR ---
     setupRouter: function() {
-        window.addEventListener('popstate', (event) => {
-            const target = (event.state && event.state.viewId) ? event.state.viewId : 'home-page';
-            // Use Instant Switch for Back Button to prevent glitches
-            this.navigateTo(target, false, false);
+        window.addEventListener('popstate', (e) => {
+            this.navigateTo(e.state?.viewId || 'home-page', false);
         });
-
-        // Initial Load Logic
         const hash = window.location.hash.substring(1);
-        if(hash) {
-            const toolId = hash.includes('-tool') ? hash : hash + '-tool';
-            if(document.getElementById(toolId)) this.navigateTo(toolId, false, true);
+        if(hash && document.getElementById(hash + '-tool')) {
+            this.navigateTo(hash + '-tool', false, true);
         }
     },
 
-    // --- 3. SIDEBAR SYNC ---
-    updateSidebar: function(activeId) {
+    updateSidebar: function(id) {
         document.querySelectorAll('.side-nav li, .mobile-nav .nav-item').forEach(li => {
             li.classList.remove('active');
             const action = li.getAttribute('onclick') || li.getAttribute('href') || "";
-            
-            const isHome = activeId === 'home-page';
-            if ((isHome && (action.includes('showHome') || action === '#')) ||
-                (!isHome && action.includes(activeId))) {
+            if((id === 'home-page' && (action.includes('showHome') || action === '#')) || 
+               (id !== 'home-page' && action.includes(id))) {
                 li.classList.add('active');
             }
         });
     },
 
-    // --- 4. THEME & SEARCH ---
+    // --- 3. UTILS ---
     toggleTheme: function() {
         document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        localStorage.setItem('tm_theme', isLight ? 'light' : 'dark');
-        this.showToast(isLight ? "Light Mode Active" : "Dark Mode Active", "info");
+        localStorage.setItem('tm_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     },
-
     loadTheme: function() {
-        if (localStorage.getItem('tm_theme') === 'light') document.body.classList.add('light-mode');
+        if(localStorage.getItem('tm_theme') === 'light') document.body.classList.add('light-mode');
     },
-
     setupSearch: function() {
-        if(!this.dom.searchBar) return;
-        this.dom.searchBar.addEventListener('input', (e) => {
-            this.filterTools(e.target.value.toLowerCase().trim());
-        });
+        const bar = document.getElementById('search-bar');
+        if(bar) bar.addEventListener('input', (e) => this.filterTools(e.target.value.toLowerCase()));
     },
-
+    resetSearch: function() {
+        const bar = document.getElementById('search-bar');
+        if(bar) { bar.value = ''; this.filterTools(''); }
+    },
     filterTools: function(term) {
         document.querySelectorAll('.t-card').forEach(card => {
-            const txt = card.innerText.toLowerCase();
-            card.style.display = txt.includes(term) ? 'flex' : 'none';
+            card.style.display = card.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
         });
-        
-        // Show/Hide Categories based on visible cards
         document.querySelectorAll('.category-block').forEach(cat => {
-            const visible = cat.querySelectorAll('.t-card[style="display: flex;"]');
-            cat.style.display = visible.length > 0 ? 'block' : 'none';
+            cat.style.display = cat.querySelectorAll('.t-card[style="display: flex;"]').length ? 'block' : 'none';
         });
     },
-
-    // --- 5. HELPERS ---
-    setupShortcuts: function() {
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.navigateTo('home-page');
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                this.navigateTo('home-page');
-                setTimeout(() => this.dom.searchBar?.focus(), 100);
-            }
-        });
-    },
-
-    showToast: function(msg, type = 'success') {
+    showToast: function(msg, type='success') {
         let box = document.getElementById('toast-container');
-        if(!box) {
-            box = document.createElement('div'); box.id = 'toast-container';
-            document.body.appendChild(box);
-        }
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `<div class="toast-content"><span>${msg}</span></div>`;
-        box.appendChild(toast);
-        
-        requestAnimationFrame(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; });
-        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        if(!box) { box = document.createElement('div'); box.id = 'toast-container'; document.body.appendChild(box); }
+        const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<span>${msg}</span>`;
+        box.appendChild(t);
+        requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; });
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
     }
 };
 
-// GLOBAL API
+// EXPORTS
 window.App = App;
 window.showHome = () => App.navigateTo('home-page');
 window.openTool = (id) => App.navigateTo(id);
 window.toggleTheme = () => App.toggleTheme();
-window.showToast = (m, t) => App.showToast(m, t);
-window.loader = (show) => {
-    const l = document.getElementById('loading-overlay');
-    if(l) l.style.display = show ? 'flex' : 'none';
-};
+window.showToast = (m,t) => App.showToast(m,t);
+window.loader = (show) => { const l = document.getElementById('loading-overlay'); if(l) l.style.display = show ? 'flex' : 'none'; };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
