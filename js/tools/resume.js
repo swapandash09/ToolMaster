@@ -1,5 +1,5 @@
 // ==========================================
-// 📄 RESUME BUILDER - TITANIUM V41 ENGINE
+// 📄 RESUME BUILDER - FINAL ENGINE (HD & AUTO-FIT)
 // ==========================================
 
 let resumeData = {
@@ -20,7 +20,7 @@ function autoScalePreview() {
     
     if(!container || !wrapper || !paper) return;
 
-    // A4 width in px is approx 794. We add buffer.
+    // A4 width in px is approx 794.
     const paperWidth = 794; 
     const containerWidth = container.offsetWidth - 30; // 30px padding
     
@@ -35,7 +35,6 @@ function autoScalePreview() {
 
 // Event Listeners for Scaling
 window.addEventListener('resize', autoScalePreview);
-// Custom event from main.js when tool is opened
 window.addEventListener('toolOpened', (e) => {
     if(e.detail.toolId === 'resume-tool') setTimeout(autoScalePreview, 100);
 });
@@ -78,6 +77,8 @@ function setText(id, val) { const el = document.getElementById(id); if(el) el.in
 // --- 3. RENDER ENGINE ---
 function renderResume() {
     const paper = document.getElementById('resume-preview');
+    if(!paper) return;
+
     // Set Classes
     paper.className = `resume-paper ${resumeData.theme} ${resumeData.font}`;
 
@@ -206,47 +207,79 @@ function loadResumeJSON(input) {
             }
             
             renderResume();
-            showToast("Resume Loaded!", "success");
-        } catch(err) { showToast("Invalid JSON File", "error"); }
+            if(typeof showToast === 'function') showToast("Resume Loaded!", "success");
+        } catch(err) { 
+            if(typeof showToast === 'function') showToast("Invalid JSON File", "error"); 
+        }
     };
     reader.readAsText(file);
 }
 
-// --- 5. PDF EXPORT (ISOLATION ENGINE) ---
+// --- 5. PDF EXPORT (HD & SINGLE PAGE FORCE) ---
 function downloadResumePDF() {
     const element = document.getElementById('resume-preview');
     if(typeof loader === 'function') loader(true);
 
     const safeName = (resumeData.name || 'Resume').replace(/[^a-z0-9]/gi, '_');
 
-    // 1. Create Isolation Overlay (Clean White BG)
+    // 1. Create Isolation Overlay
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
     overlay.style.top = '0'; overlay.style.left = '0';
     overlay.style.width = '100vw'; overlay.style.height = '100vh';
     overlay.style.background = '#ffffff';
-    overlay.style.zIndex = '9999999'; // On top of everything
+    overlay.style.zIndex = '9999999';
     overlay.style.display = 'flex';
     overlay.style.justifyContent = 'center';
-    overlay.style.overflow = 'auto';
-    overlay.style.padding = '20px';
-
-    // 2. Clone Resume & Reset Transforms
+    overlay.style.overflow = 'hidden'; 
+    
+    // 2. Clone Resume
     const clone = element.cloneNode(true);
-    clone.style.transform = 'none'; 
-    clone.style.margin = '0 auto';
+    const a4Width = 794;
+    const a4Height = 1122; 
+
+    clone.style.width = `${a4Width}px`;
+    clone.style.minHeight = `${a4Height}px`; 
+    clone.style.height = 'auto'; 
+    clone.style.transform = 'none';
+    clone.style.margin = '0';
     clone.style.boxShadow = 'none';
+    clone.style.border = 'none';
     
     overlay.appendChild(clone);
     document.body.appendChild(overlay);
 
-    // 3. Generate
+    // 3. SMART FIT (Shrink if too long)
+    const contentHeight = clone.scrollHeight;
+    
+    if (contentHeight > a4Height) {
+        const scaleFactor = a4Height / contentHeight;
+        // Apply shrink to fit 1 page
+        clone.style.transformOrigin = 'top left';
+        clone.style.transform = `scale(${scaleFactor})`;
+        clone.style.width = `${a4Width / scaleFactor}px`; 
+        clone.style.height = `${a4Height / scaleFactor}px`; 
+        clone.style.overflow = 'hidden';
+    }
+
+    // 4. Generate with High Quality (Scale: 4)
     const opt = {
         margin: 0,
         filename: `${safeName}_CV.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas: { 
+            scale: 4, // 4x Quality
+            useCORS: true, 
+            scrollY: 0,
+            windowWidth: clone.scrollWidth,
+            windowHeight: clone.scrollHeight
+        },
+        jsPDF: { 
+            unit: 'px', 
+            format: [794, 1122], 
+            orientation: 'portrait',
+            hotfixes: ['px_scaling'] 
+        }
     };
 
     html2pdf().set(opt).from(clone).save().then(() => {
