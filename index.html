@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050507">
-    <title>ToolMaster Titanium - V39 Pro</title>
+    <title>ToolMaster Titanium - V41 Ultimate</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -33,7 +32,6 @@
     <style>
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: opacity; }
-        .slide-up { animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: transform, opacity; }
         
         /* Smooth Loader */
         #loading-overlay {
@@ -49,7 +47,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -60,7 +57,7 @@
     <div id="loading-overlay">
         <div class="loader-box">
             <div class="loader-circle"></div>
-            <p>INITIALIZING V39...</p>
+            <p>SYSTEM READY...</p>
         </div>
     </div>
 
@@ -80,7 +77,7 @@
                 </ul>
                 <p class="menu-label">Top Tools</p>
                 <ul>
-                    <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume Pro</li>
+                    <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume Studio</li>
                     <li onclick="openTool('ai-image-tool')"><i class="ri-openai-line"></i> AI Art Gen</li>
                     <li onclick="openTool('subtitle-tool')"><i class="ri-closed-captioning-line"></i> SubMaster</li>
                 </ul>
@@ -89,7 +86,7 @@
             <div class="sidebar-bottom">
                 <div class="pro-card">
                     <i class="ri-vip-diamond-line"></i>
-                    <div><h4>Titanium</h4><p>V39 Pro</p></div>
+                    <div><h4>Titanium</h4><p>V41 Ultimate</p></div>
                 </div>
             </div>
         </aside>
@@ -120,7 +117,7 @@
                     <div class="category-block">
                         <h3 class="cat-title"><i class="ri-file-text-line"></i> Documents</h3>
                         <div class="tool-grid">
-                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>Pro Builder</p></div></div>
+                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>V41 Builder</p></div></div>
                             <div class="t-card" onclick="openTool('excel-tool')"><div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div><div class="tc-info"><h4>Excel</h4><p>To PDF</p></div></div>
                             <div class="t-card" onclick="openTool('pdf-excel-tool')"><div class="tc-icon c-orange"><i class="ri-file-text-line"></i></div><div class="tc-info"><h4>PDF</h4><p>To Excel</p></div></div>
                         </div>
@@ -159,18 +156,85 @@
                     <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
                     <div class="split-view">
                         <div class="editor-panel">
-                            <div class="panel-actions"><button class="small-btn" onclick="saveResumeJSON()"><i class="ri-save-3-line"></i> Save</button><button class="small-btn" onclick="document.getElementById('json-load').click()"><i class="ri-upload-cloud-2-line"></i> Load</button><input type="file" id="json-load" style="display:none" onchange="loadResumeJSON(this)"></div>
-                            <div class="input-group"><h4 class="group-title">Profile</h4><div class="input-grid"><input type="text" class="glass-input" id="in-name" placeholder="Name" oninput="updateResume()"><input type="text" class="glass-input" id="in-title" placeholder="Job Title" oninput="updateResume()"></div><div class="input-grid"><input type="text" class="glass-input" id="in-email" placeholder="Email" oninput="updateResume()"><input type="text" class="glass-input" id="in-phone" placeholder="Phone" oninput="updateResume()"></div><input type="text" class="glass-input" id="in-address" placeholder="Location" oninput="updateResume()"><input type="text" class="glass-input" id="in-web" placeholder="Website" oninput="updateResume()"></div>
-                            <div class="input-group"><h4 class="group-title">Summary</h4><div class="ai-box"><button class="glow-btn small" onclick="generateAISummary()"><i class="ri-magic-line"></i> AI Write</button></div><textarea class="glass-input" id="in-summary" rows="4" placeholder="Summary..." oninput="updateResume()"></textarea></div>
-                            <div class="input-group"><h4 class="group-title">Experience</h4><input type="text" class="glass-input" id="in-company" placeholder="Company" oninput="updateResume()"><input type="text" class="glass-input" id="in-dates" placeholder="Dates" oninput="updateResume()"><textarea class="glass-input" id="in-job-desc" rows="3" placeholder="Description..." oninput="updateResume()"></textarea><input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma separated)" oninput="updateResume()"></div>
-                            <div class="input-group"><h4 class="group-title">Theme</h4><div class="color-picker-row"><div class="c-dot c-blue" onclick="setThemeColor('blue')"></div><div class="c-dot c-green" onclick="setThemeColor('green')"></div><div class="c-dot c-purple" onclick="setThemeColor('purple')"></div><div class="c-dot c-gold" onclick="setThemeColor('gold')"></div><div class="c-dot c-dark" onclick="setThemeColor('dark')"></div></div></div>
-                            <button class="glow-btn" onclick="downloadResumePDF()">Download PDF</button>
+                            <div class="panel-actions">
+                                <button class="small-btn" onclick="saveResumeJSON()"><i class="ri-save-3-line"></i> Save</button>
+                                <label class="small-btn" style="cursor:pointer;"><i class="ri-folder-open-line"></i> Load<input type="file" hidden onchange="loadResumeJSON(this)"></label>
+                                <button class="small-btn" onclick="clearResume()"><i class="ri-delete-bin-line"></i> Reset</button>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="group-title"><span>Identity & Style</span> <i class="ri-user-smile-line"></i></div>
+                                <div class="input-grid">
+                                     <div class="upload-zone small-zone" onclick="document.getElementById('photo-in').click()">
+                                        <div id="photo-preview-box"><i class="ri-camera-line"></i></div>
+                                        <p style="font-size:0.8rem; margin-top:5px;">Photo</p>
+                                        <input type="file" id="photo-in" accept="image/*" onchange="handleProfilePhoto(this)">
+                                    </div>
+                                    <div>
+                                        <label class="input-label">Font Style</label>
+                                        <select id="in-font" class="glass-input" onchange="updateResume()"><option value="font-sans">Modern</option><option value="font-serif">Classic</option><option value="font-mono">Tech</option></select>
+                                        <label class="input-label">Theme Color</label>
+                                        <div class="color-picker-row">
+                                            <div class="c-dot c-blue" onclick="setThemeColor('blue')"></div>
+                                            <div class="c-dot c-green" onclick="setThemeColor('green')"></div>
+                                            <div class="c-dot c-purple" onclick="setThemeColor('purple')"></div>
+                                            <div class="c-dot c-gold" onclick="setThemeColor('gold')"></div>
+                                            <div class="c-dot c-dark" onclick="setThemeColor('dark')"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="group-title"><span>Header Info</span> <i class="ri-id-card-line"></i></div>
+                                <div class="input-grid"><input type="text" class="glass-input" id="in-name" placeholder="Full Name" oninput="updateResume()"><input type="text" class="glass-input" id="in-title" placeholder="Job Title" oninput="updateResume()"></div>
+                                <div class="input-grid"><input type="text" class="glass-input" id="in-email" placeholder="Email" oninput="updateResume()"><input type="text" class="glass-input" id="in-phone" placeholder="Phone" oninput="updateResume()"></div>
+                                <input type="text" class="glass-input" id="in-address" placeholder="Location" oninput="updateResume()">
+                            </div>
+
+                            <div class="input-group">
+                                <div class="group-title"><span>Social Links</span> <i class="ri-share-line"></i></div>
+                                <div class="input-grid"><input type="text" class="glass-input" id="in-linkedin" placeholder="LinkedIn" oninput="updateResume()"><input type="text" class="glass-input" id="in-github" placeholder="GitHub/Portfolio" oninput="updateResume()"></div>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="group-title"><span>Professional Summary</span> <i class="ri-text"></i></div>
+                                <div class="ai-box"><button class="glow-btn small" onclick="generateAISummary()"><i class="ri-magic-line"></i> AI Write</button></div>
+                                <textarea class="glass-input" id="in-summary" rows="4" placeholder="Write a short professional summary..." oninput="updateResume()"></textarea>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="group-title"><span>Experience</span> <i class="ri-briefcase-line"></i></div>
+                                <input type="text" class="glass-input" id="in-company" placeholder="Company Name" oninput="updateResume()">
+                                <div class="input-grid"><input type="text" class="glass-input" id="in-role" placeholder="Role" oninput="updateResume()"><input type="text" class="glass-input" id="in-dates" placeholder="Dates" oninput="updateResume()"></div>
+                                <textarea class="glass-input" id="in-job-desc" rows="3" placeholder="Description..." oninput="updateResume()"></textarea>
+                            </div>
+                            
+                            <div class="input-group">
+                                <div class="group-title"><span>Skills & Edu</span> <i class="ri-tools-line"></i></div>
+                                <input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma separated)" oninput="updateResume()">
+                                <div class="input-grid" style="margin-top:10px;"><input type="text" class="glass-input" id="in-degree" placeholder="Degree" oninput="updateResume()"><input type="text" class="glass-input" id="in-school" placeholder="University" oninput="updateResume()"></div>
+                            </div>
+
+                            <button class="glow-btn" onclick="downloadResumePDF()">Download PDF (HD)</button>
                         </div>
-                        <div class="preview-panel">
-                            <div id="resume-preview" class="resume-paper theme-blue">
-                                <div class="res-header"><div class="header-content"><h1 id="res-name">NAME</h1><p id="res-title" class="accent-text">TITLE</p></div><div class="header-contact"></div></div>
-                                <div class="res-body"><div class="col-left"><div class="section-block"><h4 class="section-title">PROFILE</h4><p id="res-summary"></p></div><div class="section-block"><h4 class="section-title">SKILLS</h4><div id="res-skills" class="skills-wrap"></div></div></div><div class="col-right"><div class="section-block"><h4 class="section-title">EXPERIENCE</h4><div class="job-item"><div class="job-head"><h3 id="res-company"></h3><span class="job-date" id="res-dates"></span></div><div class="job-desc" id="res-job-desc"></div></div></div></div></div>
-                                <div class="res-footer-bar"></div>
+
+                        <div class="preview-panel" id="preview-container">
+                            <div id="scale-wrapper">
+                                <div id="resume-preview" class="resume-paper theme-blue font-sans">
+                                    <div class="paper-sidebar">
+                                        <div id="res-photo-container"><img id="res-photo-img" src=""></div>
+                                        <div class="sb-section"><div class="sb-title">Contact</div><div id="res-contact-box"></div></div>
+                                        <div class="sb-section" id="res-socials-section" style="display:none;"><div class="sb-title">Social</div><div id="res-socials-box"></div></div>
+                                        <div class="sb-section"><div class="sb-title">Skills</div><div id="res-skills"></div></div>
+                                    </div>
+                                    <div class="paper-content">
+                                        <div class="main-header"><h1 id="res-name">YOUR NAME</h1><p id="res-title">PROFESSIONAL TITLE</p></div>
+                                        <div class="main-section"><div class="sec-head"><i class="ri-user-line"></i> Profile</div><p id="res-summary"></p></div>
+                                        <div class="main-section"><div class="sec-head"><i class="ri-briefcase-line"></i> Experience</div><div class="item-block"><span class="item-date" id="res-dates"></span><div class="item-title" id="res-company"></div><div class="item-sub" id="res-role"></div><div class="item-desc" id="res-job-desc"></div></div></div>
+                                        <div class="main-section" id="res-edu-section" style="display:none;"><div class="sec-head"><i class="ri-graduation-cap-line"></i> Education</div><div class="item-block"><span class="item-date" id="res-edu-year"></span><div class="item-title" id="res-degree"></div><div class="item-sub" id="res-school"></div></div></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -205,7 +269,8 @@
                          <div class="t-card" style="display: block; padding: 0; overflow: hidden; margin-bottom: 20px;">
                             <div style="padding: 20px; border-bottom: 1px solid var(--border);">
                                 <input type="file" id="video-input" accept="video/*" class="file-input-hidden" hidden>
-                                <label for="video-input" class="glow-btn" style="cursor: pointer; display: inline-block; width: auto; padding: 10px 20px;">
+                                
+                          <label for="video-input" class="glow-btn" style="cursor: pointer; display: inline-block; width: auto; padding: 10px 20px;">
                                     <i class="ri-upload-cloud-line"></i> Upload Video
                                 </label>
                                 <span id="video-name" style="margin-left: 10px; font-size: 0.9rem; color: var(--text-muted);">No file selected</span>
@@ -253,25 +318,17 @@
                         <button class="glow-btn hidden" id="dl-bg-btn">Download</button>
                     </div>
                 </div>
-
-                <div id="img-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Image Compressor</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('img-input').click()"><i class="ri-file-zip-line"></i><p>Upload Image</p><input type="file" id="img-input" accept="image/*"></div>
-                        <div id="comp-controls" class="hidden">
-                            <div class="controls-row"><label>Quality:</label><input type="range" id="quality" min="0.1" max="1.0" step="0.1" value="0.8" oninput="liveCompress()"><span id="q-val">80%</span></div>
-                            <div class="stats-bar"><div class="stat-box"><span>Original</span><strong id="orig-size">0 KB</strong></div><i class="ri-arrow-right-line"></i><div class="stat-box success"><span>Compressed</span><strong id="comp-size">0 KB</strong></div><div class="stat-badge" id="save-badge">-0%</div></div>
-                            <div class="flex-preview"><p>Preview:</p><img id="comp-prev"></div>
-                            <button class="glow-btn" id="dl-comp-btn">Download</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body max-600"><textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
+            </div>
+            <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body max-600"><textarea id="tts-input" class="glass-input big-area" placeholder="Type here..."></textarea><div class="controls-row"><select id="voice-select" class="glass-input"></select><input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
+                
                 <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPDFtoExcel()">Extract</button></div></div>
+                
                 <div id="speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Voice Type</h2></div><div class="ws-body"><div class="controls-row"><select id="speech-lang" class="glass-input"><option value="en-US">English</option></select></div><button class="glow-btn" onclick="toggleSpeech()">Start/Stop</button><textarea id="speech-output" class="glass-input big-area"></textarea></div></div>
+                
                 <div id="pass-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Security</h2></div><div class="ws-body max-600"><div class="pass-display" id="generated-pass">...</div><input type="range" id="pass-len" min="8" max="32" value="12"><button class="glow-btn" onclick="generatePass()">Generate</button></div></div>
+                
                 <div id="jpg-pdf-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>JPG to PDF</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('jpg-input').click()"><i class="ri-images-line"></i><p>Select Images</p><input type="file" id="jpg-input" multiple accept="image/*"></div><button class="glow-btn" onclick="convertJpgToPdf()">Merge PDF</button></div></div>
+                
                 <div id="pdf-jpg-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to JPG</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-jpg-input').click()"><i class="ri-image-line"></i><p>Select PDF</p><input type="file" id="pdf-jpg-input" accept=".pdf"></div><button class="glow-btn" onclick="convertPdfToJpg()">Convert</button><div id="jpg-preview-grid" class="image-grid-preview"></div></div></div>
 
             </div>
@@ -283,7 +340,7 @@
             <div class="nav-fab" onclick="openTool('resume-tool')"><i class="ri-add-line"></i></div>
             <a href="#" onclick="openTool('ai-image-tool')" class="nav-item"><i class="ri-openai-line"></i></a>
             <a href="#" onclick="toggleTheme()" class="nav-item"><i class="ri-user-line"></i></a>
-     </nav>
+        </nav>
     </div>
 
     <script src="js/main.js"></script>
