@@ -237,7 +237,20 @@
     <script src="js/tools/binary.js"></script>
 
     <script>
-        // CRITICAL NAV LOGIC
+        // Force Dashboard on Load
+        window.addEventListener('load', () => {
+            // Hide Loader
+            setTimeout(() => {
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+            }, 800);
+
+            // Force Home View
+            document.getElementById('home-page').classList.remove('hidden');
+            document.getElementById('tool-container').classList.add('hidden');
+        });
+
+        // Navigation Logic
         window.showHome = function() {
             document.getElementById('home-page').classList.remove('hidden');
             document.getElementById('tool-container').classList.add('hidden');
@@ -249,19 +262,13 @@
             document.getElementById('home-page').classList.add('hidden');
             document.getElementById('tool-container').classList.remove('hidden');
             document.querySelectorAll('.tool-workspace').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById(id);
-            if(target) {
-                target.classList.remove('hidden');
-                target.classList.add('fade-in');
-                window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: id } }));
+            
+            const tool = document.getElementById(id);
+            if(tool) {
+                tool.classList.remove('hidden');
+                tool.classList.add('fade-in');
             }
         };
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loading-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
-            }, 800);
-        });
         
         function changeBg(el, color) {
             document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
