@@ -164,30 +164,112 @@
             <div id="tool-container" class="hidden">
                 
                 <div id="resume-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
-                    <div class="resume-workspace" style="display:flex; flex-direction:column; height:calc(100vh - 80px);">
-                        <div class="editor-panel" style="flex:0 0 45%; overflow-y:auto; padding:25px; background:var(--bg); border-bottom:2px solid var(--border);">
-                            <div class="editor-grid">
-                                <div class="input-group"><div class="group-title">IDENTITY</div><div style="display:flex; gap:10px;"><button class="small-btn" onclick="document.getElementById('photo-in').click()">Photo</button><input type="file" id="photo-in" hidden onchange="handleProfilePhoto(this)"><input type="text" class="glass-input" id="in-name" placeholder="Full Name" oninput="updateResume()"></div><input type="text" class="glass-input" id="in-title" placeholder="Job Title" oninput="updateResume()"></div>
-                                <div class="input-group"><div class="group-title">CONTACT & PERSONAL</div><div class="input-grid"><input type="text" class="glass-input" id="in-email" placeholder="Email" oninput="updateResume()"><input type="text" class="glass-input" id="in-phone" placeholder="Phone" oninput="updateResume()"></div><input type="text" class="glass-input" id="in-address" placeholder="Address" oninput="updateResume()">
-                                    <div class="input-grid" style="margin-top:10px;"><input type="text" class="glass-input" id="in-guardian" placeholder="Guardian / C/O Name" oninput="updateResume()"><input type="text" class="glass-input" id="in-dob" placeholder="DOB (DD/MM/YYYY)" oninput="updateResume()"></div>
-                                </div>
-                                <div class="input-group"><div class="group-title">DETAILS</div><div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-size:0.8rem; color:var(--text-muted);">Summary</span><button class="small-btn" onclick="generateAISummary()" style="font-size:0.7rem; background:var(--primary); color:white;">AI Write</button></div><textarea class="glass-input" id="in-summary" rows="2" placeholder="Summary..." oninput="updateResume()"></textarea><input type="text" class="glass-input" id="in-company" placeholder="Company" oninput="updateResume()"><div class="input-grid"><input type="text" class="glass-input" id="in-role" placeholder="Role" oninput="updateResume()"><input type="text" class="glass-input" id="in-dates" placeholder="Dates" oninput="updateResume()"></div><textarea class="glass-input" id="in-job-desc" rows="2" placeholder="Responsibilities..." oninput="updateResume()"></textarea></div>
-                                <div class="input-group"><div class="group-title">EXTRA</div><input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma sep)" oninput="updateResume()"><div class="input-grid"><input type="text" class="glass-input" id="in-degree" placeholder="Degree" oninput="updateResume()"><input type="text" class="glass-input" id="in-edu-year" placeholder="Year" oninput="updateResume()"></div><input type="text" class="glass-input" id="in-school" placeholder="University" oninput="updateResume()"></div>
-                            </div>
-                        </div>
-                        <div class="preview-panel" id="preview-container" style="flex:1; background:#18181b; position:relative; overflow:hidden;">
-                            <div id="scale-wrapper" style="height:100%; overflow-y:auto; padding:40px 0 100px 0;">
-                                <div id="resume-preview" class="resume-paper">
-                                    <div class="paper-sidebar"><div id="res-photo-container"><img id="res-photo-img" src=""></div><div class="sb-section" id="contact-list"></div><div class="sb-section"><div class="sb-title">SKILLS</div><div id="res-skills"></div></div></div>
-                                    <div class="paper-content"><h1 id="res-name">YOUR NAME</h1><span id="res-title">TITLE</span><div class="sec-head">PROFILE</div><div id="res-summary">...</div><div class="sec-head">EXPERIENCE</div><div id="res-experience-list"></div><div class="sec-head">EDUCATION</div><div class="edu-block"><div class="item-row"><div class="edu-degree" id="res-degree">Degree</div><div class="item-date" id="res-edu-year">Year</div></div><div class="edu-school" id="res-school">University</div></div></div>
-                                </div>
-                            </div>
-                            <div style="position:absolute; bottom:20px; width:100%; display:flex; justify-content:center; pointer-events:none;"><button class="glow-btn" onclick="downloadResumePDF()" style="pointer-events:auto; width:auto; padding:12px 40px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">DOWNLOAD PDF</button></div>
-                        </div>
+    <div class="ws-head">
+        <button class="back-pill" onclick="showHome()">← Back</button>
+        <h2>Resume Studio</h2>
+    </div>
+    <div class="resume-workspace" style="display:flex; flex-direction:column; height:calc(100vh - 80px);">
+        
+        <div class="editor-panel" style="flex:0 0 45%; overflow-y:auto; padding:25px; background:var(--bg); border-bottom:2px solid var(--border);">
+            <div class="editor-grid">
+                
+                <div class="input-group">
+                    <div class="group-title">COLOR THEME</div>
+                    <div class="theme-picker" style="display:flex; gap:15px; flex-wrap:wrap;">
+                        <div class="theme-dot active" style="width:32px;height:32px;border-radius:50%;background:#2563eb;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-blue', this)"></div>
+                        <div class="theme-dot" style="width:32px;height:32px;border-radius:50%;background:#059669;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-green', this)"></div>
+                        <div class="theme-dot" style="width:32px;height:32px;border-radius:50%;background:#7c3aed;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-purple', this)"></div>
+                        <div class="theme-dot" style="width:32px;height:32px;border-radius:50%;background:#d97706;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-gold', this)"></div>
+                        <div class="theme-dot" style="width:32px;height:32px;border-radius:50%;background:#1f2937;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-dark', this)"></div>
+                        <div class="theme-dot" style="width:32px;height:32px;border-radius:50%;background:#dc2626;cursor:pointer;border:2px solid var(--border);" onclick="setTheme('theme-red', this)"></div>
                     </div>
                 </div>
 
+                <div class="input-group">
+                    <div class="group-title">IDENTITY</div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="small-btn" onclick="document.getElementById('photo-in').click()">Photo</button>
+                        <input type="file" id="photo-in" hidden onchange="handleProfilePhoto(this)">
+                        <input type="text" class="glass-input" id="in-name" placeholder="Full Name" oninput="updateResume()">
+                    </div>
+                    <input type="text" class="glass-input" id="in-title" placeholder="Job Title" oninput="updateResume()">
+                </div>
+
+                <div class="input-group">
+                    <div class="group-title">CONTACT & PERSONAL</div>
+                    <div class="input-grid">
+                        <input type="text" class="glass-input" id="in-email" placeholder="Email" oninput="updateResume()">
+                        <input type="text" class="glass-input" id="in-phone" placeholder="Phone" oninput="updateResume()">
+                    </div>
+                    <input type="text" class="glass-input" id="in-address" placeholder="Address" oninput="updateResume()">
+                    <div class="input-grid" style="margin-top:10px;">
+                        <input type="text" class="glass-input" id="in-guardian" placeholder="Guardian / C/O Name" oninput="updateResume()">
+                        <input type="text" class="glass-input" id="in-dob" placeholder="DOB (DD/MM/YYYY)" oninput="updateResume()">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="group-title">DETAILS</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Summary</span>
+                        <button class="small-btn" onclick="generateAISummary()" style="font-size:0.7rem; background:var(--primary); color:white;">AI Write</button>
+                    </div>
+                    <textarea class="glass-input" id="in-summary" rows="2" placeholder="Summary..." oninput="updateResume()"></textarea>
+                    <input type="text" class="glass-input" id="in-company" placeholder="Company" oninput="updateResume()">
+                    <div class="input-grid">
+                        <input type="text" class="glass-input" id="in-role" placeholder="Role" oninput="updateResume()">
+                        <input type="text" class="glass-input" id="in-dates" placeholder="Dates" oninput="updateResume()">
+                    </div>
+                    <textarea class="glass-input" id="in-job-desc" rows="2" placeholder="Responsibilities..." oninput="updateResume()"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <div class="group-title">EXTRA</div>
+                    <input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma sep)" oninput="updateResume()">
+                    <div class="input-grid">
+                        <input type="text" class="glass-input" id="in-degree" placeholder="Degree" oninput="updateResume()">
+                        <input type="text" class="glass-input" id="in-edu-year" placeholder="Year" oninput="updateResume()">
+                    </div>
+                    <input type="text" class="glass-input" id="in-school" placeholder="University" oninput="updateResume()">
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-panel" id="preview-container" style="flex:1; background:#18181b; position:relative; overflow:hidden;">
+            <div id="scale-wrapper" style="height:100%; overflow-y:auto; padding:40px 0 100px 0;">
+                <div id="resume-preview" class="resume-paper">
+                    <div class="paper-sidebar">
+                        <div id="res-photo-container"><img id="res-photo-img" src=""></div>
+                        <div class="sb-section" id="contact-list"></div>
+                        <div class="sb-section">
+                            <div class="sb-title">SKILLS</div>
+                            <div id="res-skills"></div>
+                        </div>
+                    </div>
+                    <div class="paper-content">
+                        <h1 id="res-name">YOUR NAME</h1>
+                        <span id="res-title">TITLE</span>
+                        <div class="sec-head">PROFILE</div>
+                        <div id="res-summary">...</div>
+                        <div class="sec-head">EXPERIENCE</div>
+                        <div id="res-experience-list"></div>
+                        <div class="sec-head">EDUCATION</div>
+                        <div class="edu-block">
+                            <div class="item-row">
+                                <div class="edu-degree" id="res-degree">Degree</div>
+                                <div class="item-date" id="res-edu-year">Year</div>
+                            </div>
+                            <div class="edu-school" id="res-school">University</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="position:absolute; bottom:20px; width:100%; display:flex; justify-content:center; pointer-events:none;">
+                <button class="glow-btn" onclick="downloadResumePDF()" style="pointer-events:auto; width:auto; padding:12px 40px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">DOWNLOAD PDF</button>
+            </div>
+        </div>
+    </div>
+                
                 <div id="bg-remover-tool" class="tool-workspace hidden">
                     <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div>
                     <div class="ws-body">
