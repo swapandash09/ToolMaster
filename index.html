@@ -317,7 +317,50 @@
                         <button class="glow-btn" onclick="generateUltraHDPDF()">Convert & Download</button>
                     </div>
                 </div>
+                 <div id="speech-tool" class="tool-workspace hidden">
+                     <div class="ws-head">
+                       <button class="back-pill" onclick="showHome()">← Back</button>
+                        <h2>Voice Type</h2>
+                </div>
+               <div class="ws-body">
+                <div class="controls-row">
+                   <select id="speech-lang" class="glass-input">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-IN">English (India)</option>
+                    <option value="hi-IN">Hindi</option>
+                    <option value="es-ES">Spanish</option>
+            </select>
+        </div>
+        <textarea id="speech-output" class="big-area" 
+                  placeholder="Tap 'Start Listening' and speak...&#10;💡 Tip: Say 'Period', 'Comma', or 'New Line' to format text automatically."></textarea>
+        
+        <button class="glow-btn" onclick="toggleSpeech()">
+            <i class="ri-mic-fill"></i> Start Listening
+        </button>
+    </div>
+</div>
 
+<div id="text-speech-tool" class="tool-workspace hidden">
+    <div class="ws-head">
+        <button class="back-pill" onclick="showHome()">← Back</button>
+        <h2>AI Reader</h2>
+    </div>
+    <div class="ws-body">
+        <div class="controls-row">
+            <select id="voice-select" class="glass-input"></select>
+            <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                <i class="ri-speed-line" style="color:var(--text-muted);"></i>
+                <input type="range" id="rate" min="0.5" max="2" value="1" step="0.1" title="Speed">
+            </div>
+        </div>
+        <textarea id="tts-input" class="big-area" placeholder="Paste text here to read aloud..."></textarea>
+        
+        <button class="glow-btn" onclick="speakText()">
+            <i class="ri-volume-up-line"></i> Speak Text
+        </button>
+    </div>
+</div>
+                
                 <div id="enhancer-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Enhancer</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('enhance-input').click()"><i class="ri-hd-line"></i><p>Upload Low-Res Image</p><input type="file" id="enhance-input" accept="image/*" hidden></div></div></div>
                 <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('comp-input').click()"><i class="ri-file-zip-line"></i><p>Upload Image</p><input type="file" id="comp-input" accept="image/*" hidden></div><div id="comp-controls" class="hidden"><img id="comp-preview-img" style="max-width:100%; border-radius:12px; margin:20px 0;"><div style="display:flex; justify-content:space-between; margin-bottom:20px;"><span id="orig-size"></span><i class="ri-arrow-right-line"></i><span id="comp-size" style="color:#10b981;"></span></div><div class="controls-row"><input type="range" id="comp-quality" min="10" max="90" value="80"><select id="comp-format" class="glass-input"><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select></div><button class="glow-btn" id="dl-comp-btn">Download</button></div></div></div>
                 <div id="subtitle-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('video-input').click()"><i class="ri-movie-line"></i><p>Upload Video</p><input type="file" id="video-input" accept="video/*" hidden></div><video id="main-video" style="width:100%; margin-top:20px; border-radius:12px; display:none;" controls></video><div id="caption-box" style="margin-top:20px; height:250px; overflow-y:auto;"></div><button id="btn-start-cap" class="glow-btn" onclick="startCaptioning()">Start Listening</button><div style="display:flex; gap:10px; margin-top:10px;"><button class="glow-btn" onclick="downloadSubtitle('srt')">SRT</button><button class="glow-btn" onclick="downloadSubtitle('vtt')">VTT</button></div></div></div>
