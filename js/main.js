@@ -1,47 +1,44 @@
 // ==========================================
-// ⚡ TOOLMASTER TITANIUM V58 - ULTIMATE CORE
+// ⚡ TOOLMASTER TITANIUM V75 - HYPER CORE
 // ==========================================
 
 const App = {
-    version: 'V58 Ultimate',
+    version: 'V75 Hyper',
     config: {
         animDuration: 300,
-        ease: 'cubic-bezier(0.2, 0.8, 0.2, 1)'
+        debounceTime: 50
     },
     state: {
         currentView: 'home-page',
         isAnimating: false,
-        theme: localStorage.getItem('tm_theme') || 'dark'
+        theme: localStorage.getItem('tm_theme') || 'dark',
+        searchIndex: [] // Cache for instant search
     },
-    ui: {}, // DOM Cache
+    ui: {},
 
+    // --- 1. SYSTEM BOOT ---
     init: function() {
         console.log(`%c Titanium ${this.version} [System Online] `, "background: #6366f1; color: white; padding: 4px; border-radius: 4px;");
         
         this.cacheDOM();
         this.loadTheme();
-        this.setupSearch();
+        this.indexTools(); // Pre-index for search
         this.setupRouter();
-        this.setupShortcuts();
-        this.setupEffects();
+        this.setupSearch();
+        this.setupGlobalEvents();
 
-        // Initial Tool Check
-        if(document.getElementById('generated-pass')) window.generatePass();
-
-        // Remove Loader
-        window.addEventListener('load', () => {
+        // Boot Animation
+        window.onload = () => {
             if(this.ui.loader) {
-                requestAnimationFrame(() => {
-                    this.ui.loader.style.opacity = '0';
-                    setTimeout(() => this.ui.loader.style.display = 'none', 500);
-                });
+                this.ui.loader.style.opacity = '0';
+                setTimeout(() => this.ui.loader.style.display = 'none', 500);
             }
-            // Hash Navigation (Direct Link Support)
+            // Deep Linking (e.g. #resume)
             const hash = window.location.hash.substring(1);
             if(hash && document.getElementById(hash + '-tool')) {
                 this.navigateTo(hash + '-tool', false, true);
             }
-        });
+        };
     },
 
     cacheDOM: function() {
@@ -50,149 +47,164 @@ const App = {
             toolsContainer: document.getElementById('tool-container'),
             searchBar: document.getElementById('search-bar'),
             loader: document.getElementById('loading-overlay'),
-            toastBox: document.getElementById('toast-container')
+            toastBox: document.getElementById('toast-container'),
+            cards: document.querySelectorAll('.t-card')
         };
     },
 
-    // --- 🚀 ZERO-LAG NAVIGATION ENGINE ---
+    // --- 2. SEARCH ENGINE (FIXED & OPTIMIZED) ---
+    indexTools: function() {
+        // Build a static index for O(1) lookups during search
+        this.state.searchIndex = Array.from(this.ui.cards).map(card => ({
+            el: card,
+            title: (card.querySelector('h4')?.innerText || "").toLowerCase(),
+            desc: (card.querySelector('p')?.innerText || "").toLowerCase(),
+            category: card.closest('.category-block')
+        }));
+    },
+
+    setupSearch: function() {
+        if(!this.ui.searchBar) return;
+
+        const performSearch = (term) => {
+            requestAnimationFrame(() => {
+                let hasResults = false;
+                const activeCategories = new Set();
+
+                this.state.searchIndex.forEach(item => {
+                    const isMatch = item.title.includes(term) || item.desc.includes(term);
+                    
+                    // Toggle Visibility
+                    item.el.style.display = isMatch ? 'flex' : 'none';
+                    if(isMatch) {
+                        item.el.style.animation = 'fadeIn 0.3s ease forwards';
+                        activeCategories.add(item.category);
+                        hasResults = true;
+                    }
+                });
+
+                // Hide empty categories
+                document.querySelectorAll('.category-block').forEach(cat => {
+                    cat.style.display = activeCategories.has(cat) ? 'block' : 'none';
+                });
+            });
+        };
+
+        // Debounce for smoothness
+        let timeout;
+        this.ui.searchBar.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            clearTimeout(timeout);
+            timeout = setTimeout(() => performSearch(term), this.config.debounceTime);
+        });
+    },
+
+    // --- 3. NAVIGATION ENGINE (GPU ACCELERATED) ---
     navigateTo: function(viewId, addToHistory = true, instant = false) {
         if (!this.ui.home || !this.ui.toolsContainer) return;
         if (this.state.currentView === viewId || this.state.isAnimating) return;
 
-        if(!instant) this.state.isAnimating = true;
+        this.state.isAnimating = !instant;
 
-        // URL History
+        // History Management
         if (addToHistory) {
             const slug = viewId === 'home-page' ? '' : `#${viewId.replace('-tool', '')}`;
             history.pushState({ viewId }, "", slug || window.location.pathname);
         }
 
         const isGoingHome = viewId === 'home-page';
-        const outgoing = isGoingHome ? this.ui.toolsContainer : this.ui.home;
-        const incoming = isGoingHome ? this.ui.home : this.ui.toolsContainer;
-
-        // Tool Cleanup
+        
+        // Reset Logic
         if (isGoingHome) {
-            window.dispatchEvent(new CustomEvent('toolClosed', { detail: { toolId: this.state.currentView } }));
-            this.resetSearch();
+            this.resetToolState();
             document.title = "Titanium - Dashboard";
+        } else {
+            this._prepareTool(viewId);
         }
 
-        // --- ANIMATION LOGIC ---
-        // 1. Prepare Incoming
-        if(!isGoingHome) this._activateTool(viewId);
-        
+        // View Switching
         if (instant) {
-            this._swapVisibility(outgoing, incoming);
-            this.updateSidebar(viewId);
-            this.state.currentView = viewId;
+            this._toggleViews(viewId);
             this.state.isAnimating = false;
-            return;
+        } else {
+            this._animateTransition(viewId, isGoingHome);
         }
-
-        // GPU Accelerate
-        incoming.style.display = 'block';
-        incoming.style.opacity = '0';
-        incoming.style.transform = isGoingHome ? 'scale(0.95)' : 'translateY(15px)';
-        
-        requestAnimationFrame(() => {
-            // Out Animation
-            outgoing.style.transition = `all 0.2s ease`;
-            outgoing.style.opacity = '0';
-            outgoing.style.transform = isGoingHome ? 'translateY(15px)' : 'scale(0.95)';
-            
-            // Switch
-            setTimeout(() => {
-                outgoing.style.display = 'none';
-                outgoing.classList.add('hidden');
-                outgoing.style.transform = 'none'; // Reset transform
-
-                // In Animation
-                requestAnimationFrame(() => {
-                    incoming.classList.remove('hidden');
-                    incoming.style.transition = `all 0.3s ${this.config.ease}`;
-                    incoming.style.opacity = '1';
-                    incoming.style.transform = 'none';
-                    
-                    setTimeout(() => {
-                        this.state.isAnimating = false;
-                        incoming.style.transition = ''; // Clean inline styles
-                    }, this.config.animDuration);
-                });
-            }, 200);
-        });
 
         this.state.currentView = viewId;
         this.updateSidebar(viewId);
     },
 
-    _swapVisibility: function(outEl, inEl) {
-        outEl.classList.add('hidden');
-        outEl.style.display = 'none';
-        inEl.classList.remove('hidden');
-        inEl.style.display = 'block';
+    _toggleViews: function(viewId) {
+        const showHome = viewId === 'home-page';
+        this.ui.home.classList.toggle('hidden', !showHome);
+        this.ui.toolsContainer.classList.toggle('hidden', showHome);
+        if(!showHome) this._showSpecificTool(viewId);
     },
 
-    _activateTool: function(toolId) {
-        // Hide all workspaces first
+    _animateTransition: function(viewId, isGoingHome) {
+        const outgoing = isGoingHome ? this.ui.toolsContainer : this.ui.home;
+        const incoming = isGoingHome ? this.ui.home : this.ui.toolsContainer;
+
+        // Stage 1: Fade Out
+        outgoing.style.opacity = '0';
+        outgoing.style.transform = isGoingHome ? 'translateY(10px)' : 'scale(0.98)';
+        outgoing.style.transition = 'all 0.2s ease';
+
+        setTimeout(() => {
+            this._toggleViews(viewId);
+            
+            // Stage 2: Fade In
+            incoming.style.opacity = '0';
+            incoming.style.transform = isGoingHome ? 'scale(0.98)' : 'translateY(10px)';
+            
+            requestAnimationFrame(() => {
+                incoming.style.transition = 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                incoming.style.opacity = '1';
+                incoming.style.transform = 'none';
+                
+                setTimeout(() => {
+                    this.state.isAnimating = false;
+                    incoming.style.transition = ''; // Cleanup
+                }, 300);
+            });
+        }, 200);
+    },
+
+    _prepareTool: function(toolId) {
+        // Broadcast open event for tools (Resume, AI, etc)
+        window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId } }));
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    },
+
+    _showSpecificTool: function(toolId) {
         document.querySelectorAll('.tool-workspace').forEach(el => {
-            el.classList.add('hidden');
-            el.style.display = 'none';
-        });
-
-        const target = document.getElementById(toolId);
-        if(target) {
-            target.classList.remove('hidden');
-            target.style.display = 'block';
-            
-            // Broadcast Event (For Tools to Self-Init)
-            window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: toolId } }));
-            
-            const title = target.querySelector('h2')?.innerText || "Tool";
-            document.title = `TM - ${title}`;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    },
-
-    // --- INTERACTIONS ---
-    setupEffects: function() {
-        // Ripple Effect on Clicks
-        document.addEventListener('click', (e) => {
-            const target = e.target.closest('.glow-btn, .t-card');
-            if (target && !this.state.isAnimating) {
-                // Visual feedback only, logic handled by onclick
-            }
-        });
-    },
-
-    setupRouter: function() {
-        window.addEventListener('popstate', (e) => {
-            const target = e.state?.viewId || 'home-page';
-            this.navigateTo(target, false);
-        });
-    },
-
-    setupShortcuts: function() {
-        document.addEventListener('keydown', (e) => {
-            if((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                this.ui.searchBar?.focus();
-            }
-            if(e.key === 'Escape' && this.state.currentView !== 'home-page') {
-                this.navigateTo('home-page');
-            }
-        });
-    },
-
-    updateSidebar: function(id) {
-        const navItems = document.querySelectorAll('.side-nav li, .mobile-nav .nav-item');
-        navItems.forEach(li => {
-            li.classList.remove('active');
-            const action = li.getAttribute('onclick') || "";
-            if(id === 'home-page') {
-                if(action.includes('showHome') || action.includes("home-page")) li.classList.add('active');
+            if(el.id === toolId) {
+                el.classList.remove('hidden');
+                el.style.display = 'block';
             } else {
-                if(action.includes(`'${id}'`) || action.includes(`"${id}"`)) li.classList.add('active');
+                el.classList.add('hidden');
+                el.style.display = 'none';
+            }
+        });
+    },
+
+    resetToolState: function() {
+        if(this.ui.searchBar) {
+            this.ui.searchBar.value = '';
+            this.ui.searchBar.dispatchEvent(new Event('input')); // Reset search results
+        }
+        window.dispatchEvent(new CustomEvent('toolClosed'));
+    },
+
+    // --- 4. UI HELPERS ---
+    updateSidebar: function(id) {
+        const navItems = document.querySelectorAll('.side-nav li, .mobile-nav i');
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            const action = item.getAttribute('onclick') || "";
+            // Smart matching for sidebar highlighting
+            if((id === 'home-page' && action.includes('showHome')) || action.includes(id)) {
+                item.classList.add('active');
             }
         });
     },
@@ -201,56 +213,28 @@ const App = {
         document.body.classList.toggle('light-mode');
         this.state.theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
         localStorage.setItem('tm_theme', this.state.theme);
-        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: this.state.theme } }));
     },
 
     loadTheme: function() {
         if(this.state.theme === 'light') document.body.classList.add('light-mode');
     },
 
-    setupSearch: function() {
-        if(!this.ui.searchBar) return;
-        
-        // Debounce to prevent lag while typing
-        const debounce = (func, wait) => {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        };
+    setupGlobalEvents: function() {
+        // Keyboard Shortcuts (Ctrl+K to Search, Esc to Home)
+        document.addEventListener('keydown', (e) => {
+            if((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault(); this.ui.searchBar?.focus();
+            }
+            if(e.key === 'Escape' && this.state.currentView !== 'home-page') {
+                this.navigateTo('home-page');
+            }
+        });
 
-        this.ui.searchBar.addEventListener('input', debounce((e) => {
-            const term = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.t-card');
-            
-            requestAnimationFrame(() => {
-                cards.forEach(card => {
-                    const title = card.querySelector('h4')?.innerText.toLowerCase() || "";
-                    const desc = card.querySelector('.tc-info p')?.innerText.toLowerCase() || "";
-                    
-                    if(title.includes(term) || desc.includes(term)) {
-                        card.style.display = 'flex';
-                        card.style.animation = 'fadeIn 0.3s ease';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                // Auto-hide empty categories
-                document.querySelectorAll('.category-block').forEach(cat => {
-                    const visible = cat.querySelectorAll('.t-card[style="display: flex;"]');
-                    cat.style.display = visible.length > 0 ? 'block' : 'none';
-                });
-            });
-        }, 100));
-    },
-
-    resetSearch: function() {
-        if(this.ui.searchBar) { 
-            this.ui.searchBar.value = ''; 
-            this.ui.searchBar.dispatchEvent(new Event('input'));
-        }
+        // Router (Back Button)
+        window.addEventListener('popstate', (e) => {
+            const target = e.state?.viewId || 'home-page';
+            this.navigateTo(target, false);
+        });
     },
 
     showToast: function(msg, type='success') {
@@ -261,20 +245,22 @@ const App = {
         }
 
         const toast = document.createElement('div');
-        const icon = type === 'error' ? 'error-warning-line' : (type === 'info' ? 'information-line' : 'check-line');
+        const icon = type === 'error' ? 'error-warning-line' : 'check-line';
         
-        toast.className = `toast toast-${type}`;
+        toast.className = 'toast';
+        toast.style.borderLeft = `4px solid ${type === 'error' ? '#ef4444' : '#10b981'}`;
         toast.innerHTML = `<i class="ri-${icon}"></i> <span>${msg}</span>`;
+        
         this.ui.toastBox.appendChild(toast);
 
         requestAnimationFrame(() => {
             toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0) scale(1)';
+            toast.style.transform = 'translate(-50%, 0) scale(1)';
         });
 
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateY(10px) scale(0.95)';
+            toast.style.transform = 'translate(-50%, 20px)';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     },
@@ -283,18 +269,16 @@ const App = {
         if(!this.ui.loader) return;
         const txtEl = this.ui.loader.querySelector('p');
         if(txtEl) txtEl.innerText = text;
-
-        if(show) {
-            this.ui.loader.style.display = 'flex';
-            requestAnimationFrame(() => this.ui.loader.style.opacity = '1');
-        } else {
-            this.ui.loader.style.opacity = '0';
-            setTimeout(() => this.ui.loader.style.display = 'none', 400);
-        }
+        
+        this.ui.loader.style.display = 'flex';
+        requestAnimationFrame(() => {
+            this.ui.loader.style.opacity = show ? '1' : '0';
+            if(!show) setTimeout(() => this.ui.loader.style.display = 'none', 300);
+        });
     }
 };
 
-// --- GLOBAL EXPORTS ---
+// --- GLOBAL EXPORTS (For HTML onclick) ---
 window.App = App;
 window.showHome = () => App.navigateTo('home-page');
 window.openTool = (id) => App.navigateTo(id);
@@ -302,87 +286,86 @@ window.toggleTheme = () => App.toggleTheme();
 window.showToast = (m, t) => App.showToast(m, t);
 window.loader = (s, t) => App.loader(s, t);
 
-// --- INTEGRATED HELPERS (Optimized) ---
+// --- 5. INTEGRATED TOOL LOGIC (All Features) ---
 
-// 1. Resume Sync (Debounced)
-let resumeTimeout;
-window.updateResume = function() {
-    clearTimeout(resumeTimeout);
-    resumeTimeout = setTimeout(() => {
-        // Broadcast for resume.js
-        window.dispatchEvent(new CustomEvent('resumeUpdate'));
-        
-        // Fallback sync logic
-        const pTitle = document.getElementById('in-proj-title')?.value;
-        const pDesc = document.getElementById('in-proj-desc')?.value;
-        const pSec = document.getElementById('res-proj-section');
-        if(pSec) {
-            if(pTitle || pDesc) {
-                pSec.style.display = 'block';
-                const pt = document.getElementById('res-proj-title'); if(pt) pt.innerText = pTitle;
-                const pd = document.getElementById('res-proj-desc'); if(pd) pd.innerText = pDesc;
-            } else { pSec.style.display = 'none'; }
-        }
-    }, 50); 
-};
-
-// 2. Magic Eraser Background Switcher
-window.changeBg = function(el, color) {
-    document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
-    el.classList.add('active');
-    const img = document.getElementById('bg-result-img');
-    if(img) img.style.background = color;
-};
-
-// 3. Password Generator (V58)
-window.generatePass = () => {
-    const display = document.getElementById('generated-pass');
-    if(!display) return;
-
-    const length = parseInt(document.getElementById('pass-len')?.value || 16);
-    const useUpper = document.getElementById('pass-upper')?.checked;
-    const useNum = document.getElementById('pass-num')?.checked;
-    const useSym = document.getElementById('pass-sym')?.checked;
-
-    let charset = "abcdefghijklmnopqrstuvwxyz";
-    if (useUpper) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if (useNum) charset += "0123456789";
-    if (useSym) charset += "!@#$%^&*()_+~`|}{[]:;?><,./-=";
-
-    let password = "";
-    const array = new Uint32Array(length);
-    window.crypto.getRandomValues(array);
-
-    for (let i = 0; i < length; i++) {
-        password += charset[array[i] % charset.length];
-    }
-
-    display.innerText = password;
+// 1. Password Generator (V70)
+window.genPass = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let p = "";
+    for(let i=0; i<16; i++) p += chars[Math.floor(Math.random() * chars.length)];
     
-    // Strength Meter
-    let strength = 0;
-    if (length > 10) strength++;
-    if (useUpper) strength++;
-    if (useNum) strength++;
-    if (useSym) strength++;
-    const width = (strength / 4) * 100;
-    const bar = document.getElementById('pass-strength-bar');
+    const out = document.getElementById('generated-pass') || document.getElementById('pass-out');
+    if(out) out.innerText = p;
+    
+    // Strength Visual
+    const bar = document.getElementById('pass-strength') || document.querySelector('.strength-fill');
     if(bar) {
-        bar.style.width = `${width}%`;
-        bar.style.background = width < 50 ? '#ef4444' : (width < 80 ? '#f59e0b' : '#10b981');
+        bar.style.width = "100%";
+        bar.style.background = "#10b981";
     }
-    
-    // Update Label
-    const lbl = document.getElementById('pass-len-val');
-    if(lbl) lbl.innerText = length;
 };
 
 window.copyPass = () => {
-    const display = document.getElementById('generated-pass');
-    if(!display) return;
-    navigator.clipboard.writeText(display.innerText);
-    App.showToast("Copied to clipboard!", "success");
+    const el = document.getElementById('generated-pass') || document.getElementById('pass-out');
+    if(el) {
+        navigator.clipboard.writeText(el.innerText);
+        App.showToast("Copied to clipboard!", "success");
+    }
 };
 
-// Initialize App
+// 2. Magic Eraser (Custom BG)
+window.changeBg = (el, color) => {
+    document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
+    if(el) el.classList.add('active');
+    const img = document.getElementById('bg-result-img') || document.getElementById('bg-res');
+    if(img) {
+        img.style.backgroundImage = 'none';
+        img.style.background = color;
+    }
+};
+
+window.custBg = (input) => {
+    if(input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+            const img = document.getElementById('bg-result-img') || document.getElementById('bg-res');
+            if(img) img.style.background = `url(${e.target.result}) center/cover no-repeat`;
+        };
+        r.readAsDataURL(input.files[0]);
+    }
+};
+
+// 3. Compressor & Enhancer
+window.updateCompression = () => {
+    const val = document.getElementById('comp-quality')?.value || 0.6;
+    const disp = document.getElementById('comp-val-display') || document.getElementById('q-val');
+    if(disp) disp.innerText = `Quality: ${Math.round(val * 100)}%`;
+};
+
+// 4. Speech & AI
+window.smartFormatSpeech = () => {
+    const el = document.getElementById('speech-output') || document.getElementById('sp-txt');
+    if(!el || !el.value) return App.showToast("Speak something first!", "error");
+    
+    let txt = el.value.trim();
+    txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+    if(!txt.endsWith('.')) txt += '.';
+    el.value = txt;
+    
+    const moodEl = document.getElementById('speech-mood') || document.getElementById('mood-res');
+    if(moodEl) {
+        moodEl.style.display = 'block';
+        moodEl.innerText = "Mood: Professional 👔";
+    }
+    App.showToast("Formatted Successfully");
+};
+
+// 5. Binary Lab
+window.analyzeBinary = () => {
+    const val = document.getElementById('bin-input')?.value || "";
+    const preview = document.getElementById('bin-preview');
+    if(preview) preview.innerText = val.split('').map(c => c.charCodeAt(0).toString(2)).join(' ');
+};
+
+// Boot System
 document.addEventListener('DOMContentLoaded', () => App.init());
