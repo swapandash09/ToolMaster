@@ -6,7 +6,7 @@
 .tool-workspace { 
     width: 100%; max-width: 1200px; margin: 0 auto; 
     /* Force Hardware Acceleration for smooth entry */
-    animation: slideUpFade 0.35s var(--ease-exec) forwards; 
+    animation: slideUpFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
     padding-bottom: 100px; 
     opacity: 0; 
     will-change: transform, opacity;
@@ -52,7 +52,7 @@ body.light-mode .ws-head h2 { color: #1e293b; }
     border-radius: 16px; padding: 60px 40px;
     text-align: center; cursor: pointer; 
     background: var(--card);
-    transition: transform 0.2s var(--ease-exec), border-color 0.2s, background-color 0.2s;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s, background-color 0.2s;
     position: relative; overflow: hidden;
     /* GPU Layer */
     transform: translate3d(0,0,0);
