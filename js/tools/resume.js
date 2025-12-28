@@ -1,13 +1,13 @@
 // ==========================================
-// 📄 RESUME BUILDER - TITANIUM V51 (4K ENGINE)
+// 📄 RESUME BUILDER - TITANIUM V53 EXECUTIVE
 // ==========================================
+
+console.log("Resume Engine V53: Executive Core Online");
 
 let resumeData = {
     // Identity
     profileImage: "", font: "font-sans", theme: "theme-blue",
     name: "", title: "", email: "", phone: "", address: "",
-    // Socials
-    linkedin: "", github: "",
     // Content
     summary: "",
     company: "", role: "", dates: "", jobdesc: "",
@@ -16,179 +16,179 @@ let resumeData = {
     // Education & Skills
     degree: "", school: "", eduYear: "", skills: "",
     // Config
-    scaleFactor: 1 // For One-Page Fit
+    scaleFactor: 1
 };
 
-// --- 1. SMART PREVIEW SCALER ---
+// --- 1. SMART PREVIEW SCALER (Responsive Zoom) ---
 function autoScalePreview() {
     const container = document.getElementById('preview-container');
     const wrapper = document.getElementById('scale-wrapper');
     if(!container || !wrapper) return;
 
-    // Standard A4 Ratio
-    const paperWidth = 794; 
-    const containerWidth = container.offsetWidth - 40; // Padding buffer
+    const paperWidth = 794; // A4 Width px
+    const containerWidth = container.offsetWidth - 60; // Padding buffer
     
     let scale = containerWidth / paperWidth;
-    if(scale > 1.2) scale = 1.2; 
-    if(scale < 0.3) scale = 0.3;
+    // Limits
+    if(scale > 1.1) scale = 1.1; 
+    if(scale < 0.25) scale = 0.25;
 
     wrapper.style.transform = `scale(${scale})`;
 }
 
 window.addEventListener('resize', autoScalePreview);
 window.addEventListener('toolOpened', (e) => {
-    if(e.detail.toolId === 'resume-tool') setTimeout(autoScalePreview, 200);
+    if(e.detail.toolId === 'resume-tool') setTimeout(autoScalePreview, 100);
 });
 
-// --- 2. DATA HANDLER ---
+// --- 2. DATA BINDING (Real-Time Sync) ---
 function updateResume() {
-    // Map inputs to data
-    const ids = [
-        'in-font', 'in-name', 'in-title', 'in-email', 'in-phone', 'in-address',
-        'in-linkedin', 'in-github', 'in-company', 'in-role', 'in-dates', 'in-job-desc',
-        'in-proj-title', 'in-proj-desc', 'in-languages', 'in-degree', 'in-school',
-        'in-edu-year', 'in-skills', 'in-summary'
-    ];
-    
-    // Auto-update state
-    ids.forEach(id => {
-        const key = id.replace('in-', '').replace(/-([a-z])/g, g => g[1].toUpperCase()); // camelCase
+    // Map IDs to Data Keys
+    const map = {
+        'in-name': 'name', 'in-title': 'title', 
+        'in-email': 'email', 'in-phone': 'phone', 'in-address': 'address',
+        'in-company': 'company', 'in-role': 'role', 'in-dates': 'dates', 'in-job-desc': 'jobdesc',
+        'in-proj-title': 'projTitle', 'in-proj-desc': 'projDesc',
+        'in-skills': 'skills', 'in-languages': 'languages',
+        'in-degree': 'degree', 'in-school': 'school', 'in-edu-year': 'eduYear',
+        'in-summary': 'summary'
+    };
+
+    for (const [id, key] of Object.entries(map)) {
         const el = document.getElementById(id);
         if(el) resumeData[key] = el.value;
-    });
+    }
 
     renderResume();
 }
 
-// --- 3. RENDER ENGINE ---
+// --- 3. RENDER ENGINE (Visual Construction) ---
 function renderResume() {
     const paper = document.getElementById('resume-preview');
     if(!paper) return;
 
-    // Apply Styles
+    // Apply Theme & Font
     paper.className = `resume-paper ${resumeData.theme} ${resumeData.font}`;
-    paper.style.fontSize = `${14 * resumeData.scaleFactor}px`; // Smart Scaling
+    // Font Scaling for Fit
+    paper.style.fontSize = `${14 * resumeData.scaleFactor}px`;
 
-    // Helper: Safe Set Text
-    const set = (id, val) => {
+    // Helper: Text Injection
+    const set = (id, val, fallback = "") => {
         const el = document.getElementById(id);
-        if(el) el.innerText = val;
+        if(el) el.innerText = val || fallback;
+    };
+
+    // Helper: HTML Injection
+    const setHtml = (id, val) => {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = val;
     };
 
     // Header
-    set('res-name', resumeData.name || "YOUR NAME");
-    set('res-title', resumeData.title || "PROFESSIONAL TITLE");
+    set('res-name', resumeData.name, "YOUR NAME");
+    set('res-title', resumeData.title, "PROFESSIONAL TITLE");
 
-    // Sidebar: Contact
+    // Profile Sidebar (Icon List)
     const cBox = document.getElementById('res-contact-box');
     if(cBox) {
         let h = '';
+        // Smart Check: Only show if data exists
         if(resumeData.phone) h += `<div><i class="ri-phone-fill"></i> ${resumeData.phone}</div>`;
         if(resumeData.email) h += `<div><i class="ri-mail-fill"></i> ${resumeData.email}</div>`;
         if(resumeData.address) h += `<div><i class="ri-map-pin-fill"></i> ${resumeData.address}</div>`;
-        if(resumeData.linkedin) h += `<div><i class="ri-linkedin-box-fill"></i> ${resumeData.linkedin}</div>`;
-        if(resumeData.github) h += `<div><i class="ri-github-fill"></i> ${resumeData.github}</div>`;
         cBox.innerHTML = h;
     }
 
-    // Skills
+    // Skills (Tags)
     const sk = document.getElementById('res-skills');
     if(sk) {
-        sk.innerHTML = resumeData.skills.split(',').map(s => s.trim() ? `<span class="tag">${s.trim()}</span>` : '').join('');
-    }
-
-    // Languages
-    const langSec = document.getElementById('res-lang-section');
-    if(langSec) {
-        if(resumeData.languages) {
-            langSec.style.display = 'block';
-            document.getElementById('res-languages').innerText = resumeData.languages;
+        if(resumeData.skills) {
+            sk.innerHTML = resumeData.skills.split(',').map(s => 
+                s.trim() ? `<span>${s.trim()}</span>` : ''
+            ).join('');
         } else {
-            langSec.style.display = 'none';
+            sk.innerHTML = '<span>Skill 1</span><span>Skill 2</span>';
         }
     }
 
     // Main Content
-    set('res-summary', resumeData.summary || "Professional summary goes here...");
+    set('res-summary', resumeData.summary, "Experienced professional with a proven track record...");
     
     // Experience
-    set('res-company', resumeData.company || "Company Name");
-    set('res-role', resumeData.role || "Role");
-    set('res-dates', resumeData.dates || "Dates");
-    const job = document.getElementById('res-job-desc');
-    if(job) job.innerHTML = resumeData.jobDesc ? resumeData.jobDesc.replace(/\n/g, '<br>') : "Responsibilities...";
-
-    // Projects
-    const projSec = document.getElementById('res-proj-section');
-    if(projSec) {
-        if(resumeData.projTitle) {
-            projSec.style.display = 'block';
-            set('res-proj-title', resumeData.projTitle);
-            document.getElementById('res-proj-desc').innerHTML = resumeData.projDesc ? resumeData.projDesc.replace(/\n/g, '<br>') : "";
-        } else {
-            projSec.style.display = 'none';
-        }
-    }
+    set('res-company', resumeData.company, "Company Name");
+    set('res-role', resumeData.role, "Job Role");
+    set('res-dates', resumeData.dates, "2020 - Present");
+    
+    // Smart Description Formatting (Bullets)
+    const formatDesc = (text) => {
+        if(!text) return "• Responsibility 1\n• Responsibility 2";
+        return text.replace(/\n/g, '<br>');
+    };
+    setHtml('res-job-desc', formatDesc(resumeData.jobdesc));
 
     // Education
     const eduSec = document.getElementById('res-edu-section');
-    if(eduSec) {
-        if(resumeData.degree) {
-            eduSec.style.display = 'block';
-            set('res-degree', resumeData.degree);
-            set('res-school', resumeData.school);
-            set('res-edu-year', resumeData.eduYear);
-        } else {
-            eduSec.style.display = 'none';
-        }
+    if(resumeData.degree || resumeData.school) {
+        eduSec.style.display = 'block';
+        set('res-degree', resumeData.degree);
+        set('res-school', resumeData.school);
+        set('res-edu-year', resumeData.eduYear);
+    } else {
+        // Keep placeholder visible for editing comfort
+        set('res-degree', "Degree / Diploma");
+        set('res-school', "University Name");
+        set('res-edu-year', "2018 - 2022");
     }
 
     // Profile Photo
+    const pImg = document.getElementById('res-photo-img');
     const pBox = document.getElementById('res-photo-container');
-    if(pBox) {
-        pBox.style.display = resumeData.profileImage ? 'block' : 'none';
-        if(resumeData.profileImage) document.getElementById('res-photo-img').src = resumeData.profileImage;
+    if(pImg && pBox) {
+        if(resumeData.profileImage) {
+            pImg.src = resumeData.profileImage;
+            pBox.style.display = 'block';
+        } else {
+            // Placeholder Avatar if no image
+            pImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+        }
     }
 }
 
-// --- 4. ONE-PAGE FIT SYSTEM ---
+// --- 4. ONE-PAGE FIT ALGORITHM ---
 function fitToOnePage() {
     const paper = document.getElementById('resume-preview');
-    // Reset
-    resumeData.scaleFactor = 1;
+    resumeData.scaleFactor = 1; // Reset
     renderResume();
 
-    // Check Height (A4 Height in px approx 1122)
-    const maxHeight = 1115; // slightly less for margin safety
-    let iterations = 0;
+    const maxHeight = 1118; // Safe printable A4 height
+    let loops = 0;
 
-    // Loop until it fits or gets too small
-    while(paper.scrollHeight > maxHeight && iterations < 20) {
-        resumeData.scaleFactor -= 0.02; // Reduce by 2%
+    // Shrink until fit
+    while(paper.scrollHeight > maxHeight && loops < 50) {
+        resumeData.scaleFactor -= 0.01; 
         renderResume();
-        iterations++;
+        loops++;
     }
 
-    if(iterations > 0) showToast(`Fitted to page (Scale: ${Math.round(resumeData.scaleFactor * 100)}%)`, "success");
-    else showToast("Already fits on one page!", "info");
+    if(loops > 0) showToast(`Optimized! Size reduced by ${loops}%`, "success");
+    else showToast("Perfect fit! No adjustment needed.", "info");
 }
 
-// --- 5. 4K PDF EXPORT ---
+// --- 5. 4K ULTRA-HD PDF EXPORT ---
 function downloadResumePDF() {
     const element = document.getElementById('resume-preview');
     if(typeof loader === 'function') loader(true, "RENDERING 4K PDF...");
 
     const safeName = (resumeData.name || 'Resume').replace(/[^a-z0-9]/gi, '_');
 
-    // 1. Create a clone for rendering (High Res)
+    // 1. Create High-Fidelity Clone
     const clone = element.cloneNode(true);
     
-    // Force A4 dimensions on clone
+    // Force A4 Dimensions (Pixels at 96 DPI)
     const a4Width = 794; 
     const a4Height = 1123; 
     
-    // Setup isolated container
+    // Prepare Off-Screen Container
     const container = document.createElement('div');
     container.style.position = 'fixed'; 
     container.style.top = '-10000px'; 
@@ -196,28 +196,33 @@ function downloadResumePDF() {
     container.appendChild(clone);
     document.body.appendChild(container);
 
-    // 2. Configure 4K Settings
+    // 2. Configure V53 Render Engine
     const opt = {
         margin: 0,
-        filename: `${safeName}_CV_4K.pdf`,
-        image: { type: 'jpeg', quality: 1.0 }, // Max Quality
-        enableLinks: true,
+        filename: `${safeName}_CV_Executive.pdf`,
+        image: { type: 'jpeg', quality: 1.0 }, // Maximum Quality
+        enableLinks: true, // Clickable Links
         html2canvas: { 
-            scale: 4, // 4x Resolution (approx 3200px wide)
+            scale: 4, // 4x Native Resolution (UHD)
             useCORS: true, 
-            letterRendering: true,
+            letterRendering: true, // Crisper Text
             scrollY: 0,
             windowWidth: a4Width,
             windowHeight: a4Height
         },
-        jsPDF: { unit: 'px', format: [a4Width, a4Height], orientation: 'portrait' }
+        jsPDF: { 
+            unit: 'px', 
+            format: [a4Width, a4Height], 
+            orientation: 'portrait',
+            compress: true
+        }
     };
 
-    // 3. Generate
+    // 3. Execute
     html2pdf().set(opt).from(clone).save().then(() => {
         document.body.removeChild(container);
         if(typeof loader === 'function') loader(false);
-        if(typeof showToast === 'function') showToast("4K Resume Downloaded!", "success");
+        if(typeof showToast === 'function') showToast("4K Resume Saved!", "success");
     }).catch(err => {
         console.error(err);
         document.body.removeChild(container);
@@ -226,6 +231,41 @@ function downloadResumePDF() {
     });
 }
 
+// --- 6. AI WRITER INTEGRATION (RESTORED) ---
+window.generateAISummary = () => {
+    const title = document.getElementById('in-title').value;
+    if(!title) return showToast("Enter Job Title first!", "error");
+    
+    if(typeof loader === 'function') loader(true, "AI WRITING...");
+    
+    setTimeout(() => {
+        const templates = [
+            `Highly motivated ${title} with a proven track record of delivering results. Skilled in strategic planning and driving efficiency in fast-paced environments.`,
+            `Experienced ${title} dedicated to optimizing processes and achieving business goals. Strong leader with expertise in modern industry standards.`,
+            `Creative and detail-oriented ${title} with a passion for innovation. Proven ability to collaborate with teams and deliver high-quality solutions.`
+        ];
+        
+        const summary = templates[Math.floor(Math.random() * templates.length)];
+        
+        // Typing Effect
+        const el = document.getElementById('in-summary');
+        el.value = "";
+        let i = 0;
+        function type() {
+            if(i < summary.length) {
+                el.value += summary.charAt(i);
+                i++;
+                setTimeout(type, 15);
+            } else {
+                updateResume();
+                if(typeof loader === 'function') loader(false);
+                showToast("Summary Written!", "success");
+            }
+        }
+        type();
+    }, 800);
+};
+
 // --- UTILS ---
 function handleProfilePhoto(input) {
     if(input.files && input.files[0]) {
@@ -233,7 +273,7 @@ function handleProfilePhoto(input) {
         r.onload = e => { 
             resumeData.profileImage = e.target.result; 
             renderResume(); 
-            // Update UI preview
+            // Preview Update
             const box = document.getElementById('photo-preview-box');
             if(box) box.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
         };
@@ -241,16 +281,10 @@ function handleProfilePhoto(input) {
     }
 }
 
-function setThemeColor(c) { 
-    resumeData.theme = `theme-${c}`; 
-    document.querySelectorAll('.c-dot').forEach(d => d.classList.remove('active'));
-    renderResume(); 
-}
-
 function clearResume() {
-    if(confirm("Clear all data?")) {
-        resumeData.scaleFactor = 1;
-        document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+    if(confirm("Reset all data?")) {
+        resumeData = { scaleFactor: 1, theme: "theme-blue", font: "font-sans" };
+        document.querySelectorAll('#resume-tool input, #resume-tool textarea').forEach(i => i.value = '');
         updateResume();
     }
-}
+                              }
