@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050507">
-    <title>ToolMaster Titanium - V47 Hyperion</title>
+    <title>ToolMaster Titanium - V48 Omni</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +14,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
@@ -28,38 +29,49 @@
     <link rel="stylesheet" href="css/tools/utils.css">
 
     <style>
-        /* CRITICAL: Lag-Free Loader CSS */
+        /* V48 CRITICAL CSS & FOOTER */
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.3s ease-out; will-change: opacity; }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: opacity, transform; }
         
         #loading-overlay {
             position: fixed; inset: 0; background: #050507; z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.4s ease;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
         }
-        .loader-box { text-align: center; }
-        .loader-box p { 
-            color: #6366f1; font-family: 'JetBrains Mono', monospace; 
-            font-size: 0.8rem; margin-top: 15px; letter-spacing: 2px;
-        }
-        .loader-circle {
-            width: 45px; height: 45px; margin: 0 auto;
-            border: 3px solid rgba(255,255,255,0.05);
-            border-top-color: #6366f1; border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .loader-logo { font-size: 3rem; color: #6366f1; margin-bottom: 15px; animation: pulse 2s infinite; }
+        .loader-bar { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: #6366f1; animation: load 1.5s ease-out forwards; }
+        
+        @keyframes load { to { width: 100%; } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Magic Eraser Palette */
-        .bg-palette { display: flex; gap: 12px; margin: 20px 0; justify-content: center; }
+        /* Magic Palette */
+        .bg-palette { display: flex; gap: 12px; margin: 20px 0; justify-content: center; flex-wrap: wrap; }
         .bg-dot { 
-            width: 32px; height: 32px; border-radius: 50%; cursor: pointer; 
+            width: 36px; height: 36px; border-radius: 50%; cursor: pointer; 
             border: 2px solid rgba(255,255,255,0.1); transition: transform 0.2s; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .bg-dot:hover { transform: scale(1.15); border-color: white; }
         .bg-dot.active { border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.6); transform: scale(1.1); }
+
+        /* Footer & Info Pages */
+        .app-footer {
+            margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 30px; text-align: center; color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .footer-links a:hover { color: var(--primary); }
+        .dev-credit { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; opacity: 0.7; margin-top: 10px; }
+        .dev-credit span { color: #ec4899; font-weight: 700; }
+
+        .info-page { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .info-content { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); }
+        .info-content h2 { margin-bottom: 20px; color: var(--text); }
+        .info-content p { line-height: 1.6; color: var(--text-muted); margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -68,10 +80,9 @@
     <div id="toast-container"></div>
     
     <div id="loading-overlay">
-        <div class="loader-box">
-            <div class="loader-circle"></div>
-            <p>SYSTEM ONLINE</p>
-        </div>
+        <i class="ri-flashlight-fill loader-logo"></i>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <p style="margin-top: 15px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #a1a1aa;">INITIALIZING CORE...</p>
     </div>
 
     <div class="app-container">
@@ -79,25 +90,34 @@
         <aside class="desktop-sidebar">
             <div class="brand-area">
                 <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
-                <span class="brand-text">ToolMaster</span>
+                <div>
+                    <span class="brand-text">ToolMaster</span>
+                    <div style="font-size: 0.65rem; color: #ec4899; font-weight: 700; letter-spacing: 1px; margin-top: 2px;">BY SWAPAN</div>
+                </div>
             </div>
             <nav class="side-nav">
                 <p class="menu-label">Main</p>
                 <ul>
                     <li class="active" onclick="showHome()"><i class="ri-home-5-line"></i> Dashboard</li>
-                    <li onclick="toggleTheme()"><i class="ri-contrast-drop-2-line"></i> Appearance</li>
+                    <li onclick="openTool('about-page')"><i class="ri-information-line"></i> About</li>
+                    <li onclick="toggleTheme()"><i class="ri-contrast-drop-2-line"></i> Theme</li>
                 </ul>
-                <p class="menu-label">Power Tools</p>
+                <p class="menu-label">Creativity</p>
                 <ul>
-                    <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume Studio</li>
-                    <li onclick="openTool('excel-tool')"><i class="ri-file-excel-2-line"></i> Excel Engine</li>
+                    <li onclick="openTool('resume-tool')"><i class="ri-file-user-line"></i> Resume Pro</li>
                     <li onclick="openTool('bg-remover-tool')"><i class="ri-magic-line"></i> Magic Eraser</li>
+                    <li onclick="openTool('ai-image-tool')"><i class="ri-openai-line"></i> AI Art</li>
+                </ul>
+                <p class="menu-label">Utilities</p>
+                <ul>
+                    <li onclick="openTool('excel-tool')"><i class="ri-file-excel-2-line"></i> Excel Engine</li>
+                    <li onclick="openTool('pdf-excel-tool')"><i class="ri-file-text-line"></i> PDF Tools</li>
                 </ul>
             </nav>
             <div class="sidebar-bottom">
                 <div class="pro-card">
                     <i class="ri-vip-diamond-line"></i>
-                    <div><h4>Titanium</h4><p>V47 Hyperion</p></div>
+                    <div><h4>Titanium</h4><p>V48 Omni</p></div>
                 </div>
             </div>
         </aside>
@@ -107,7 +127,9 @@
             <div class="mobile-header">
                 <div class="mh-left">
                     <div class="logo-icon small"><i class="ri-flashlight-fill"></i></div>
-                    <span class="brand-text">ToolMaster</span>
+                    <div>
+                        <span class="brand-text">ToolMaster</span>
+                    </div>
                 </div>
                 <button class="icon-btn-simple" onclick="toggleTheme()"><i class="ri-contrast-drop-2-line"></i></button>
             </div>
@@ -116,20 +138,20 @@
                 <header class="dash-hero">
                     <div class="hero-content">
                         <h1>Welcome Back <span class="wave">👋</span></h1>
-                        <p>Select a tool to boost your productivity.</p>
+                        <p>Select a tool to start creating magic.</p>
                     </div>
                     <div class="search-wrapper">
                         <i class="ri-search-line"></i>
-                        <input type="text" id="search-bar" placeholder="Search tools (Ctrl + K)..." autocomplete="off">
+                        <input type="text" id="search-bar" placeholder="Search (Ctrl + K)..." autocomplete="off">
                     </div>
                 </header>
 
                 <div class="tools-wrapper">
                     <div class="category-block">
-                        <h3 class="cat-title"><i class="ri-file-text-line"></i> Office Tools</h3>
+                        <h3 class="cat-title"><i class="ri-file-text-line"></i> Documents</h3>
                         <div class="tool-grid">
-                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>Builder V47</p></div></div>
-                            <div class="t-card" onclick="openTool('excel-tool')"><div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div><div class="tc-info"><h4>Excel</h4><p>To PDF Engine</p></div></div>
+                            <div class="t-card" onclick="openTool('resume-tool')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>Pro Builder</p></div></div>
+                            <div class="t-card" onclick="openTool('excel-tool')"><div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div><div class="tc-info"><h4>Excel</h4><p>To PDF</p></div></div>
                             <div class="t-card" onclick="openTool('pdf-excel-tool')"><div class="tc-icon c-orange"><i class="ri-file-text-line"></i></div><div class="tc-info"><h4>PDF</h4><p>To Excel</p></div></div>
                         </div>
                     </div>
@@ -139,8 +161,8 @@
                         <div class="tool-grid">
                             <div class="t-card" onclick="openTool('bg-remover-tool')"><div class="tc-icon c-purple"><i class="ri-magic-line"></i></div><div class="tc-info"><h4>Eraser</h4><p>AI Background</p></div></div>
                             <div class="t-card" onclick="openTool('enhancer-tool')"><div class="tc-icon c-gold"><i class="ri-hd-line"></i></div><div class="tc-info"><h4>Enhance</h4><p>4K Upscale</p></div></div>
-                            <div class="t-card" onclick="openTool('img-tool')"><div class="tc-icon c-red"><i class="ri-file-zip-line"></i></div><div class="tc-info"><h4>Compress</h4><p>Optimize JPG</p></div></div>
-                            <div class="t-card" onclick="openTool('ai-image-tool')"><div class="tc-icon c-pink"><i class="ri-openai-fill"></i></div><div class="tc-info"><h4>AI Art</h4><p>Generator</p></div></div>
+                            <div class="t-card" onclick="openTool('img-tool')"><div class="tc-icon c-red"><i class="ri-file-zip-line"></i></div><div class="tc-info"><h4>Compress</h4><p>Optimize Size</p></div></div>
+                            <div class="t-card" onclick="openTool('ai-image-tool')"><div class="tc-icon c-pink"><i class="ri-openai-fill"></i></div><div class="tc-info"><h4>AI Art</h4><p>Text to Image</p></div></div>
                         </div>
                     </div>
 
@@ -148,17 +170,47 @@
                         <h3 class="cat-title"><i class="ri-robot-line"></i> AI Utilities</h3>
                         <div class="tool-grid">
                             <div class="t-card" onclick="openTool('subtitle-tool')"><div class="tc-icon c-red"><i class="ri-closed-captioning-line"></i></div><div class="tc-info"><h4>SubMaster</h4><p>Auto Captions</p></div></div>
-                            <div class="t-card" onclick="openTool('speech-tool')"><div class="tc-icon c-teal"><i class="ri-mic-line"></i></div><div class="tc-info"><h4>Dictate</h4><p>Speech to Text</p></div></div>
+                            <div class="t-card" onclick="openTool('speech-tool')"><div class="tc-icon c-teal"><i class="ri-mic-line"></i></div><div class="tc-info"><h4>Dictate</h4><p>Voice to Text</p></div></div>
                             <div class="t-card" onclick="openTool('text-speech-tool')"><div class="tc-icon c-yellow"><i class="ri-volume-up-line"></i></div><div class="tc-info"><h4>Reader</h4><p>Text to Voice</p></div></div>
-                            <div class="t-card" onclick="openTool('jpg-pdf-tool')"><div class="tc-icon c-blue"><i class="ri-stack-line"></i></div><div class="tc-info"><h4>Merge</h4><p>Images to PDF</p></div></div>
+                            <div class="t-card" onclick="openTool('jpg-pdf-tool')"><div class="tc-icon c-blue"><i class="ri-stack-line"></i></div><div class="tc-info"><h4>Merge</h4><p>JPG to PDF</p></div></div>
                         </div>
                     </div>
                 </div>
-                <div style="height: 120px;" class="mobile-only"></div>
+
+                <footer class="app-footer">
+                    <div class="footer-links">
+                        <a onclick="openTool('about-page')">About</a>
+                        <a onclick="openTool('privacy-page')">Privacy</a>
+                        <a href="#">Contact</a>
+                    </div>
+                    <div class="dev-credit">Developed with ❤️ by <span>SWAPAN</span></div>
+                </footer>
+                
+                <div style="height: 100px;" class="mobile-only"></div>
             </div>
 
             <div id="tool-container" class="hidden">
                 
+                <div id="about-page" class="tool-workspace hidden info-page">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>About Us</h2></div>
+                    <div class="info-content">
+                        <h2>ToolMaster Titanium V48</h2>
+                        <p>ToolMaster is an advanced, all-in-one web utility platform designed for productivity and creativity.</p>
+                        <p>Built with the latest web technologies, it offers serverless, privacy-focused tools that run directly in your browser.</p>
+                        <div class="dev-credit" style="margin-top: 30px; font-size: 1rem;">Developer: <span>Swapan</span></div>
+                    </div>
+                </div>
+
+                <div id="privacy-page" class="tool-workspace hidden info-page">
+                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Privacy Policy</h2></div>
+                    <div class="info-content">
+                        <h2>Your Data Stays With You</h2>
+                        <p>We believe in privacy first. <strong>ToolMaster does not upload your files to any server.</strong></p>
+                        <p>All processing (PDF conversion, Image compression, Resume building) happens locally on your device.</p>
+                        <p>AI tools use secure, ephemeral connections and do not store your data.</p>
+                    </div>
+                </div>
+
                 <div id="resume-tool" class="tool-workspace hidden">
                     <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Resume Studio</h2></div>
                     <div class="split-view">
@@ -201,7 +253,7 @@
                                 <textarea class="glass-input" id="in-proj-desc" rows="2" placeholder="Project Details..." oninput="updateResume()" style="margin-top:10px;"></textarea>
                             </div>
                             <div class="input-group">
-                                <div class="group-title"><span>Skills & Education</span> <i class="ri-book-open-line"></i></div>
+                                <div class="group-title"><span>Skills & Edu</span> <i class="ri-book-open-line"></i></div>
                                 <input type="text" class="glass-input" id="in-skills" placeholder="Skills (comma separated)" oninput="updateResume()">
                                 <input type="text" class="glass-input" id="in-languages" placeholder="Languages (e.g. English, Hindi)" oninput="updateResume()" style="margin-top:10px;">
                                 <div class="input-grid" style="margin-top:10px;">
@@ -237,8 +289,7 @@
                     <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Excel to PDF</h2></div>
                     <div class="ws-body">
                         <div class="upload-zone" onclick="document.getElementById('excel-input').click()">
-                            <i class="ri-file-excel-2-line"></i>
-                            <p>Click to Upload Excel (.xlsx)</p>
+                            <i class="ri-file-excel-2-line"></i><p>Click to Upload Excel (.xlsx)</p>
                             <input type="file" id="excel-input" accept=".xlsx, .xls" hidden>
                         </div>
                         <div id="excel-preview-container" class="preview-box">
@@ -259,7 +310,6 @@
                             <i class="ri-magic-line"></i><p>Upload Image to Remove Background</p>
                             <input type="file" id="bg-input" accept="image/*" hidden>
                         </div>
-                        
                         <div id="compare-container" class="compare-viewer hidden">
                             <div class="bg-palette">
                                 <div class="bg-dot active" style="background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2P8///3f3qbAQXt7e3/6WwGJGGEa6S3GVA0AwC01xN1u79ZagAAAABJRU5ErkJggg==');" onclick="changeBg(this, 'transparent')" title="Transparent"></div>
@@ -269,36 +319,30 @@
                                 <div class="bg-dot" style="background: #3b82f6;" onclick="changeBg(this, '#3b82f6')"></div>
                                 <div class="bg-dot" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);" onclick="changeBg(this, 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)')"></div>
                             </div>
-
-                            <div class="comp-label lbl-orig">ORIGINAL</div>
-                            <div class="comp-label lbl-res">RESULT</div>
-                            
+                            <div class="comp-label lbl-orig">ORIGINAL</div><div class="comp-label lbl-res">RESULT</div>
                             <div class="img-back-container" style="position:absolute; width:100%; height:100%; top:0; left:0; overflow:hidden; z-index:1;">
                                 <img id="bg-result-img" style="width:100%; height:100%; object-fit:contain;">
                             </div>
                             <img id="bg-original-img" class="img-front">
-                            
                             <div class="slider-line-deco" id="slider-line"></div>
                             <div class="slider-handle-deco" id="slider-handle"><i class="ri-arrow-left-right-line"></i></div>
                             <input type="range" class="slider" min="0" max="100" value="50" oninput="slideCompare(this.value)">
                         </div>
-                        
                         <button class="glow-btn hidden" id="dl-bg-btn" onclick="downloadBgImage()" style="margin-top:20px;">Download HD Image</button>
                     </div>
                 </div>
 
                 <div id="enhancer-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Enhancer</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('enhance-input').click()"><i class="ri-hd-line"></i><p>Upload Low-Res Image</p><input type="file" id="enhance-input" accept="image/*" hidden></div></div></div>
-                <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('comp-input').click()"><i class="ri-file-zip-line"></i><p>Upload Image</p><input type="file" id="comp-input" accept="image/*" hidden></div><div id="comp-controls" class="hidden"><button class="glow-btn" id="dl-comp-btn">Download Compressed</button></div></div></div>
-                <div id="ai-image-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Art Gen</h2></div><div class="ws-body"><textarea class="glass-input big-area" id="ai-img-prompt" placeholder="Describe your imagination..."></textarea><button class="glow-btn" onclick="generateAIImage()" style="margin-top:20px;">Generate Art</button><div id="ai-result-box" class="hidden" style="margin-top:20px; text-align:center;"><img id="ai-generated-img" style="max-width:100%; border-radius:15px;"></div></div></div>
-                <div id="subtitle-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('video-input').click()"><i class="ri-movie-line"></i><p>Upload Video</p><input type="file" id="video-input" accept="video/*" hidden></div></div></div>
+                <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('comp-input').click()"><i class="ri-file-zip-line"></i><p>Upload Image to Compress</p><input type="file" id="comp-input" accept="image/*" hidden></div><div id="comp-controls" class="hidden"><div class="options-bar" style="margin-bottom:15px;"><label>Quality</label><input type="range" id="comp-quality" min="10" max="90" value="80"><select id="comp-format" class="glass-input"><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select></div><img id="comp-preview-img" style="max-width:100%; border-radius:10px; margin-bottom:15px;"><div style="display:flex; justify-content:space-between; margin-bottom:15px;"><span id="orig-size"></span><i class="ri-arrow-right-line"></i><span id="comp-size" style="color:#10b981;"></span></div><button class="glow-btn" id="dl-comp-btn">Download</button></div></div></div>
+                <div id="ai-image-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Art Gen</h2></div><div class="ws-body"><textarea class="glass-input big-area" id="ai-img-prompt" placeholder="A cyberpunk city in rain..."></textarea><div class="controls-row"><select id="ai-style" class="glass-input"><option value="">Realistic</option><option value="anime">Anime</option><option value="3d">3D Render</option></select><select id="ai-ratio" class="glass-input"><option value="square">Square (1:1)</option><option value="portrait">Portrait (9:16)</option><option value="landscape">Landscape (16:9)</option></select></div><button class="glow-btn" onclick="generateAIImage()" style="margin-top:20px;">Generate ✨</button><div id="ai-result-box" class="hidden" style="margin-top:20px; text-align:center;"><p id="ai-loading" class="hidden">Dreaming...</p><img id="ai-generated-img" style="max-width:100%; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.5);"></div></div></div>
+                <div id="subtitle-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('video-input').click()"><i class="ri-movie-line"></i><p>Upload Video</p><input type="file" id="video-input" accept="video/*" hidden></div><div id="caption-box" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div><button id="btn-start-cap" class="glow-btn" onclick="startCaptioning()" style="margin-top:15px;">Start Captioning</button><div style="display:flex; gap:10px; margin-top:10px;"><button class="glow-btn" onclick="downloadSubtitle('srt')">SRT</button><button class="glow-btn" onclick="downloadSubtitle('vtt')">VTT</button></div></div></div>
                 <div id="speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Voice Type</h2></div><div class="ws-body"><button class="glow-btn" onclick="toggleSpeech()">Start Listening</button><textarea id="speech-output" class="glass-input big-area" style="margin-top:20px;"></textarea></div></div>
-                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body"><textarea id="tts-input" class="glass-input big-area" placeholder="Enter text..."></textarea><button class="glow-btn" onclick="speakText()" style="margin-top:20px;">Speak</button></div></div>
+                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body"><textarea id="tts-input" class="glass-input big-area" placeholder="Enter text to speak..."></textarea><button class="glow-btn" onclick="speakText()" style="margin-top:20px;">Speak</button></div></div>
                 <div id="pdf-excel-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF to Excel</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('pdf-to-ex-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-to-ex-input" accept=".pdf" hidden></div></div></div>
                 <div id="jpg-pdf-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>JPG to PDF</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('jpg-input').click()"><i class="ri-images-line"></i><p>Select Images</p><input type="file" id="jpg-input" multiple accept="image/*" hidden></div></div></div>
 
             </div>
         </main>
-        
         <nav class="mobile-nav">
             <a href="#" onclick="showHome()" class="nav-item active"><i class="ri-home-5-line"></i></a>
             <div class="nav-fab" onclick="openTool('resume-tool')"><i class="ri-add-line"></i></div>
@@ -315,61 +359,46 @@
     <script src="js/tools/voice.js"></script>
 
     <script>
-        // --- 1. RESUME HELPER: Sync New Fields ---
+        // Resume Sync Logic (Projects/Languages)
         const originalUpdate = window.updateResume || function(){};
         window.updateResume = function() {
             if(typeof originalUpdate === 'function') originalUpdate();
             
-            // Sync Projects
             const pTitle = document.getElementById('in-proj-title').value;
             const pDesc = document.getElementById('in-proj-desc').value;
             const pSec = document.getElementById('res-proj-section');
-            
             if(pTitle || pDesc) {
-                if(pSec) pSec.style.display = 'block';
-                const tEl = document.getElementById('res-proj-title');
-                const dEl = document.getElementById('res-proj-desc');
-                if(tEl) tEl.innerText = pTitle;
-                if(dEl) dEl.innerText = pDesc;
-            } else {
-                if(pSec) pSec.style.display = 'none';
-            }
-            // Sync Languages
+                pSec.style.display = 'block';
+                document.getElementById('res-proj-title').innerText = pTitle;
+                document.getElementById('res-proj-desc').innerText = pDesc;
+            } else { pSec.style.display = 'none'; }
+
             const langs = document.getElementById('in-languages').value;
             const lSec = document.getElementById('res-lang-section');
             if(langs) {
-                if(lSec) lSec.style.display = 'block';
-                const lEl = document.getElementById('res-languages');
-                if(lEl) lEl.innerText = langs;
-            } else {
-                if(lSec) lSec.style.display = 'none';
-            }
+                lSec.style.display = 'block';
+                document.getElementById('res-languages').innerText = langs;
+            } else { lSec.style.display = 'none'; }
         };
 
-        // --- 2. MAGIC ERASER: Palette Fix ---
+        // Magic Eraser Background Helper
         function changeBg(el, color) {
-            // Remove active class from all dots
             document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
-            // Add to clicked
             el.classList.add('active');
-            // Apply color
             const img = document.getElementById('bg-result-img');
             if(img) img.style.background = color;
         }
 
-        // --- 3. SYSTEM LAUNCHER ---
+        // System Launch
         window.addEventListener('load', () => {
-            // Ensure XLSX is ready
-            if(typeof XLSX === 'undefined') console.warn("Excel Engine Loading...");
-            
-            // Hide Loader Smoothly
+            if(typeof XLSX === 'undefined') console.error("Excel Engine Failed.");
             setTimeout(() => {
                 const l = document.getElementById('loading-overlay');
                 if(l) {
                     l.style.opacity = '0';
                     setTimeout(() => l.style.display = 'none', 500);
                 }
-            }, 600);
+            }, 800);
         });
     </script>
 </body>
