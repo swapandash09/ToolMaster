@@ -1,274 +1,252 @@
 // ==========================================
-// 🎬 SUBMASTER AI - TITANIUM V42 ENGINE
+// 🎬 SUBMASTER AI - TITANIUM V51 QUANTUM ENGINE
 // ==========================================
 
-console.log("SubMaster V42: Online");
+console.log("SubMaster V51: Quantum Core Online");
 
-let recognition;
-let isRecording = false;
-let subtitles = []; // Stores { id, start, end, text }
-let currentObjectUrl = null;
-let silenceTimer = null;
-
-// --- 1. VIDEO LOADER ---
-const videoInput = document.getElementById('video-input');
-if (videoInput) {
-    videoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Cleanup Memory
-        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
-        currentObjectUrl = URL.createObjectURL(file);
+const SubMaster = {
+    recognition: null,
+    isRecording: false,
+    shouldRestart: false, // For continuous listening loop
+    subtitles: [],
+    chunkStartTime: null,
+    videoEl: null,
+    
+    // --- 1. INITIALIZATION ---
+    init: function() {
+        this.videoEl = document.getElementById('main-video');
+        this.setupUpload();
         
-        // Setup Video Player
-        const mainVideo = document.getElementById('main-video');
-        if (mainVideo) {
-            mainVideo.src = currentObjectUrl;
-            mainVideo.style.display = 'block';
-            mainVideo.load();
+        // Browser Support Check
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.error("Web Speech API not supported");
+            if(typeof showToast === 'function') showToast("Browser not supported. Use Chrome/Edge.", "error");
+            return;
         }
 
-        // UI Updates
-        const nameLabel = document.getElementById('video-name');
-        if(nameLabel) nameLabel.innerText = file.name;
-        
-        document.getElementById('caption-box').innerHTML = `
-            <div style="text-align:center; margin-top:40px; color:var(--text-muted); opacity:0.6;">
-                <i class="ri-movie-2-line" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
-                Video loaded. Select language & click "Start".<br>
-                <small>(Ensure your volume is up so the mic can hear it)</small>
-            </div>
-        `;
-        
-        subtitles = [];
-        if(typeof showToast === 'function') showToast("Video Loaded Successfully", "success");
-    });
-}
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.maxAlternatives = 1;
 
-// --- 2. CORE CAPTIONING ENGINE ---
-window.startCaptioning = function() {
-    const mainVideo = document.getElementById('main-video');
-    
-    if (!mainVideo || !mainVideo.src) {
-        if(typeof showToast === 'function') showToast("Please upload a video first", "error");
-        return;
-    }
+        this.bindEvents();
+    },
 
-    // Browser Support Check
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        alert("⚠️ Browser Error: Web Speech API not found. Please use Google Chrome or Edge.");
-        return;
-    }
+    // --- 2. VIDEO HANDLER ---
+    setupUpload: function() {
+        const input = document.getElementById('video-input');
+        if(!input) return;
 
-    // Init Recognition
-    recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    
-    // Dynamic Language Selection (Default to en-US if dropdown missing)
-    const langSelect = document.getElementById('speech-lang'); // Re-using existing select if available
-    recognition.lang = langSelect ? langSelect.value : 'en-US';
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    let chunkStartTime = null;
+            // Reset
+            this.subtitles = [];
+            document.getElementById('caption-box').innerHTML = '';
+            
+            const url = URL.createObjectURL(file);
+            this.videoEl.src = url;
+            this.videoEl.style.display = 'block';
+            
+            // Name update (if element exists)
+            const lbl = document.getElementById('video-name');
+            if(lbl) lbl.innerText = file.name;
 
-    recognition.onstart = () => {
-        isRecording = true;
-        updateStatusUI(true);
-        mainVideo.play().catch(e => console.log("Autoplay blocked:", e));
-        if(typeof showToast === 'function') showToast(`Listening in ${recognition.lang}...`, "info");
-    };
+            if(typeof showToast === 'function') showToast("Video Loaded. Ready to Listen.", "success");
+        });
+    },
 
-    recognition.onresult = (event) => {
-        const currentTime = mainVideo.currentTime;
-        if (chunkStartTime === null) chunkStartTime = currentTime;
+    // --- 3. SPEECH CORE ---
+    bindEvents: function() {
+        this.recognition.onstart = () => {
+            this.isRecording = true;
+            this.updateUI(true);
+            this.videoEl.play();
+        };
 
-        // Reset silence timer (Auto-stop logic if needed)
-        clearTimeout(silenceTimer);
-
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                const transcript = event.results[i][0].transcript.trim();
-                const endTime = mainVideo.currentTime;
-                
-                if (transcript.length > 0) {
-                    // Create Data Object
-                    const subItem = {
-                        id: Date.now(), // Unique ID for syncing edits
-                        start: chunkStartTime,
-                        end: endTime,
-                        text: transcript
-                    };
-                    
-                    subtitles.push(subItem);
-                    renderSubtitleCard(subItem); // Add to UI
-                }
-                chunkStartTime = null; // Reset for next phrase
-            }
-        }
-    };
-
-    recognition.onend = () => {
-        if (isRecording) {
-            // Auto-resume if video is still playing (API often cuts off after silence)
-            if(!mainVideo.paused && !mainVideo.ended) {
-                console.log("SubMaster: Auto-restarting recognition...");
-                try { recognition.start(); } catch(e) {}
+        this.recognition.onend = () => {
+            if (this.shouldRestart) {
+                // Auto-restart logic for continuous listening
+                try { this.recognition.start(); } catch(e) {}
             } else {
-                stopCaptioning();
+                this.isRecording = false;
+                this.updateUI(false);
+                this.videoEl.pause();
             }
-        } else {
-            updateStatusUI(false);
+        };
+
+        this.recognition.onresult = (event) => {
+            const currentTime = this.videoEl.currentTime;
+            
+            // Mark start of phrase
+            if (this.chunkStartTime === null) this.chunkStartTime = currentTime;
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    const text = event.results[i][0].transcript.trim();
+                    const endTime = this.videoEl.currentTime;
+
+                    if (text.length > 0) {
+                        const sub = {
+                            id: Date.now(),
+                            start: this.chunkStartTime,
+                            end: endTime,
+                            text: text
+                        };
+                        this.subtitles.push(sub);
+                        this.renderCard(sub);
+                    }
+                    this.chunkStartTime = null; // Reset
+                }
+            }
+        };
+
+        this.recognition.onerror = (e) => {
+            if(e.error === 'not-allowed') {
+                this.stop();
+                alert("Microphone access denied.");
+            }
+        };
+    },
+
+    // --- 4. CONTROLS ---
+    toggle: function() {
+        if (this.isRecording) this.stop();
+        else this.start();
+    },
+
+    start: function() {
+        if(!this.videoEl.src) {
+            if(typeof showToast === 'function') showToast("Upload a video first!", "error");
+            return;
         }
-    };
+        this.shouldRestart = true;
+        this.recognition.lang = document.getElementById('speech-lang') ? document.getElementById('speech-lang').value : 'en-US';
+        try { this.recognition.start(); } catch(e) {}
+    },
 
-    recognition.onerror = (event) => {
-        console.warn("Speech API Error:", event.error);
-        if(event.error === 'not-allowed') {
-            stopCaptioning();
-            alert("Microphone Access Denied. Please allow microphone permissions.");
-        }
-    };
+    stop: function() {
+        this.shouldRestart = false;
+        this.recognition.stop();
+        this.isRecording = false;
+        this.updateUI(false);
+    },
 
-    try {
-        recognition.start();
-    } catch(e) {
-        console.error("Could not start:", e);
-    }
-};
-
-window.stopCaptioning = function() {
-    isRecording = false;
-    const mainVideo = document.getElementById('main-video');
-    if(mainVideo) mainVideo.pause();
-    if(recognition) recognition.stop();
-    updateStatusUI(false);
-    if(typeof showToast === 'function') showToast("Captioning Stopped", "info");
-};
-
-// --- 3. UI RENDERER (EDITABLE CARDS) ---
-function renderSubtitleCard(sub) {
-    const box = document.getElementById('caption-box');
-    
-    // Clear placeholder
-    if (box.innerText.includes("Video loaded")) box.innerHTML = "";
-
-    const card = document.createElement('div');
-    card.className = "sub-card fade-in";
-    card.dataset.id = sub.id; // Link UI to Data
-    
-    // Modern Glass styling injected via JS
-    card.style.cssText = `
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-        margin-bottom: 12px;
-        position: relative;
-        transition: 0.2s;
-        border-left: 3px solid var(--primary);
-    `;
-
-    card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; margin-bottom:6px; opacity:0.8; font-size:0.75rem;">
-            <div style="font-family:'JetBrains Mono', monospace; color:var(--primary);">
-                <span contenteditable="true" onblur="syncTime(this, ${sub.id}, 'start')">${formatTime(sub.start)}</span> 
-                ➔ 
-                <span contenteditable="true" onblur="syncTime(this, ${sub.id}, 'end')">${formatTime(sub.end)}</span>
+    // --- 5. RENDERER (V51 EXECUTIVE STYLE) ---
+    renderCard: function(sub) {
+        const box = document.getElementById('caption-box');
+        
+        const div = document.createElement('div');
+        div.className = 'sub-card fade-in';
+        div.dataset.id = sub.id;
+        
+        // CSS via JS to ensure V50 Theme Match without extra CSS file
+        div.style.background = 'var(--card-hover)';
+        div.style.border = '1px solid var(--border)';
+        div.style.borderRadius = '8px';
+        div.style.padding = '12px';
+        div.style.marginBottom = '10px';
+        div.style.borderLeft = '3px solid var(--primary)';
+        
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.75rem; color:var(--text-muted);">
+                <div style="font-family:'JetBrains Mono'; cursor:pointer; color:var(--primary);" title="Click to seek video" onclick="SubMaster.seek(${sub.start})">
+                    ${this.fmtTime(sub.start)} <i class="ri-arrow-right-s-line"></i> ${this.fmtTime(sub.end)}
+                </div>
+                <i class="ri-close-line" onclick="SubMaster.remove(${sub.id})" style="cursor:pointer; color:#ef4444;"></i>
             </div>
-            <i class="ri-delete-bin-line" onclick="deleteSubtitle(${sub.id})" style="cursor:pointer; color:#ef4444;" title="Delete Line"></i>
-        </div>
-        <div contenteditable="true" onblur="syncText(this, ${sub.id})" 
-             style="color:var(--text); font-size:0.95rem; outline:none; line-height:1.4;">${sub.text}</div>
-    `;
+            <div contenteditable="true" onblur="SubMaster.updateText(${sub.id}, this.innerText)" 
+                 style="color:var(--text); font-size:0.9rem; outline:none;">${sub.text}</div>
+        `;
 
-    box.appendChild(card);
-    box.scrollTop = box.scrollHeight; // Auto Scroll
-}
+        box.appendChild(div);
+        
+        // Smart Scroll (Only if near bottom)
+        box.scrollTop = box.scrollHeight;
+    },
 
-// --- 4. DATA SYNC (TWO-WAY BINDING) ---
-// Updates global array when User edits UI
-window.syncText = function(el, id) {
-    const index = subtitles.findIndex(s => s.id === id);
-    if(index !== -1) subtitles[index].text = el.innerText.trim();
-};
+    // --- 6. UTILITIES ---
+    seek: function(time) {
+        this.videoEl.currentTime = time;
+        if(this.videoEl.paused) this.videoEl.play();
+    },
 
-window.syncTime = function(el, id, type) {
-    const index = subtitles.findIndex(s => s.id === id);
-    if(index !== -1) {
-        // Convert "00:00:05,123" back to seconds (simplified for sync)
-        // Note: For full accuracy, parsing logic would go here. 
-        // For now, we assume user keeps format valid or we rely on text update.
-    }
-};
+    remove: function(id) {
+        this.subtitles = this.subtitles.filter(s => s.id !== id);
+        const el = document.querySelector(`.sub-card[data-id="${id}"]`);
+        if(el) el.remove();
+    },
 
-window.deleteSubtitle = function(id) {
-    // Remove from Array
-    subtitles = subtitles.filter(s => s.id !== id);
-    // Remove from UI
-    const card = document.querySelector(`.sub-card[data-id="${id}"]`);
-    if(card) {
-        card.style.opacity = '0';
-        setTimeout(() => card.remove(), 300);
-    }
-};
+    updateText: function(id, text) {
+        const sub = this.subtitles.find(s => s.id === id);
+        if(sub) sub.text = text;
+    },
 
-// --- 5. HELPERS ---
-function updateStatusUI(recording) {
-    const btn = document.getElementById('btn-start-cap');
-    if(!btn) return;
-    
-    if(recording) {
-        btn.innerHTML = '<i class="ri-pulse-line ri-spin"></i> Listening...';
-        btn.classList.add('glow-active'); // Add CSS class for pulsing
-        btn.style.borderColor = "var(--primary)";
-    } else {
-        btn.innerHTML = 'Start Captioning';
-        btn.classList.remove('glow-active');
-        btn.style.borderColor = "";
-    }
-}
+    fmtTime: function(s) {
+        const date = new Date(s * 1000);
+        return date.toISOString().substr(14, 5); // MM:SS
+    },
 
-function formatTime(seconds) {
-    const date = new Date(0);
-    date.setSeconds(seconds);
-    const timeStr = date.toISOString().substr(11, 8);
-    const ms = Math.floor((seconds % 1) * 1000).toString().padStart(3, '0');
-    return `${timeStr},${ms}`;
-}
+    fmtTimeFull: function(s, sep) {
+        const date = new Date(s * 1000);
+        const iso = date.toISOString().substr(11, 8); // HH:MM:SS
+        const ms = Math.floor((s % 1) * 1000).toString().padStart(3,'0');
+        return `${iso}${sep}${ms}`;
+    },
 
-// --- 6. EXPORT ENGINE ---
-window.downloadSubtitle = function(type) {
-    if (subtitles.length === 0) {
-        if(typeof showToast === 'function') showToast("No captions generated yet.", "error");
-        return;
-    }
-
-    let content = "";
-    if (type === 'vtt') content += "WEBVTT\n\n";
-
-    subtitles.forEach((sub, index) => {
-        // SRT uses comma (00:00:01,000) | VTT uses dot (00:00:01.000)
-        const sTime = formatTime(sub.start).replace(',', type === 'vtt' ? '.' : ',');
-        const eTime = formatTime(sub.end).replace(',', type === 'vtt' ? '.' : ',');
-
-        if (type === 'srt') {
-            content += `${index + 1}\n${sTime} --> ${eTime}\n${sub.text}\n\n`;
+    updateUI: function(active) {
+        const btn = document.getElementById('btn-start-cap');
+        if(!btn) return;
+        if(active) {
+            btn.innerHTML = '<i class="ri-mic-fill"></i> Listening...';
+            btn.style.background = '#ef4444'; // Recording Red
+            btn.classList.add('glow-active');
         } else {
-            content += `${sTime} --> ${eTime}\n${sub.text}\n\n`;
+            btn.innerHTML = 'Start Captioning';
+            btn.style.background = ''; // Revert to CSS default
+            btn.classList.remove('glow-active');
         }
-    });
+    },
 
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `SubMaster_Export.${type}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    if(typeof showToast === 'function') showToast(`Downloaded .${type.toUpperCase()} file`, "success");
+    // --- 7. EXPORT ENGINE ---
+    download: function(type) {
+        if(!this.subtitles.length) return showToast("No captions to export.", "error");
+        
+        let txt = type === 'vtt' ? "WEBVTT\n\n" : "";
+        
+        this.subtitles.forEach((s, i) => {
+            // SRT uses comma (,), VTT uses dot (.)
+            const sep = type === 'vtt' ? '.' : ',';
+            const start = this.fmtTimeFull(s.start, sep);
+            const end = this.fmtTimeFull(s.end, sep);
+            
+            if(type === 'srt') {
+                txt += `${i+1}\n${start} --> ${end}\n${s.text}\n\n`;
+            } else {
+                txt += `${start} --> ${end}\n${s.text}\n\n`;
+            }
+        });
+
+        const blob = new Blob([txt], {type:'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Captions_${Date.now()}.${type}`;
+        a.click();
+        
+        if(typeof showToast === 'function') showToast(`Exported .${type.toUpperCase()}`, "success");
+    }
 };
+
+// Global Bridge
+window.SubMaster = SubMaster;
+window.startCaptioning = () => SubMaster.toggle();
+window.downloadSubtitle = (t) => SubMaster.download(t);
+
+// Init on Load
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if tool is active or wait
+    SubMaster.init();
+});
