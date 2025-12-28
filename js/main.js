@@ -1,38 +1,34 @@
 // ==========================================
-// 💧 TOOLMASTER TITANIUM V46 - LIQUID ENGINE (FIXED)
+// ⚡ TOOLMASTER TITANIUM V47 - PERFORMANCE ENGINE
 // ==========================================
 
 const App = {
-    version: 'V46 Liquid Stable',
+    version: 'V47 Fast',
     config: {
-        animTime: 400 // Matches CSS transition 0.4s
+        animTime: 300 // Super Fast 0.3s
     },
     state: {
-        currentView: 'home-page',
-        debounce: null
+        currentView: 'home-page'
     },
     
     init: function() {
-        console.log(`%c ${this.version} %c Systems Nominal `, 
-            'background:#6366f1; color:white; border-radius:4px;', 'color:#6366f1; font-weight:bold;');
-        
+        console.log("Titanium V47: Optimized Mode");
         this.loadTheme();
         this.setupSearch();
         this.setupRouter();
         
-        // 🚀 SAFE LAUNCH SEQUENCE
+        // Fast Launch
         window.addEventListener('load', () => {
             const loader = document.getElementById('loading-overlay');
             if(loader) {
                 loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 600);
+                setTimeout(() => loader.style.display = 'none', 300);
             }
-            // Force clean entry
             this.navigateTo('home-page', false, true); 
         });
     },
 
-    // --- 1. INTELLIGENT NAVIGATION ENGINE ---
+    // --- FAST NAVIGATION ---
     navigateTo: function(viewId, addToHistory = true, instant = false) {
         const home = document.getElementById('home-page');
         const toolsContainer = document.getElementById('tool-container');
@@ -40,12 +36,11 @@ const App = {
         if(!home || !toolsContainer) return;
         if(viewId === this.state.currentView && !instant) return;
 
-        // 1. Manage History
         if (addToHistory) {
             history.pushState({ viewId }, "", `#${viewId.replace('-tool', '')}`);
         }
 
-        // 2. Lifecycle Cleanup (Stop Cameras, etc.)
+        // Cleanup
         if(this.state.currentView !== 'home-page') {
             window.dispatchEvent(new CustomEvent('toolClosed', { detail: { toolId: this.state.currentView } }));
         }
@@ -53,74 +48,67 @@ const App = {
         const prevView = this.state.currentView;
         this.state.currentView = viewId;
         const isGoingHome = viewId === 'home-page';
-        const wasHome = prevView === 'home-page' || prevView === '';
 
-        // --- INSTANT MODE (Initial Load) ---
+        // INSTANT MODE
         if(instant) {
             if(isGoingHome) {
-                this._showEl(home); this._hideEl(toolsContainer);
+                this._show(home); this._hide(toolsContainer);
             } else {
-                this._hideEl(home); this._showEl(toolsContainer);
+                this._hide(home); this._show(toolsContainer);
                 this._activateTool(viewId);
             }
             this.updateSidebar(viewId);
             return;
         }
 
-        // --- ANIMATED MODE ---
-        
-        // SCENARIO A: Tool -> Tool (Direct Switch)
-        if (!isGoingHome && !wasHome) {
-            const oldTool = document.getElementById(prevView);
-            const newTool = document.getElementById(viewId);
-            
-            // Cross-fade tools directly
-            this._animateSwitch(oldTool, newTool, () => {
-                this._activateTool(viewId, true); // true = skip hiding others (handled by anim)
-            });
-        }
-        
-        // SCENARIO B: Home <-> Tool (Major Switch)
-        else {
-            const outEl = isGoingHome ? toolsContainer : home;
-            const inEl = isGoingHome ? home : toolsContainer;
+        // ANIMATED MODE (Simplified)
+        const outEl = isGoingHome ? toolsContainer : home;
+        const inEl = isGoingHome ? home : toolsContainer;
 
-            this._animateSwitch(outEl, inEl, () => {
-                if(isGoingHome) {
-                    this.resetSearch();
-                    document.title = "ToolMaster - Dashboard";
-                } else {
-                    this._activateTool(viewId);
-                }
-            });
-        }
-        
+        // 1. Hide Old
+        outEl.classList.add('view-exit');
+        outEl.classList.remove('view-enter');
+        outEl.style.opacity = '0';
+
+        setTimeout(() => {
+            this._hide(outEl);
+            outEl.classList.remove('view-exit');
+            outEl.style.opacity = '1'; // Reset for next time
+
+            // 2. Show New
+            this._show(inEl);
+            if(!isGoingHome) this._activateTool(viewId);
+            else {
+                this.resetSearch();
+                document.title = "ToolMaster - Dashboard";
+            }
+
+            inEl.classList.add('view-enter');
+            // Force Reflow
+            void inEl.offsetWidth; 
+            inEl.style.opacity = '1';
+            
+            // Clean classes after anim
+            setTimeout(() => {
+                inEl.classList.remove('view-enter');
+            }, this.config.animTime);
+
+        }, 200); // Fast 200ms switch
+
         this.updateSidebar(viewId);
     },
 
-    // --- HELPER: TOOL ACTIVATOR ---
-    _activateTool: function(toolId, skipHide = false) {
-        // Ensure container is visible
-        const container = document.getElementById('tool-container');
-        container.classList.remove('hidden', 'force-gone');
-        container.style.display = 'block';
-        container.style.opacity = '1';
+    // --- HELPERS ---
+    _activateTool: function(toolId) {
+        document.querySelectorAll('.tool-workspace').forEach(el => {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        });
 
-        // Manage Workspaces
-        if(!skipHide) {
-            document.querySelectorAll('.tool-workspace').forEach(el => {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            });
-        }
-
-        // Show Target
         const target = document.getElementById(toolId);
         if(target) {
             target.classList.remove('hidden');
             target.style.display = 'block';
-            
-            // Trigger internal layout resize (fixes Resume/Canvas size)
             window.dispatchEvent(new CustomEvent('toolOpened', { detail: { toolId: toolId } }));
             
             const title = target.querySelector('h2')?.innerText || "Tool";
@@ -129,59 +117,10 @@ const App = {
         window.scrollTo(0, 0);
     },
 
-    // --- ANIMATION CORE (THE LIQUID EFFECT) ---
-    _animateSwitch: function(elementOut, elementIn, callback) {
-        if(!elementOut || !elementIn) { if(callback) callback(); return; }
+    _show: function(el) { el.classList.remove('hidden', 'force-gone'); el.style.display = 'block'; },
+    _hide: function(el) { el.classList.add('hidden', 'force-gone'); el.style.display = 'none'; },
 
-        // 1. Lock UI
-        document.body.style.pointerEvents = 'none';
-
-        // 2. Animate OUT
-        elementOut.classList.remove('view-enter');
-        elementOut.classList.add('view-exit');
-
-        // 3. Wait for CSS Transition (Synced)
-        setTimeout(() => {
-            // Hide Old
-            this._hideEl(elementOut);
-            elementOut.classList.remove('view-exit'); // Reset class
-
-            // Prepare New (Start Hidden)
-            this._showEl(elementIn); // Applies display:block
-            elementIn.classList.add('view-exit'); // Move off-screen
-            
-            // Run Logic
-            if(callback) callback();
-
-            // 4. Animate IN (Double RAF for Browser Paint)
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    elementIn.classList.remove('view-exit');
-                    elementIn.classList.add('view-enter');
-                    
-                    // Unlock UI
-                    setTimeout(() => {
-                        document.body.style.pointerEvents = 'all';
-                    }, this.config.animTime);
-                });
-            });
-
-        }, this.config.animTime - 50); // Slight overlap for speed
-    },
-
-    // Simple helpers to enforce CSS states
-    _showEl: function(el) {
-        if(!el) return;
-        el.classList.remove('hidden', 'force-gone');
-        el.style.display = 'block';
-    },
-    _hideEl: function(el) {
-        if(!el) return;
-        el.classList.add('hidden', 'force-gone');
-        el.style.display = 'none';
-    },
-
-    // --- 2. ROUTER & SIDEBAR ---
+    // --- OTHER CORE FUNCTIONS ---
     setupRouter: function() {
         window.addEventListener('popstate', (e) => {
             this.navigateTo(e.state?.viewId || 'home-page', false);
@@ -203,11 +142,9 @@ const App = {
         });
     },
 
-    // --- 3. UTILS ---
     toggleTheme: function() {
         document.body.classList.toggle('light-mode');
         localStorage.setItem('tm_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-        window.dispatchEvent(new Event('themeChanged'));
     },
     loadTheme: function() {
         if(localStorage.getItem('tm_theme') === 'light') document.body.classList.add('light-mode');
@@ -221,21 +158,16 @@ const App = {
         if(bar) { bar.value = ''; this.filterTools(''); }
     },
     filterTools: function(term) {
-        document.querySelectorAll('.t-card').forEach(card => {
-            card.style.display = card.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
-        });
+        // Optimized Filter loop
+        const cards = document.getElementsByClassName('t-card');
+        for(let i=0; i<cards.length; i++) {
+            const card = cards[i];
+            const txt = card.innerText.toLowerCase();
+            card.style.display = txt.includes(term) ? 'flex' : 'none';
+        }
+        // Category hiding logic remains same
         document.querySelectorAll('.category-block').forEach(cat => {
             cat.style.display = cat.querySelectorAll('.t-card[style="display: flex;"]').length ? 'block' : 'none';
-        });
-    },
-    setupShortcuts: function() {
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') this.navigateTo('home-page');
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                this.navigateTo('home-page');
-                setTimeout(() => document.getElementById('search-bar')?.focus(), 100);
-            }
         });
     },
     showToast: function(msg, type='success') {
@@ -244,11 +176,10 @@ const App = {
         const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<span>${msg}</span>`;
         box.appendChild(t);
         requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; });
-        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
     }
 };
 
-// EXPORTS
 window.App = App;
 window.showHome = () => App.navigateTo('home-page');
 window.openTool = (id) => App.navigateTo(id);
