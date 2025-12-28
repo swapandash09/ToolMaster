@@ -1,10 +1,10 @@
 /* =========================================
-   TOOLMASTER TITANIUM V71 - HYPER CORE
+   TOOLMASTER TITANIUM V71 - FINAL STYLE
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-    /* --- V71 DARK THEME (DEFAULT) --- */
+    /* --- DARK THEME (DEFAULT) --- */
     --bg: #0b0b0e;
     --sidebar: #121216;
     --card: #18181c;
@@ -81,7 +81,7 @@ body {
     padding: 20px 30px; 
     display: flex; align-items: center; justify-content: space-between;
     backdrop-filter: blur(12px);
-    background: rgba(11, 11, 14, 0.85); /* Glass Effect */
+    background: rgba(11, 11, 14, 0.85);
 }
 body.light-mode .ws-head { background: rgba(255, 255, 255, 0.85); }
 
@@ -131,7 +131,7 @@ body.light-mode .ws-head { background: rgba(255, 255, 255, 0.85); }
 .t-card h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 2px; }
 .t-card p { font-size: 0.85rem; color: var(--text-muted); }
 
-/* --- NEON ICONS (V71 Special) --- */
+/* --- NEON ICONS --- */
 .tc-icon { 
     width: 48px; height: 48px; border-radius: 12px; 
     display: grid; place-items: center; font-size: 1.5rem; color: white;
@@ -141,8 +141,9 @@ body.light-mode .ws-head { background: rgba(255, 255, 255, 0.85); }
 .c-green { background: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
 .c-purple { background: #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
 .c-orange { background: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+.c-cyan { background: #06b6d4; box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
 
-/* --- INPUTS & BUTTONS (Glassmorphism) --- */
+/* --- INPUTS & BUTTONS --- */
 .glass-input { 
     width: 100%; background: rgba(255,255,255,0.03); 
     border: 1px solid var(--border); padding: 12px; 
@@ -166,28 +167,67 @@ body.light-mode .glass-input {
 .glow-btn:hover { 
     transform: scale(1.02); box-shadow: 0 0 30px rgba(99, 102, 241, 0.5); 
 }
-.glow-btn:active { transform: scale(0.98); }
 
-.small-btn { 
-    padding: 8px 16px; font-size: 0.8rem; font-weight: 600;
-    background: var(--card); border: 1px solid var(--border); 
-    color: var(--text); border-radius: 6px; cursor: pointer; transition: 0.2s;
+.back-pill {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 8px 16px; border-radius: 50px;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    font-weight: 600; font-size: 0.85rem; transition: 0.2s;
 }
-.small-btn:hover { border-color: var(--text); background: var(--card-hover); }
+.back-pill:hover { border-color: var(--text); color: var(--text); background: var(--card-hover); }
 
-/* --- UTILITIES & ANIMATIONS --- */
-.hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.3s var(--ease) forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* =========================================
+   🔥 SPECIAL FEATURES STYLING (RESTORED)
+   ========================================= */
 
-/* --- AI RESULT BOX --- */
-.ai-box { 
-    background: rgba(99,102,241,0.1); border: 1px solid var(--primary); 
+/* 1. RESUME THEME PICKER */
+.theme-picker {
+    display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;
+}
+.theme-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    cursor: pointer; border: 2px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.theme-dot:hover { transform: scale(1.1); }
+.theme-dot.active { 
+    border-color: white; 
+    transform: scale(1.2); 
+    box-shadow: 0 0 15px var(--primary-dim);
+    z-index: 2;
+}
+
+/* 2. AI RESULT BOX */
+.ai-box, .ai-result-box { 
+    background: rgba(99,102,241,0.08); border: 1px solid var(--primary); 
     padding: 15px; border-radius: 10px; margin-top: 15px; display: none; 
     color: var(--text); font-size: 0.9rem;
 }
 
-/* --- RESUME PREVIEW CORE (Simplified for Style.css) --- */
+/* 3. PASSWORD STRENGTH METER */
+.strength-meter { 
+    height: 6px; background: rgba(255,255,255,0.1); 
+    margin-top: 10px; border-radius: 10px; overflow: hidden; 
+}
+.strength-fill { 
+    height: 100%; width: 0%; transition: width 0.3s ease, background 0.3s ease; 
+}
+
+/* 4. COMPARE VIEWER (BG Remover) */
+.compare-viewer {
+    position: relative; overflow: hidden; border-radius: 12px; margin-top: 20px;
+}
+.bg-palette {
+    display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;
+}
+.bg-dot {
+    width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border);
+    cursor: pointer; display: grid; place-items: center;
+}
+.bg-dot.active { border-color: var(--primary); transform: scale(1.1); }
+
+/* --- RESUME PREVIEW CORE --- */
 .resume-workspace { display: flex; height: calc(100vh - 80px); }
 .editor-panel { flex: 1; padding: 25px; overflow-y: auto; border-right: 1px solid var(--border); }
 .preview-panel { 
@@ -237,4 +277,4 @@ body.light-mode .glass-input {
         transform: scale(0.42); transform-origin: top left; 
         width: 235%; height: 235%; 
     }
-}
+   }
