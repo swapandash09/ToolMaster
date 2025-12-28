@@ -2,7 +2,7 @@
    RESUME STUDIO - TITANIUM V53 EXECUTIVE PRO
    ========================================= */
 
-/* --- 1. WORKSPACE LAYOUT (Optimized Split) --- */
+/* --- 1. WORKSPACE LAYOUT --- */
 .split-view {
     display: flex;
     gap: 30px;
@@ -12,21 +12,19 @@
     padding-bottom: 20px;
 }
 
-/* Editor Panel (Left) */
 .editor-panel {
     flex: 1;
     overflow-y: auto;
     padding-right: 15px;
     min-width: 350px;
-    /* Custom Scrollbar */
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
 }
 
-/* Preview Panel (Right - Darkroom Style) */
+/* Darkroom Preview Background */
 .preview-panel {
     flex: 1.3;
-    background: #1e1e24; /* Dark neutral */
+    background: #18181b; 
     border-radius: 16px;
     border: 1px solid var(--border);
     display: flex;
@@ -34,10 +32,9 @@
     align-items: flex-start;
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
 }
 
-/* Scale Wrapper (Zoom Engine) */
 #scale-wrapper {
     transform-origin: top center;
     padding: 60px 0;
@@ -48,147 +45,79 @@
     justify-content: center;
 }
 
-/* --- 2. EDITOR CONTROLS --- */
-.panel-actions {
-    display: flex; gap: 10px; margin-bottom: 20px;
-}
-
-.small-btn {
-    padding: 10px 16px;
-    font-size: 0.85rem; font-weight: 600;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text);
-    cursor: pointer; transition: 0.2s;
-    display: flex; align-items: center; gap: 8px;
-}
-.small-btn:hover { background: var(--card-hover); border-color: var(--primary); }
-
-.fit-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
-    border: none; color: white; margin-left: auto;
-}
-.fit-btn:hover { background: #047857; transform: translateY(-1px); }
-
-/* Input Groups */
-.input-group {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 24px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.group-title {
-    font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 20px; letter-spacing: 1px;
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 10px;
-}
-
-.input-grid { display: flex; gap: 15px; }
-
-/* Photo Uploader */
-.small-zone {
-    width: 110px; padding: 0; border: none; background: transparent;
-    display: flex; flex-direction: column; align-items: center;
-}
-.small-zone:hover { background: transparent; border: none; }
-
-#photo-preview-box {
-    width: 80px; height: 80px;
-    background: var(--card-hover);
-    border: 2px dashed var(--border);
-    border-radius: 50%;
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    transition: 0.2s; color: var(--text-muted); font-size: 1.5rem;
-}
-.small-zone:hover #photo-preview-box { border-color: var(--primary); color: var(--primary); transform: scale(1.05); }
-
-/* --- 3. RESUME PAPER (A4 PROFESSIONAL) --- */
+/* --- 2. RESUME PAPER (A4 EXECUTIVE) --- */
 .resume-paper {
-    width: 794px; /* A4 width @ 96 DPI */
-    min-height: 1123px; /* A4 height */
+    width: 794px; /* A4 @ 96 DPI */
+    min-height: 1123px;
     background: white;
-    color: #1f2937;
+    color: #1e293b;
     display: flex;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    font-family: 'Outfit', sans-serif; /* Modern Pro Font */
-    transform: translateZ(0);
-    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
     position: relative;
+    overflow: hidden;
 }
 
-/* Professional Border Frame Effect */
-.resume-paper::before {
+/* FULL PAGE BORDER EFFECT */
+.resume-paper::after {
     content: '';
     position: absolute;
-    top: 15px; left: 15px; right: 15px; bottom: 15px;
-    border: 1px solid rgba(0,0,0,0.08);
+    top: 15px; bottom: 15px;
+    left: 15px; right: 15px;
+    border: 1px solid rgba(0,0,0,0.1);
     pointer-events: none;
     z-index: 10;
 }
 
-/* --- LEFT SIDEBAR (Dark Executive Style) --- */
+/* --- LEFT SIDEBAR (Color Graded) --- */
 .paper-sidebar {
-    width: 34%;
-    background: #f1f5f9; /* Light Gray for Contrast */
+    width: 32%;
+    background: var(--sidebar-bg, #f8fafc);
     padding: 50px 30px;
-    border-right: 1px solid #e2e8f0;
-    text-align: left;
+    border-right: 1px solid rgba(0,0,0,0.05);
     position: relative;
     z-index: 2;
 }
 
-/* Profile Image (Unique Design) */
+/* Profile Photo (3D Float Effect) */
 #res-photo-container {
-    width: 150px; height: 150px;
-    margin: 0 auto 40px;
-    border-radius: 24px; /* Soft Square */
+    width: 140px; height: 140px;
+    margin: 0 auto 30px;
+    border-radius: 20px;
     overflow: hidden;
     border: 4px solid white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    position: relative;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     background: #e2e8f0;
-    transform: rotate(-2deg); /* Artistic touch */
+    transform: rotate(-2deg);
 }
-#res-photo-img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-}
+#res-photo-img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Sidebar Titles */
-.sb-title {
-    font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
-    color: #0f172a; margin-bottom: 15px; letter-spacing: 1px;
-    display: flex; align-items: center; gap: 10px;
-}
-.sb-title::after {
-    content: ''; flex: 1; height: 2px; background: var(--primary-theme, #2563eb); opacity: 0.5;
-}
-
-/* Sidebar Content (Icon Boxes) */
+/* Sidebar Sections */
 .sb-section { margin-bottom: 40px; }
 
+.sb-title {
+    font-size: 0.8rem; font-weight: 800; 
+    text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--primary-theme, #2563eb);
+    margin-bottom: 15px;
+    display: flex; align-items: center; gap: 10px;
+}
+.sb-title::after { content:''; flex:1; height:1px; background: currentColor; opacity:0.3; }
+
+/* Contact Items (Glass Icons) */
 .sb-section div {
     font-size: 0.85rem; margin-bottom: 12px; color: #475569;
     display: flex; align-items: center; gap: 12px;
     line-height: 1.4; font-weight: 500;
 }
-
-/* Unique Icon Design */
 .sb-section i { 
-    font-size: 0.9rem; 
-    color: white;
+    font-size: 0.9rem; color: white;
     background: var(--primary-theme, #2563eb);
-    width: 24px; height: 24px;
+    width: 26px; height: 26px;
     display: flex; align-items: center; justify-content: center;
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
 }
 
 /* Skills Tags */
@@ -196,118 +125,84 @@
 #res-skills span {
     display: inline-block;
     background: white; color: #334155;
-    padding: 6px 12px; border-radius: 4px;
+    padding: 6px 12px; border-radius: 6px;
     font-size: 0.75rem; font-weight: 700;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }
 
 /* --- RIGHT CONTENT (Main) --- */
 .paper-content {
     flex: 1;
-    padding: 60px 40px;
-    position: relative;
+    padding: 60px 45px;
 }
 
 /* Header */
 .main-header {
     margin-bottom: 40px;
-    border-bottom: 3px solid #f1f5f9;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
     padding-bottom: 30px;
 }
 #res-name {
-    font-size: 3rem; font-weight: 800; color: #0f172a;
+    font-size: 2.8rem; font-weight: 800; color: #0f172a;
     line-height: 1; text-transform: uppercase; letter-spacing: -1px;
     margin-bottom: 10px;
 }
 #res-title {
-    font-size: 1.2rem; color: var(--primary-theme, #2563eb);
+    font-size: 1.1rem; color: var(--primary-theme, #2563eb);
     font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
 }
 
-/* Sections */
-.main-section { margin-bottom: 35px; }
-
-.sec-head {
-    font-size: 1.1rem; font-weight: 800; text-transform: uppercase;
-    color: #0f172a; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px;
-    letter-spacing: 0.5px;
-}
-.sec-head::before {
-    content: ''; width: 6px; height: 24px;
-    background: var(--primary-theme, #2563eb);
-    border-radius: 2px;
+/* AI Summary Box */
+#res-summary {
+    font-size: 0.95rem; line-height: 1.8; color: #334155;
+    background: #f8fafc; padding: 20px;
+    border-left: 4px solid var(--primary-theme, #2563eb);
+    border-radius: 0 12px 12px 0;
+    margin-bottom: 35px;
 }
 
 /* Experience Items */
 .item-block { 
-    margin-bottom: 25px; 
+    margin-bottom: 30px; 
     position: relative;
     padding-left: 20px;
-    border-left: 2px solid #f1f5f9;
+    border-left: 2px solid rgba(0,0,0,0.05);
+}
+.item-block::before {
+    content:''; position: absolute; left:-6px; top:0;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--primary-theme, #2563eb);
+    border: 2px solid white; box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
 }
 
-.item-title { font-weight: 800; font-size: 1.15rem; color: #1e293b; }
+.item-title { font-weight: 800; font-size: 1.1rem; color: #1e293b; }
 .item-sub { 
-    font-size: 0.95rem; color: var(--primary-theme, #2563eb); 
-    font-weight: 700; margin-bottom: 6px; display: inline-block;
+    font-size: 0.9rem; color: var(--primary-theme, #2563eb); 
+    font-weight: 700; margin-bottom: 5px; display: inline-block;
 }
 .item-date { 
-    float: right; font-size: 0.8rem; font-weight: 700; 
-    color: #64748b; background: #f8fafc; 
+    float: right; font-size: 0.75rem; font-weight: 700; 
+    color: #64748b; background: #f1f5f9; 
     padding: 4px 10px; border-radius: 4px;
 }
 .item-desc { 
-    font-size: 0.92rem; color: #475569; margin-top: 8px; 
-    line-height: 1.7; white-space: pre-wrap;
-    text-align: justify;
+    font-size: 0.9rem; color: #475569; margin-top: 8px; 
+    line-height: 1.6; white-space: pre-wrap;
 }
 
-/* Summary Text */
-#res-summary {
-    font-size: 1rem; line-height: 1.8; color: #334155;
-    font-weight: 500; font-style: italic;
-    background: #f8fafc; padding: 20px;
-    border-left: 4px solid var(--primary-theme, #2563eb);
-    border-radius: 0 12px 12px 0;
-}
+/* --- THEME COLORS (Grading) --- */
+.theme-blue { --primary-theme: #2563eb; --sidebar-bg: #eff6ff; }
+.theme-green { --primary-theme: #059669; --sidebar-bg: #ecfdf5; }
+.theme-purple { --primary-theme: #7c3aed; --sidebar-bg: #f5f3ff; }
+.theme-gold { --primary-theme: #d97706; --sidebar-bg: #fffbeb; }
+.theme-dark { --primary-theme: #1f2937; --sidebar-bg: #f8fafc; }
 
-/* --- 4. COLOR GRADING (THEMES) --- */
-.theme-blue { --primary-theme: #2563eb; }
-.theme-green { --primary-theme: #059669; }
-.theme-purple { --primary-theme: #7c3aed; }
-.theme-gold { --primary-theme: #d97706; }
-.theme-dark { --primary-theme: #1f2937; }
-
-/* Font Families */
-.font-sans { font-family: 'Outfit', sans-serif; }
-.font-serif { font-family: 'Merriweather', serif; }
-.font-mono { font-family: 'JetBrains Mono', monospace; }
-
-/* --- 5. PRINT OPTIMIZATION --- */
-@media print {
-    body * { visibility: hidden; }
-    #resume-preview, #resume-preview * { visibility: visible; }
-    #resume-preview {
-        position: absolute; left: 0; top: 0;
-        width: 100%; margin: 0; padding: 0;
-        box-shadow: none; border: none;
-        transform: none !important;
-        -webkit-print-color-adjust: exact;
-    }
-}
-
-/* --- 6. MOBILE RESPONSIVE --- */
+/* Mobile */
 @media (max-width: 900px) {
-    .split-view { flex-direction: column; height: auto; gap: 20px; }
-    .editor-panel { width: 100%; padding-right: 0; min-width: auto; overflow: visible; margin-bottom: 40px; }
-    .preview-panel { width: 100%; height: 600px; border-radius: 0; border: none; }
-    #scale-wrapper {
-        transform-origin: top left;
-        transform: scale(0.45);
-        width: 220%; height: 220%; padding: 20px;
-        align-items: flex-start;
-    }
+    .split-view { flex-direction: column; height: auto; }
+    .editor-panel { width: 100%; margin-bottom: 30px; }
+    .preview-panel { width: 100%; height: 550px; border: none; border-radius: 0; }
+    #scale-wrapper { transform-origin: top left; transform: scale(0.45); width: 220%; height: 220%; padding: 20px; }
     .input-grid { flex-direction: column; gap: 10px; }
 }
