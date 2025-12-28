@@ -1,8 +1,8 @@
 // ==========================================
-// 📄 RESUME BUILDER - TITANIUM V64 COLOR ENGINE
+// 📄 RESUME BUILDER - TITANIUM V65 FINAL
 // ==========================================
 
-console.log("Resume V64: Color Engine Online");
+console.log("Resume V65: Final Engine Online");
 
 let resumeData = {
     profileImage: "", 
@@ -38,7 +38,7 @@ function setTheme(themeName, el) {
     renderResume();
 }
 
-// --- 2. SMART PREVIEW ---
+// --- 2. SMART PREVIEW (Auto-Zoom) ---
 function autoScalePreview() {
     const container = document.getElementById('preview-container');
     const wrapper = document.getElementById('scale-wrapper');
@@ -48,6 +48,7 @@ function autoScalePreview() {
     const containerWidth = container.offsetWidth - 40; 
     let scale = containerWidth / paperWidth;
     
+    // Limits
     if(scale > 1.2) scale = 1.2;
     if(scale < 0.25) scale = 0.25;
 
@@ -62,7 +63,7 @@ window.addEventListener('toolOpened', (e) => {
     }
 });
 
-// --- 3. RENDERER ---
+// --- 3. RENDERER (Live Update) ---
 function updateResume() {
     clearTimeout(renderTimeout);
     renderTimeout = setTimeout(() => {
@@ -172,77 +173,93 @@ function renderResume() {
     }
 }
 
-// --- 4. PDF EXPORT (MOBILE SAFE FIX) ---
-window.downloadResumePDF = () => {
-    loader(true, "GENERATING HD PDF...");
+// --- 4. TITANIUM V65: CANVAS-FIRST PDF ENGINE (ZERO CUTOFF) ---
+window.downloadResumePDF = async () => {
+    loader(true, "GENERATING PDF...");
     
+    // 1. Scroll to top (Critical for Mobile)
+    window.scrollTo(0, 0);
+    await new Promise(r => setTimeout(r, 200)); // Wait for scroll to settle
+
     const element = document.getElementById('resume-preview');
     
-    // 1. Clone banayein taaki original screen par asar na pade
-    const clone = element.cloneNode(true);
-    
-    // 2. Clone ko A4 Size mein force karein (Cut-out problem fix)
-    clone.style.transform = "none"; 
-    clone.style.width = "794px";
-    clone.style.minHeight = "1123px";
-    clone.style.margin = "0";       // Margin hatana zaroori hai
-    clone.style.padding = "0";      // Padding reset
-    clone.style.borderRadius = "0"; 
-    clone.style.boxShadow = "none";
-    clone.style.position = "relative";
-    
-    // 3. Container ko Screen ke PEECHE rakhein (Bahar nahi)
-    // Mobile browsers bahar wale elements ko render nahi karte isliye cut hota hai
+    // 2. Create a specific container for the clone
+    // We place it absolutely at 0,0 to ensure mobile browser viewport catches it
     const container = document.createElement('div');
-    container.style.position = 'fixed';
+    container.style.position = 'absolute';
     container.style.top = '0';
     container.style.left = '0';
-    container.style.width = '794px';
-    container.style.height = '1123px';
-    container.style.zIndex = '-9999'; // User ko nahi dikhega
-    container.style.overflow = 'hidden';
-    container.style.background = 'white'; // White bg for clean print
-    
-    container.appendChild(clone);
+    container.style.zIndex = '99999'; // On TOP of everything (acting as a temporary overlay)
+    container.style.width = '794px';  // A4 Width
+    container.style.background = '#ffffff'; // Ensure white background
+    container.style.pointerEvents = 'none'; 
     document.body.appendChild(container);
 
-    // 4. PDF Options (HD Quality)
+    // 3. Clone and Clean
+    const clone = element.cloneNode(true);
+    clone.style.transform = 'scale(1)'; // Reset any CSS zoom/scale
+    clone.style.width = '794px';
+    clone.style.minHeight = '1123px';
+    clone.style.margin = '0';
+    clone.style.padding = '0';
+    clone.style.boxShadow = 'none';
+    clone.style.border = 'none';
+    
+    container.appendChild(clone);
+
+    // 4. Force wait for images in clone to render
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 5. HTML2PDF Configuration
     const opt = {
         margin: 0,
         filename: `${resumeData.name || 'Resume'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
+        enableLinks: true,
         html2canvas: { 
-            scale: 2,       // 2x Scale Mobile ke liye best hai (4x crash ho sakta hai)
-            useCORS: true,
-            width: 794,     // Exact Width Force
-            height: 1123,   // Exact Height Force
-            windowWidth: 794, // Browser ko dhoka dene ke liye ki screen badi hai
-            x: 0,
-            y: 0,
+            scale: 2,       // Safe scale for mobile memory (4x can crash phones)
+            useCORS: true, 
+            width: 794,
+            height: 1123,
+            scrollY: 0,     // Force top capture
             scrollX: 0,
-            scrollY: 0
+            windowWidth: 794, // Trick browser into thinking it's desktop width
+            windowHeight: 1123
         },
         jsPDF: { 
             unit: 'px', 
-            format: [794, 1123], // Pixel perfect A4 match
+            format: [794, 1123], 
             orientation: 'portrait',
-            compress: true
+            compress: true 
         }
     };
 
-    // 5. Generate & Cleanup
-    html2pdf().set(opt).from(clone).save().then(() => {
-        document.body.removeChild(container);
+    // 6. Execute
+    try {
+        await html2pdf().set(opt).from(clone).save();
+        showToast("PDF Downloaded!", "success");
+    } catch (err) {
+        console.error("PDF Fail:", err);
+        showToast("PDF Generation Failed", "error");
+    } finally {
+        document.body.removeChild(container); // Cleanup immediately
         loader(false);
-        showToast("PDF Downloaded Successfully!", "success");
-    }).catch(err => {
-        console.error(err);
-        document.body.removeChild(container);
-        loader(false);
-        showToast("PDF Error: Try Laptop for best results", "error");
-    });
+    }
 };
-// AI Helper (kept same)
+
+// Utils
+function handleProfilePhoto(input) {
+    if(input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => { 
+            resumeData.profileImage = e.target.result; 
+            renderResume();
+        };
+        r.readAsDataURL(input.files[0]);
+    }
+}
+
+// AI Helper
 window.generateAISummary = () => {
     const title = document.getElementById('in-title').value;
     if(!title) return showToast("Enter Job Title first!", "error");
