@@ -1,15 +1,16 @@
 // ==========================================
-// 📄 RESUME BUILDER - TITANIUM V65 FINAL
+// 📄 RESUME BUILDER - TITANIUM V66 PRO
 // ==========================================
 
-console.log("Resume V65: Final Engine Online");
+console.log("Resume V66: Pro Engine Online");
 
+// 1. STATE MANAGEMENT (With Auto-Save Defaults)
 let resumeData = {
     profileImage: "", 
     font: "font-sans", 
-    theme: "theme-blue", // Default Theme
+    theme: "theme-blue", 
     name: "", title: "", email: "", phone: "", address: "",
-    guardian: "", dob: "",
+    guardian: "", dob: "", languages: "", // Added Languages
     summary: "",
     company: "", role: "", dates: "", jobdesc: "",
     degree: "", school: "", eduYear: "", skills: "",
@@ -18,44 +19,11 @@ let resumeData = {
 
 let renderTimeout;
 
-// --- 1. THEME SWITCHER LOGIC ---
-function setTheme(themeName, el) {
-    resumeData.theme = themeName;
-    
-    // UI Update (Visual Selection)
-    document.querySelectorAll('.theme-dot').forEach(d => {
-        d.classList.remove('active');
-        d.style.borderColor = 'var(--border)';
-        d.style.transform = 'scale(1)';
-    });
-    
-    // Activate Clicked
-    el.classList.add('active');
-    el.style.borderColor = 'white';
-    el.style.transform = 'scale(1.2)';
-    
-    // Render
-    renderResume();
-}
+// --- 2. INITIALIZATION & AUTO-LOAD ---
+document.addEventListener('DOMContentLoaded', () => {
+    loadSavedData(); // Restore data on load
+});
 
-// --- 2. SMART PREVIEW (Auto-Zoom) ---
-function autoScalePreview() {
-    const container = document.getElementById('preview-container');
-    const wrapper = document.getElementById('scale-wrapper');
-    if(!container || !wrapper) return;
-
-    const paperWidth = 794; 
-    const containerWidth = container.offsetWidth - 40; 
-    let scale = containerWidth / paperWidth;
-    
-    // Limits
-    if(scale > 1.2) scale = 1.2;
-    if(scale < 0.25) scale = 0.25;
-
-    wrapper.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', autoScalePreview);
 window.addEventListener('toolOpened', (e) => {
     if(e.detail.toolId === 'resume-tool') {
         setTimeout(autoScalePreview, 100);
@@ -63,15 +31,31 @@ window.addEventListener('toolOpened', (e) => {
     }
 });
 
-// --- 3. RENDERER (Live Update) ---
-function updateResume() {
-    clearTimeout(renderTimeout);
-    renderTimeout = setTimeout(() => {
-        captureData();
-        renderResume();
-    }, 50);
+window.addEventListener('resize', autoScalePreview);
+
+// --- 3. CORE FUNCTIONS ---
+
+// Theme Switcher
+function setTheme(themeName, el) {
+    resumeData.theme = themeName;
+    
+    // UI Visual Update
+    if(el) {
+        document.querySelectorAll('.theme-dot').forEach(d => {
+            d.classList.remove('active');
+            d.style.borderColor = 'var(--border)';
+            d.style.transform = 'scale(1)';
+        });
+        el.classList.add('active');
+        el.style.borderColor = 'white';
+        el.style.transform = 'scale(1.2)';
+    }
+    
+    saveData();
+    renderResume();
 }
 
+// Data Capture (Reads inputs)
 function captureData() {
     const getVal = (id) => {
         const el = document.getElementById('in-' + id);
@@ -87,6 +71,7 @@ function captureData() {
     // Personal Details
     resumeData.guardian = getVal('guardian');
     resumeData.dob = getVal('dob');
+    resumeData.languages = getVal('languages'); // New Input
 
     resumeData.summary = getVal('summary');
     resumeData.company = getVal('company');
@@ -98,13 +83,16 @@ function captureData() {
     resumeData.degree = getVal('degree');
     resumeData.school = getVal('school');
     resumeData.eduYear = getVal('edu-year');
+
+    saveData(); // Auto-save on every keystroke
 }
 
+// Renderer (Updates HTML)
 function renderResume() {
     const paper = document.getElementById('resume-preview');
     if(!paper) return;
 
-    // Apply Selected Theme
+    // Apply Theme & Font
     paper.className = `resume-paper ${resumeData.theme} ${resumeData.font}`;
 
     const setText = (id, val, fb) => {
@@ -116,7 +104,7 @@ function renderResume() {
     setText('res-title', resumeData.title, "PROFESSIONAL TITLE");
     setText('res-summary', resumeData.summary, "Professional summary goes here...");
 
-    // --- SIDEBAR (Photo, Contact, Skills) ---
+    // --- SIDEBAR ---
     const cList = document.getElementById('contact-list');
     if(cList) {
         let html = '';
@@ -131,6 +119,16 @@ function renderResume() {
             if(resumeData.dob) html += `<div><i class="ri-calendar-event-line"></i> DOB: ${resumeData.dob}</div>`;
         }
         cList.innerHTML = html;
+    }
+
+    // Languages (New Section)
+    const lBox = document.getElementById('res-languages'); // Needs <div id="res-languages"> in HTML
+    const lSec = document.getElementById('lang-section'); // Wrapper
+    if(lBox && resumeData.languages) {
+        if(lSec) lSec.style.display = 'block';
+        lBox.innerHTML = resumeData.languages.split(',').map(l => `<span>${l.trim()}</span>`).join('');
+    } else if (lSec) {
+        lSec.style.display = 'none';
     }
 
     // Skills
@@ -173,111 +171,162 @@ function renderResume() {
     }
 }
 
-// --- 4. TITANIUM V65: CANVAS-FIRST PDF ENGINE (ZERO CUTOFF) ---
+// --- 4. DATA PERSISTENCE (Auto-Save) ---
+function saveData() {
+    localStorage.setItem('titaniumResumeData', JSON.stringify(resumeData));
+}
+
+function loadSavedData() {
+    const saved = localStorage.getItem('titaniumResumeData');
+    if(saved) {
+        resumeData = JSON.parse(saved);
+        
+        // Restore Inputs
+        const setVal = (id, val) => {
+            const el = document.getElementById('in-' + id);
+            if(el) el.value = val;
+        };
+
+        setVal('name', resumeData.name);
+        setVal('title', resumeData.title);
+        setVal('email', resumeData.email);
+        setVal('phone', resumeData.phone);
+        setVal('address', resumeData.address);
+        setVal('guardian', resumeData.guardian);
+        setVal('dob', resumeData.dob);
+        setVal('languages', resumeData.languages);
+        setVal('summary', resumeData.summary);
+        setVal('company', resumeData.company);
+        setVal('role', resumeData.role);
+        setVal('dates', resumeData.dates);
+        setVal('job-desc', resumeData.jobdesc);
+        setVal('skills', resumeData.skills);
+        setVal('degree', resumeData.degree);
+        setVal('school', resumeData.school);
+        setVal('edu-year', resumeData.eduYear);
+
+        updateResume();
+    }
+}
+
+// --- 5. PDF ENGINE (V66: Pixel Perfect) ---
 window.downloadResumePDF = async () => {
-    loader(true, "GENERATING PDF...");
+    loader(true, "RENDERING HD PDF...");
     
-    // 1. Scroll to top (Critical for Mobile)
     window.scrollTo(0, 0);
-    await new Promise(r => setTimeout(r, 200)); // Wait for scroll to settle
+    await new Promise(r => setTimeout(r, 200)); 
 
     const element = document.getElementById('resume-preview');
     
-    // 2. Create a specific container for the clone
-    // We place it absolutely at 0,0 to ensure mobile browser viewport catches it
+    // Create Temporary Container (Off-Screen but Visible to Engine)
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.top = '0';
     container.style.left = '0';
-    container.style.zIndex = '99999'; // On TOP of everything (acting as a temporary overlay)
-    container.style.width = '794px';  // A4 Width
-    container.style.background = '#ffffff'; // Ensure white background
-    container.style.pointerEvents = 'none'; 
+    container.style.zIndex = '99999'; 
+    container.style.width = '794px'; 
+    container.style.background = '#ffffff'; 
     document.body.appendChild(container);
 
-    // 3. Clone and Clean
     const clone = element.cloneNode(true);
-    clone.style.transform = 'scale(1)'; // Reset any CSS zoom/scale
+    clone.style.transform = 'scale(1)'; 
     clone.style.width = '794px';
     clone.style.minHeight = '1123px';
     clone.style.margin = '0';
-    clone.style.padding = '0';
-    clone.style.boxShadow = 'none';
-    clone.style.border = 'none';
     
     container.appendChild(clone);
 
-    // 4. Force wait for images in clone to render
+    // Wait for images
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 5. HTML2PDF Configuration
     const opt = {
         margin: 0,
-        filename: `${resumeData.name || 'Resume'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
+        filename: `${resumeData.name || 'Resume'}_CV.pdf`,
+        image: { type: 'jpeg', quality: 1.0 },
         enableLinks: true,
         html2canvas: { 
-            scale: 2,       // Safe scale for mobile memory (4x can crash phones)
+            scale: 2, // High Quality
             useCORS: true, 
             width: 794,
             height: 1123,
-            scrollY: 0,     // Force top capture
-            scrollX: 0,
-            windowWidth: 794, // Trick browser into thinking it's desktop width
-            windowHeight: 1123
+            scrollY: 0,
+            windowWidth: 794
         },
         jsPDF: { 
             unit: 'px', 
             format: [794, 1123], 
-            orientation: 'portrait',
-            compress: true 
+            orientation: 'portrait' 
         }
     };
 
-    // 6. Execute
     try {
         await html2pdf().set(opt).from(clone).save();
         showToast("PDF Downloaded!", "success");
     } catch (err) {
-        console.error("PDF Fail:", err);
-        showToast("PDF Generation Failed", "error");
+        console.error(err);
+        showToast("PDF Failed. Try on Desktop.", "error");
     } finally {
-        document.body.removeChild(container); // Cleanup immediately
+        document.body.removeChild(container); 
         loader(false);
     }
 };
 
-// Utils
+// --- UTILS ---
+function updateResume() {
+    clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(() => {
+        captureData();
+        renderResume();
+    }, 50);
+}
+
+function autoScalePreview() {
+    const container = document.getElementById('preview-container');
+    const wrapper = document.getElementById('scale-wrapper');
+    if(!container || !wrapper) return;
+
+    const paperWidth = 794; 
+    const containerWidth = container.offsetWidth - 40; 
+    let scale = containerWidth / paperWidth;
+    if(scale > 1.2) scale = 1.2;
+    if(scale < 0.25) scale = 0.25;
+
+    wrapper.style.transform = `scale(${scale})`;
+}
+
 function handleProfilePhoto(input) {
     if(input.files && input.files[0]) {
         const r = new FileReader();
         r.onload = e => { 
             resumeData.profileImage = e.target.result; 
+            saveData();
             renderResume();
         };
         r.readAsDataURL(input.files[0]);
     }
 }
 
-// AI Helper
 window.generateAISummary = () => {
     const title = document.getElementById('in-title').value;
     if(!title) return showToast("Enter Job Title first!", "error");
     loader(true, "AI WRITING...");
+    
+    // Simple Local AI Simulation
+    const templates = [
+        `Results-oriented ${title} with a proven track record of success. Dedicated to improving efficiency and driving growth.`,
+        `Motivated ${title} skilled in problem-solving and collaboration. Ready to leverage skills to contribute to team goals.`,
+        `Experienced ${title} with strong technical expertise. Committed to delivering high-quality results in fast-paced environments.`
+    ];
+    
     setTimeout(() => {
-        const templates = [
-            `Results-oriented ${title} with strong expertise in the industry. Proven track record of improving efficiency.`,
-            `Dedicated ${title} with a focus on delivering high-quality results. Skilled in project management.`,
-            `Innovative ${title} combining creativity with technical skills. Committed to continuous growth.`
-        ];
         const summary = templates[Math.floor(Math.random() * templates.length)];
         const el = document.getElementById('in-summary');
         el.value = "";
         let i = 0;
         function type() {
-            if(i < summary.length) { el.value += summary.charAt(i); i++; setTimeout(type, 15); } 
-            else { updateResume(); loader(false); }
+            if(i < summary.length) { el.value += summary.charAt(i); i++; setTimeout(type, 10); } 
+            else { updateResume(); loader(false); showToast("Summary Generated", "success"); }
         }
         type();
-    }, 1000);
+    }, 800);
 };
