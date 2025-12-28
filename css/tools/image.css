@@ -1,36 +1,29 @@
 /* =========================================
-   IMAGE ENGINE - TITANIUM V51 QUANTUM CORE
+   IMAGE ENGINE - TITANIUM V52 STABLE CORE
    ========================================= */
 
-/* --- 1. MAIN VIEWER (ZERO LAG) --- */
+/* --- 1. VIEWER CONTAINER (Fixed Layout) --- */
 .compare-viewer {
     position: relative;
     width: 100%;
     max-width: 900px;
-    /* Aspect ratio fallback for smooth loading */
-    min-height: 500px;
+    height: 500px; /* Fixed Height for stability */
     margin: 30px auto;
     
-    /* V51 Executive Styling */
     background: #0b0b0e;
     border: 1px solid var(--border);
-    border-radius: 12px; /* Sharper radius */
+    border-radius: 12px;
     overflow: hidden;
     
     box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
     user-select: none;
     -webkit-user-drag: none;
     
-    /* GPU Promotion */
-    transform: translateZ(0); 
+    /* Hardware Acceleration */
+    transform: translate3d(0,0,0);
     will-change: transform;
-}
-
-/* --- 2. PERFORMANCE GRID (CSS ONLY) --- */
-/* Replaces heavy images with fast CSS gradients */
-.compare-viewer::before {
-    content: ''; position: absolute; inset: 0; z-index: 0;
-    background-color: #121216;
+    
+    /* Checkerboard Pattern for Transparency */
     background-image: 
         linear-gradient(45deg, #18181c 25%, transparent 25%), 
         linear-gradient(-45deg, #18181c 25%, transparent 25%), 
@@ -38,109 +31,117 @@
         linear-gradient(-45deg, transparent 75%, #18181c 75%);
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-    opacity: 1;
 }
 
-/* --- 3. IMAGE LAYERS --- */
+/* --- 2. IMAGE LAYERS (Fixed Z-Index) --- */
 .img-back, .img-front {
-    position: absolute; inset: 0;
+    position: absolute;
+    top: 0; left: 0;
     width: 100%; height: 100%;
-    object-fit: contain; /* Ensures 4K fit */
-    display: block; pointer-events: none;
+    object-fit: contain; /* Ensures full image is seen */
+    pointer-events: none;
+    display: block;
 }
 
-.img-back { z-index: 1; }
+/* Result Layer (Bottom) */
+.img-back {
+    z-index: 1;
+}
 
+/* Original Layer (Top - Clipped) */
 .img-front {
-    z-index: 3;
-    /* Dim background slightly for contrast */
-    background-color: rgba(0,0,0,0.8); 
-    will-change: clip-path; /* Optimizes resizing */
-    /* Sharp shadow line */
-    filter: drop-shadow(-2px 0 10px rgba(0,0,0,0.8)); 
+    z-index: 2;
+    background: rgba(0,0,0,0.02); /* Slight tint to differentiate */
+    will-change: clip-path; /* Optimization */
+    /* Smooth clip transition */
+    transition: clip-path 0.05s linear;
 }
 
-/* --- 4. TACTICAL SLIDER (PROFESSIONAL) --- */
-
-/* The Line */
-.slider-line-deco {
-    position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
-    background: #ffffff;
-    z-index: 10; pointer-events: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
-
-/* The Handle (Sleek Vertical Grip) */
-.slider-handle-deco {
-    position: absolute; top: 50%; left: 50%;
-    width: 40px; height: 60px; /* Rectangular Grip */
-    transform: translate(-50%, -50%);
-    z-index: 12; pointer-events: none;
-    
-    background: var(--card);
-    border: 2px solid #ffffff;
-    border-radius: 8px;
-    
-    display: flex; align-items: center; justify-content: center;
-    color: #ffffff;
-    
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Grip Texture */
-.slider-handle-deco::after {
-    content: ''; width: 4px; height: 20px;
-    border-left: 2px solid rgba(255,255,255,0.3);
-    border-right: 2px solid rgba(255,255,255,0.3);
-}
-
-/* Hide Icon inside handle (using texture instead) */
-.slider-handle-deco i { display: none; }
-
-/* Active State */
-.compare-viewer:active .slider-handle-deco {
-    transform: translate(-50%, -50%) scale(0.95);
-    background: #ffffff;
-    border-color: var(--primary);
-}
-.compare-viewer:active .slider-handle-deco::after {
-    border-color: var(--primary);
-}
-
-/* --- 5. TOUCH LAYER --- */
+/* --- 3. SLIDER CONTROLS (Center Fix) --- */
 .slider {
-    position: absolute; inset: 0;
+    position: absolute;
+    top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: 20; opacity: 0;
-    cursor: col-resize; margin: 0;
-    touch-action: none;
+    z-index: 20;
+    opacity: 0;
+    cursor: col-resize;
+    margin: 0;
 }
 
-/* --- 6. LABELS (EXECUTIVE TAGS) --- */
+/* The Vertical Line */
+.slider-line-deco {
+    position: absolute;
+    top: 0; bottom: 0; left: 50%; /* Default Center */
+    width: 2px;
+    background: #ffffff;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+}
+
+/* The Handle */
+.slider-handle-deco {
+    position: absolute;
+    top: 50%; left: 50%; /* Default Center */
+    transform: translate(-50%, -50%);
+    width: 44px; height: 44px;
+    
+    background: var(--primary);
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    
+    z-index: 12;
+    pointer-events: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    display: grid; place-items: center;
+}
+
+/* Handle Icon */
+.slider-handle-deco::after {
+    content: '↔';
+    color: white; font-weight: bold; font-size: 1.2rem;
+    padding-bottom: 2px;
+}
+
+/* --- 4. DOWNLOAD BUTTON CONTAINER (New) --- */
+.dl-action-box {
+    text-align: center;
+    margin-top: 25px;
+    padding-bottom: 20px;
+    min-height: 60px; /* Reserve layout space */
+}
+
+/* --- 5. AI ART STYLES --- */
+#ai-generated-img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-top: 20px;
+    min-height: 200px;
+    background: #121212;
+    display: none; /* Hidden until loaded */
+    transition: opacity 0.5s ease;
+}
+
+/* --- 6. LABELS --- */
 .comp-label {
     position: absolute; top: 20px; 
     padding: 6px 12px;
-    
-    background: rgba(0,0,0,0.8);
-    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.85);
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 6px;
-    
     color: #ffffff;
-    font-size: 0.75rem; font-weight: 700;
+    font-size: 0.7rem; font-weight: 700;
     letter-spacing: 1px; text-transform: uppercase;
-    
     z-index: 15; pointer-events: none;
     transition: opacity 0.3s;
 }
-
 .lbl-orig { left: 20px; border-left: 3px solid #ef4444; }
 .lbl-res { right: 20px; border-right: 3px solid var(--primary); text-align: right; }
 
-/* Hide labels on interaction for clean view */
 .compare-viewer:active .comp-label { opacity: 0; }
 
-/* --- 7. PALETTE (Floating) --- */
+/* --- 7. PALETTE --- */
 .bg-palette {
     display: flex; gap: 10px; margin: 20px 0; 
     justify-content: center;
@@ -149,38 +150,32 @@
     border: 1px solid var(--border);
     width: fit-content; margin-left: auto; margin-right: auto;
 }
-
 .bg-dot {
-    width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
     border: 2px solid transparent; transition: 0.2s;
-    position: relative;
 }
 .bg-dot:hover { transform: scale(1.2); }
-.bg-dot.active { 
-    border-color: #ffffff; 
-    box-shadow: 0 0 0 2px var(--primary);
-}
+.bg-dot.active { border-color: #ffffff; box-shadow: 0 0 0 2px var(--primary); }
 
-/* --- 8. SCANNER EFFECT (For Loading) --- */
+/* --- 8. LOADING SCANNER --- */
 .compare-viewer.scanning::after {
     content: ''; position: absolute;
-    top: 0; left: 0; width: 5px; height: 100%;
-    background: var(--primary);
-    box-shadow: 0 0 15px var(--primary);
+    top: 0; left: 0; width: 4px; height: 100%;
+    background: #10b981; /* Green Scanner */
+    box-shadow: 0 0 20px #10b981;
     animation: scan 1.5s infinite linear;
-    z-index: 25; pointer-events: none;
+    z-index: 30; pointer-events: none;
 }
 
 @keyframes scan {
     0% { left: 0; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
     100% { left: 100%; opacity: 0; }
 }
 
-/* Mobile Adjustments */
+/* Mobile */
 @media (max-width: 768px) {
-    .compare-viewer { min-height: 350px; border-radius: 0; border-left: none; border-right: none; }
-    .slider-handle-deco { width: 36px; height: 50px; }
-    .bg-palette { width: 100%; border-radius: 12px; justify-content: space-between; }
+    .compare-viewer { height: 350px; border-radius: 8px; }
+    .slider-handle-deco { width: 36px; height: 36px; }
 }
