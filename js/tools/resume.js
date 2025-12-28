@@ -172,48 +172,76 @@ function renderResume() {
     }
 }
 
-// --- 4. EXPORT ---
+// --- 4. PDF EXPORT (MOBILE SAFE FIX) ---
 window.downloadResumePDF = () => {
-    loader(true, "RENDERING PDF...");
+    loader(true, "GENERATING HD PDF...");
+    
     const element = document.getElementById('resume-preview');
     
-    // Deep Clone to preserve style state
+    // 1. Clone banayein taaki original screen par asar na pade
     const clone = element.cloneNode(true);
+    
+    // 2. Clone ko A4 Size mein force karein (Cut-out problem fix)
+    clone.style.transform = "none"; 
+    clone.style.width = "794px";
+    clone.style.minHeight = "1123px";
+    clone.style.margin = "0";       // Margin hatana zaroori hai
+    clone.style.padding = "0";      // Padding reset
+    clone.style.borderRadius = "0"; 
+    clone.style.boxShadow = "none";
+    clone.style.position = "relative";
+    
+    // 3. Container ko Screen ke PEECHE rakhein (Bahar nahi)
+    // Mobile browsers bahar wale elements ko render nahi karte isliye cut hota hai
     const container = document.createElement('div');
-    container.style.position = 'fixed'; 
-    container.style.top = '-10000px';
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '794px';
+    container.style.height = '1123px';
+    container.style.zIndex = '-9999'; // User ko nahi dikhega
+    container.style.overflow = 'hidden';
+    container.style.background = 'white'; // White bg for clean print
+    
     container.appendChild(clone);
     document.body.appendChild(container);
 
-    const w = 794; const h = 1123;
-
+    // 4. PDF Options (HD Quality)
     const opt = {
         margin: 0,
-        filename: `${resumeData.name || 'Resume'}_CV.pdf`,
-        image: { type: 'jpeg', quality: 1.0 },
-        enableLinks: true,
-        html2canvas: { scale: 3, useCORS: true, scrollY: 0, windowWidth: w, windowHeight: h },
-        jsPDF: { unit: 'px', format: [w, h], orientation: 'portrait' }
+        filename: `${resumeData.name || 'Resume'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,       // 2x Scale Mobile ke liye best hai (4x crash ho sakta hai)
+            useCORS: true,
+            width: 794,     // Exact Width Force
+            height: 1123,   // Exact Height Force
+            windowWidth: 794, // Browser ko dhoka dene ke liye ki screen badi hai
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0
+        },
+        jsPDF: { 
+            unit: 'px', 
+            format: [794, 1123], // Pixel perfect A4 match
+            orientation: 'portrait',
+            compress: true
+        }
     };
 
+    // 5. Generate & Cleanup
     html2pdf().set(opt).from(clone).save().then(() => {
         document.body.removeChild(container);
         loader(false);
-        showToast("PDF Saved Successfully!", "success");
+        showToast("PDF Downloaded Successfully!", "success");
+    }).catch(err => {
+        console.error(err);
+        document.body.removeChild(container);
+        loader(false);
+        showToast("PDF Error: Try Laptop for best results", "error");
     });
 };
-
-function handleProfilePhoto(input) {
-    if(input.files && input.files[0]) {
-        const r = new FileReader();
-        r.onload = e => { 
-            resumeData.profileImage = e.target.result; 
-            renderResume();
-        };
-        r.readAsDataURL(input.files[0]);
-    }
-}
-
 // AI Helper (kept same)
 window.generateAISummary = () => {
     const title = document.getElementById('in-title').value;
