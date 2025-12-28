@@ -1,10 +1,10 @@
 // ==========================================
-// 📄 PDF ENGINE - TITANIUM V51 QUANTUM
+// 📄 PDF ENGINE - TITANIUM V52 STABLE
 // ==========================================
 
-console.log("PDF Engine V51: Quantum Core Online");
+console.log("PDF Engine V52: Stable Core Online");
 
-// --- 1. PDF TO EXCEL (QUANTUM ROW ALGORITHM) ---
+// --- 1. PDF TO EXCEL (Smart Semantic Extraction) ---
 window.convertPDFtoExcel = async () => {
     const input = document.getElementById('pdf-to-ex-input');
     if (!input || !input.files.length) return showToast("Select a PDF file first.", "error");
@@ -19,6 +19,7 @@ window.convertPDFtoExcel = async () => {
             // Init PDF.js
             const pdf = await pdfjsLib.getDocument(typedArray).promise;
             const wb = XLSX.utils.book_new(); 
+            let totalItemsProcessed = 0;
             
             for (let i = 1; i <= pdf.numPages; i++) {
                 if(typeof loader === 'function') loader(true, `ANALYZING PAGE ${i}/${pdf.numPages}...`);
@@ -26,14 +27,20 @@ window.convertPDFtoExcel = async () => {
                 const page = await pdf.getPage(i);
                 const content = await page.getTextContent();
                 
-                // --- V51 SMART ROW GROUPING ---
+                // Check if page is scanned (Image based)
+                if (content.items.length === 0) {
+                    console.warn(`Page ${i} appears to be empty or scanned.`);
+                    continue;
+                }
+                totalItemsProcessed += content.items.length;
+
+                // --- V52 SMART ROW GROUPING ---
                 const rows = {};
-                // Dynamic Tolerance based on page scale usually helps, but fixed 4-6 is stable
-                const Y_TOLERANCE = 4; 
+                const Y_TOLERANCE = 5; // Increased slightly for better line detection
                 
                 content.items.forEach(item => {
-                    const y = item.transform[5]; // Y Position
-                    const x = item.transform[4]; // X Position
+                    const y = Math.round(item.transform[5]); // Round Y for better grouping
+                    const x = item.transform[4];
                     
                     // Find existing row within tolerance
                     let matchedY = Object.keys(rows).find(key => Math.abs(key - y) < Y_TOLERANCE);
@@ -45,14 +52,13 @@ window.convertPDFtoExcel = async () => {
                     rows[matchedY].push({ x: x, text: item.str });
                 });
 
-                // Sort Rows (Top to Bottom)
+                // Sort Rows (Top to Bottom) - PDF coords: 0,0 is bottom-left usually, but transform[5] handles it
                 const sortedY = Object.keys(rows).sort((a,b) => b - a); 
                 
                 const sheetData = [];
                 sortedY.forEach(y => {
                     // Sort Columns (Left to Right)
                     const rowItems = rows[y].sort((a,b) => a.x - b.x);
-                    // Filter empty strings
                     const rowText = rowItems.map(item => item.text.trim()).filter(t => t.length > 0);
                     if(rowText.length > 0) sheetData.push(rowText);
                 });
@@ -63,21 +69,25 @@ window.convertPDFtoExcel = async () => {
                 }
             }
             
-            // Export
-            XLSX.writeFile(wb, `Titanium_Export_${Date.now()}.xlsx`);
-            if(typeof showToast === 'function') showToast("Excel Extraction Complete!", "success");
+            if (totalItemsProcessed === 0) {
+                showToast("Warning: This PDF seems to be scanned (Images only). No text found.", "error");
+            } else {
+                XLSX.writeFile(wb, `Titanium_Export_${Date.now()}.xlsx`);
+                showToast("Excel Extraction Complete!", "success");
+            }
+            
             if(typeof loader === 'function') loader(false);
         };
         fileReader.readAsArrayBuffer(input.files[0]);
 
     } catch(e) { 
         console.error("PDF-Excel Error:", e);
-        if(typeof showToast === 'function') showToast("Extraction Failed. Is file valid?", "error"); 
+        showToast("Extraction Failed. Is file valid?", "error"); 
         if(typeof loader === 'function') loader(false); 
     }
 };
 
-// --- 2. JPG TO PDF (SMART ORIENTATION ENGINE) ---
+// --- 2. JPG TO PDF (Auto-Rotate & Fit) ---
 window.convertJpgToPdf = () => {
     const input = document.getElementById('jpg-input');
     if (!input || !input.files.length) return showToast("Select images first.", "error");
@@ -111,13 +121,10 @@ window.convertJpgToPdf = () => {
             img.src = e.target.result;
             
             img.onload = () => {
-                // Determine layout
                 const isLandscape = img.width > img.height;
                 
-                // Add new page (skip first empty page check logic simplified)
                 if (index > 0) doc.addPage();
                 
-                // Configure Page
                 doc.setPage(index + 1);
                 if (isLandscape) {
                     doc.deletePage(index + 1); 
@@ -127,7 +134,6 @@ window.convertJpgToPdf = () => {
                 const pageWidth = doc.internal.pageSize.getWidth(); 
                 const pageHeight = doc.internal.pageSize.getHeight(); 
                 
-                // Fit Logic (Maintain Aspect Ratio)
                 const margin = 10; 
                 const maxW = pageWidth - (margin * 2);
                 const maxH = pageHeight - (margin * 2);
@@ -145,13 +151,14 @@ window.convertJpgToPdf = () => {
                     finalW = maxH * imgRatio;
                 }
 
-                // Center
                 const x = (pageWidth - finalW) / 2;
                 const y = (pageHeight - finalH) / 2;
 
+                // Use 'FAST' compression for speed
                 doc.addImage(img, 'JPEG', x, y, finalW, finalH, undefined, 'FAST');
                 
-                // Next
+                // Memory Cleanup
+                img.src = ""; 
                 processImage(index + 1);
             };
         };
@@ -161,19 +168,27 @@ window.convertJpgToPdf = () => {
     processImage(0);
 };
 
-// --- 3. PDF TO JPG (4K RENDER CORE) ---
+// --- 3. PDF TO JPG (4K Render) ---
 window.convertPdfToJpg = async () => {
-    const input = document.getElementById('pdf-to-ex-input'); // Re-using upload for demo, ensure IDs match in HTML
-    const grid = document.getElementById('image-grid-preview'); // Using V51 Grid ID
+    // Detect Input ID dynamically (handles duplicates)
+    const input = document.getElementById('pdf-jpg-input') || document.getElementById('pdf-to-ex-input');
+    const grid = document.getElementById('image-grid-preview') || document.getElementById('jpg-preview-grid'); 
     
-    // Fallback if ID is different (user might be using pdf-jpg-input)
-    const altInput = document.getElementById('pdf-jpg-input');
-    const finalInput = input || altInput;
+    // Explicit ID check for "JPG to PDF" tool if separate
+    const targetGrid = document.querySelector('#jpg-pdf-tool .ws-body');
 
-    if (!finalInput || !finalInput.files.length) return showToast("Select a PDF file.", "error");
+    if (!input || !input.files.length) return showToast("Select a PDF file.", "error");
     
     if(typeof loader === 'function') loader(true, "STARTING RENDER ENGINE...");
-    if(grid) grid.innerHTML = ''; 
+    
+    // Create grid if missing
+    let displayGrid = grid;
+    if(!displayGrid && targetGrid) {
+        displayGrid = document.createElement('div');
+        displayGrid.className = 'image-grid-preview';
+        targetGrid.appendChild(displayGrid);
+    }
+    if(displayGrid) displayGrid.innerHTML = ''; 
 
     try {
         const fileReader = new FileReader();
@@ -186,8 +201,8 @@ window.convertPdfToJpg = async () => {
                 
                 const page = await pdf.getPage(i);
                 
-                // V51 HIGH-RES SCALE (3.0 = 4K Quality)
-                const viewport = page.getViewport({ scale: 3.0 });
+                // Scale 2.5 is balanced for 4K / Performance
+                const viewport = page.getViewport({ scale: 2.5 });
                 
                 const canvas = document.createElement('canvas');
                 canvas.width = viewport.width;
@@ -201,29 +216,28 @@ window.convertPdfToJpg = async () => {
                 canvas.toBlob((blob) => {
                     const imgUrl = URL.createObjectURL(blob);
                     
-                    if(grid) {
+                    if(displayGrid) {
                         const card = document.createElement('div');
                         card.className = 'img-card fade-in';
                         
-                        // V51 Card Structure
                         card.innerHTML = `
                             <img src="${imgUrl}" alt="Page ${i}">
-                            <a href="${imgUrl}" download="Page_${i}_4K.jpg" class="glow-btn" style="margin-top:5px; padding:8px; font-size:0.8rem; width:100%; text-align:center;">
-                                <i class="ri-download-line"></i> SAVE 4K
+                            <a href="${imgUrl}" download="Page_${i}_HD.jpg" class="glow-btn" style="margin-top:5px; padding:8px; font-size:0.8rem; width:100%; text-align:center;">
+                                <i class="ri-download-line"></i> SAVE HD
                             </a>
                         `;
-                        grid.appendChild(card);
+                        displayGrid.appendChild(card);
                     }
-                }, 'image/jpeg', 0.95);
+                }, 'image/jpeg', 0.9);
             }
             
             if(typeof loader === 'function') loader(false);
-            if(typeof showToast === 'function') showToast(`Rendered ${pdf.numPages} Pages in 4K`, "success");
+            showToast(`Rendered ${pdf.numPages} Pages`, "success");
         };
-        fileReader.readAsArrayBuffer(finalInput.files[0]);
+        fileReader.readAsArrayBuffer(input.files[0]);
     } catch(e) {
         if(typeof loader === 'function') loader(false);
-        if(typeof showToast === 'function') showToast("Render Error. File might be corrupted.", "error");
+        showToast("Render Error. File might be corrupted.", "error");
         console.error(e);
     }
 };
