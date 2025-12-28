@@ -1,5 +1,5 @@
 /* =========================================
-   UTILITIES - TITANIUM V51 QUANTUM CORE
+   UTILITIES - TITANIUM V52 QUANTUM CORE
    ========================================= */
 
 /* --- 1. DATA TABLE (EXECUTIVE GRID) --- */
@@ -7,17 +7,22 @@
     margin-top: 30px; 
     max-height: 600px; 
     overflow: auto; 
-    background: #ffffff; 
+    background: var(--card); 
     border-radius: 12px; 
     border: 1px solid var(--border);
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     position: relative;
+    
+    /* Performance Optimization for large datasets */
+    contain: content;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Scrollbar */
-.preview-box::-webkit-scrollbar { width: 8px; height: 8px; }
-.preview-box::-webkit-scrollbar-track { background: #f8fafc; }
-.preview-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+/* Slim Scrollbar */
+.preview-box::-webkit-scrollbar { width: 6px; height: 6px; }
+.preview-box::-webkit-scrollbar-track { background: transparent; }
+.preview-box::-webkit-scrollbar-thumb { background: var(--border-highlight); border-radius: 10px; }
+.preview-box::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 .preview-box table { 
     width: 100%; border-collapse: collapse; min-width: 600px; 
@@ -26,25 +31,31 @@
 
 /* Sticky Header with Blur */
 .preview-box th {
-    background: rgba(248, 250, 252, 0.95);
+    background: var(--card); /* Fallback */
+    background: rgba(24, 24, 28, 0.95); /* Dark Translucent */
     backdrop-filter: blur(8px);
-    color: #475569;
+    color: var(--text-muted);
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem; letter-spacing: 0.05em;
+    font-size: 0.75rem; letter-spacing: 0.5px;
     padding: 16px 24px;
     text-align: left;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--border);
     position: sticky; top: 0; z-index: 10;
+    white-space: nowrap;
 }
+
+/* Light Mode Override for Header */
+body.light-mode .preview-box th { background: rgba(255, 255, 255, 0.95); }
 
 .preview-box td { 
     padding: 14px 24px; 
-    border-bottom: 1px solid #f1f5f9; 
-    color: #1e293b;
+    border-bottom: 1px solid var(--border); 
+    color: var(--text);
+    transition: background 0.1s;
 }
 
-.preview-box tr:hover td { background: #f1f5f9; }
+.preview-box tr:hover td { background: var(--card-hover); }
 
 /* --- 2. OPTIONS BAR (Floating Dock) --- */
 .options-bar { 
@@ -55,45 +66,55 @@
     border: 1px solid var(--border);
     margin-bottom: 25px; 
     flex-wrap: wrap;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    /* GPU */
+    transform: translate3d(0,0,0);
 }
 
 .options-bar .glass-input { 
     background: transparent; 
     border: none; border-bottom: 2px solid var(--border);
-    border-radius: 0; padding: 8px 0;
+    border-radius: 0; padding: 8px 0; margin-bottom: 0;
     color: var(--text); min-width: 150px;
 }
 .options-bar .glass-input:focus { border-bottom-color: var(--primary); }
 
-/* --- 3. TACTICAL TOGGLES (Sharp) --- */
+/* --- 3. TACTICAL TOGGLES (Quantum Switch) --- */
 .toggle-label { 
     display: inline-flex; align-items: center; gap: 12px;
     cursor: pointer; font-size: 0.9rem; color: var(--text-muted);
-    font-weight: 500;
+    font-weight: 600; select-none: none;
 }
 .toggle-label input { display: none; }
 
 /* Switch Track */
 .toggle-label input + span {
-    position: relative; width: 44px; height: 24px;
-    background: var(--border);
-    border-radius: 4px; /* Sharper corners */
-    transition: 0.2s ease;
+    position: relative; width: 48px; height: 26px;
+    background: var(--card-hover);
+    border: 1px solid var(--border);
+    border-radius: 50px; /* Pill shape */
+    transition: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
+
 /* Switch Knob */
 .toggle-label input + span::before {
     content: ''; position: absolute;
     top: 3px; left: 3px; width: 18px; height: 18px;
-    background: #a1a1aa; border-radius: 2px;
-    transition: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--text-muted); 
+    border-radius: 50%;
+    transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 /* Active State */
-.toggle-label input:checked + span { background: var(--primary-dim); border: 1px solid var(--primary); }
+.toggle-label input:checked + span { 
+    background: var(--primary-dim); 
+    border-color: var(--primary); 
+}
 .toggle-label input:checked + span::before { 
-    transform: translateX(20px); 
+    transform: translateX(22px); 
     background: var(--primary); 
+    box-shadow: 0 0 10px var(--primary);
 }
 
 /* --- 4. TERMINAL TEXT AREA --- */
@@ -105,8 +126,15 @@
     color: #e2e8f0 !important;
     padding: 25px; border-radius: 12px !important;
     line-height: 1.6; resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
-.big-area:focus { border-color: var(--primary) !important; }
+.big-area:focus { 
+    border-color: var(--primary) !important; 
+    box-shadow: 0 0 0 4px var(--primary-dim);
+}
+
+/* Light mode adjustments */
+body.light-mode .big-area { background: #1e293b !important; color: #f8fafc !important; }
 
 /* --- 5. SLIDERS (Precision) --- */
 .controls-row { 
@@ -114,50 +142,69 @@
     background: var(--card); padding: 20px; 
     border-radius: 12px; border: 1px solid var(--border);
     margin-top: 20px;
+    /* Prevent layout shift */
+    min-height: 70px;
 }
 
 input[type=range] {
     flex: 1; -webkit-appearance: none; background: transparent; cursor: pointer;
 }
 input[type=range]::-webkit-slider-runnable-track {
-    height: 4px; background: var(--border); border-radius: 2px;
+    height: 6px; background: var(--border); border-radius: 10px;
+    transition: background 0.2s;
 }
 input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; margin-top: -6px;
-    height: 16px; width: 16px; background: var(--text);
-    border-radius: 50%; transition: 0.2s;
-    box-shadow: 0 0 0 4px var(--card);
+    -webkit-appearance: none; margin-top: -7px;
+    height: 20px; width: 20px; background: var(--text);
+    border-radius: 50%; transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid var(--card);
 }
 input[type=range]:hover::-webkit-slider-thumb {
-    background: var(--primary); transform: scale(1.2);
+    background: var(--primary); transform: scale(1.15);
+}
+input[type=range]:active::-webkit-slider-thumb {
+    transform: scale(0.95); cursor: grabbing;
 }
 
-/* --- 6. PASSWORD DISPLAY (Cyber) --- */
+/* --- 6. PASSWORD DISPLAY (Digital Vault) --- */
 .pass-display {
-    background: #0f0f12;
+    background: #0b0b0e;
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 40px; text-align: center;
     margin-bottom: 30px; cursor: pointer;
     position: relative; overflow: hidden;
+    
     font-family: 'JetBrains Mono', monospace;
     font-size: 2rem; color: var(--primary);
-    text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-    transition: 0.3s;
+    text-shadow: 0 0 15px var(--primary-dim);
+    transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    
+    /* Digital Pattern Background */
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
+
 .pass-display:hover {
     border-color: var(--primary);
-    box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 40px -10px var(--primary-dim);
     transform: translateY(-2px);
+    letter-spacing: 1px;
 }
+
+.pass-display:active { transform: scale(0.98); }
+
 .pass-display::after {
-    content: 'COPY'; position: absolute; bottom: 10px; right: 15px;
-    font-size: 0.7rem; font-weight: 700; color: var(--text-muted); opacity: 0.5;
+    content: 'CLICK TO COPY'; 
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 0.65rem; font-weight: 700; color: var(--text-muted); opacity: 0.6;
+    letter-spacing: 2px;
 }
 
 /* Mobile */
 @media (max-width: 600px) {
-    .options-bar { flex-direction: column; align-items: stretch; }
-    .controls-row { flex-direction: column; }
-    .pass-display { font-size: 1.5rem; padding: 30px 20px; }
+    .options-bar { flex-direction: column; align-items: stretch; gap: 15px; }
+    .controls-row { flex-direction: column; align-items: stretch; }
+    .pass-display { font-size: 1.4rem; padding: 30px 15px; word-break: break-all; }
 }
