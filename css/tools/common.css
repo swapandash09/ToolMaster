@@ -1,21 +1,24 @@
 /* =========================================
-   COMMON COMPONENTS - TITANIUM V50 EXECUTIVE CORE
+   COMMON COMPONENTS - TITANIUM V52 QUANTUM CORE
    ========================================= */
 
-/* --- 1. WORKSPACE TRANSITIONS (Smooth Entry) --- */
+/* --- 1. WORKSPACE TRANSITIONS (GPU ACCELERATED) --- */
 .tool-workspace { 
     width: 100%; max-width: 1200px; margin: 0 auto; 
-    animation: slideUpFade 0.4s var(--ease-exec) forwards; 
-    padding-bottom: 80px; 
-    opacity: 0; will-change: transform, opacity;
+    /* Force Hardware Acceleration for smooth entry */
+    animation: slideUpFade 0.35s var(--ease-exec) forwards; 
+    padding-bottom: 100px; 
+    opacity: 0; 
+    will-change: transform, opacity;
+    transform: translate3d(0, 20px, 0); 
+    backface-visibility: hidden;
 }
 
 @keyframes slideUpFade { 
-    from { opacity: 0; transform: translateY(20px) scale(0.98); } 
-    to { opacity: 1; transform: translateY(0) scale(1); } 
+    to { opacity: 1; transform: translate3d(0, 0, 0); } 
 }
 
-/* --- 2. HEADERS (Underlined Professional Style) --- */
+/* --- 2. HEADERS (EXECUTIVE SHARP) --- */
 .ws-head { 
     display: flex; align-items: center; gap: 20px; 
     margin-bottom: 40px; padding-bottom: 20px;
@@ -27,110 +30,127 @@
     font-size: 2rem; font-weight: 700; letter-spacing: -0.5px;
     color: var(--text);
     text-transform: uppercase;
+    /* Clean text rendering */
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Light Mode Override */
 body.light-mode .ws-head h2 { color: #1e293b; }
 
-/* --- 3. EXECUTIVE CARD BODY --- */
+/* --- 3. CONTAINER BODY --- */
 .ws-body {
-    background: transparent; /* Cleaner look, no heavy card bg */
-    padding: 0; /* Let content breathe */
+    background: transparent; 
+    padding: 0; 
     position: relative;
+    /* Optimize repaints */
+    contain: content;
 }
 
-/* --- 4. PROFESSIONAL UPLOAD ZONES --- */
+/* --- 4. UPLOAD ZONES (INTERACTIVE) --- */
 .upload-zone {
     border: 2px dashed var(--border); 
-    border-radius: 12px; padding: 60px 40px;
+    border-radius: 16px; padding: 60px 40px;
     text-align: center; cursor: pointer; 
     background: var(--card);
-    transition: 0.2s var(--ease-exec);
+    transition: transform 0.2s var(--ease-exec), border-color 0.2s, background-color 0.2s;
     position: relative; overflow: hidden;
+    /* GPU Layer */
+    transform: translate3d(0,0,0);
 }
 
 .upload-zone:hover { 
     border-color: var(--primary); 
     background: var(--primary-dim);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
 }
+.upload-zone:active { transform: scale(0.98); }
 
 .upload-zone i { 
-    font-size: 3rem; color: var(--text-muted); margin-bottom: 15px; display: block; 
-    transition: 0.2s;
+    font-size: 3.5rem; color: var(--text-muted); margin-bottom: 15px; display: block; 
+    transition: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce effect */
 }
 .upload-zone:hover i { color: var(--primary); transform: scale(1.1); }
 
 .upload-zone p {
-    font-size: 1rem; font-weight: 500; color: var(--text); margin: 0;
+    font-size: 1.1rem; font-weight: 600; color: var(--text); margin: 0;
 }
 
-/* --- 5. EXECUTIVE INPUT FIELDS (Underline) --- */
+/* --- 5. INPUT FIELDS (ZERO LAG) --- */
 .glass-input {
     width: 100%; 
     background: transparent; 
     border: none; border-bottom: 2px solid var(--border);
-    color: var(--text); padding: 12px 0; 
+    color: var(--text); padding: 14px 0; 
     border-radius: 0; outline: none;
-    transition: 0.3s; font-size: 1rem; 
-    font-family: 'Outfit', sans-serif;
-    margin-bottom: 15px;
+    transition: border-color 0.2s, padding-left 0.2s; 
+    font-size: 1rem; font-family: 'Outfit', sans-serif;
+    margin-bottom: 20px;
 }
 
 .glass-input:focus { 
     border-bottom-color: var(--primary); 
-    background: linear-gradient(to top, var(--primary-dim), transparent);
-    padding-left: 10px; /* Slight indent on focus */
+    padding-left: 10px; /* Visual cue */
 }
 
-.glass-input::placeholder { color: var(--text-muted); opacity: 0.5; font-weight: 400; }
+.glass-input::placeholder { color: var(--text-muted); opacity: 0.4; font-weight: 400; transition: opacity 0.2s; }
+.glass-input:focus::placeholder { opacity: 0.7; }
 
 /* Textarea Specifics */
 textarea.glass-input {
-    border: 1px solid var(--border); /* Full border for textareas */
-    border-radius: 8px; padding: 15px;
+    border: 1px solid var(--border); 
+    border-radius: 12px; padding: 20px;
     background: var(--card);
-    min-height: 100px; resize: vertical;
+    min-height: 120px; resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 textarea.glass-input:focus {
-    border-color: var(--primary); border-bottom: 1px solid var(--primary);
-    background: var(--card-hover); padding-left: 15px;
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 4px var(--primary-dim);
 }
 
-/* --- 6. NAVIGATION PILLS (Sharp) --- */
+/* --- 6. NAVIGATION PILLS --- */
 .back-pill {
     background: transparent; 
     border: 1px solid var(--border);
     color: var(--text-muted); 
-    padding: 8px 16px; border-radius: 50px; 
+    padding: 10px 20px; border-radius: 50px; 
     cursor: pointer; font-weight: 600; font-size: 0.85rem;
     display: flex; align-items: center; gap: 8px;
-    transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+    transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
 }
 .back-pill:hover { 
     border-color: var(--text); color: var(--text);
     background: var(--card-hover);
 }
+.back-pill:active { transform: scale(0.95); }
 
-/* --- 7. PRIMARY ACTION BUTTONS (Solid & Sharp) --- */
+/* --- 7. ACTION BUTTONS (TACTILE) --- */
 .glow-btn {
-    width: 100%; padding: 16px; 
+    width: 100%; padding: 18px; 
     background: var(--primary);
-    color: white; border: none; border-radius: 8px; 
-    font-weight: 600; font-size: 1rem; letter-spacing: 0.5px;
+    color: white; border: none; border-radius: 12px; 
+    font-weight: 700; font-size: 1rem; letter-spacing: 0.5px;
     cursor: pointer; text-transform: uppercase;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-    transition: 0.2s; position: relative; overflow: hidden;
-    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    transition: transform 0.1s, box-shadow 0.2s, background-color 0.2s;
+    position: relative; overflow: hidden;
+    margin-top: 20px;
+    /* GPU */
+    transform: translate3d(0,0,0);
 }
+
 .glow-btn:hover { 
     background: #4f46e5;
     transform: translateY(-2px); 
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3); 
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); 
 }
-.glow-btn:active { transform: translateY(0); }
+.glow-btn:active { 
+    transform: translateY(0) scale(0.98); /* Tactile click */
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+}
 
-/* --- 8. UTILS & HELPERS --- */
+/* --- 8. UTILS --- */
 .max-600 { max-width: 600px; margin: 0 auto; }
 .hidden { display: none !important; }
 
@@ -142,7 +162,8 @@ textarea.glass-input:focus {
 @media (max-width: 768px) { 
     .ws-head { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 30px; padding-bottom: 15px; }
     .ws-head h2 { font-size: 1.8rem; }
-    .upload-zone { padding: 40px 20px; } 
-    .glass-input { font-size: 1rem; }
-    .back-pill { padding: 8px 14px; font-size: 0.8rem; }
+    .upload-zone { padding: 50px 20px; } 
+    .glass-input { font-size: 1rem; padding: 12px 0; }
+    .back-pill { padding: 8px 16px; font-size: 0.8rem; }
+    .glow-btn { padding: 16px; font-size: 0.95rem; }
 }
