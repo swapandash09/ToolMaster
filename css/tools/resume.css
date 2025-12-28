@@ -1,260 +1,225 @@
 /* =========================================
-   RESUME STUDIO - TITANIUM V48 CORE
+   RESUME STUDIO - TITANIUM V51 QUANTUM CORE
    ========================================= */
 
-/* --- 1. WORKSPACE LAYOUT --- */
+/* --- 1. WORKSPACE LAYOUT (Split View) --- */
 .split-view {
     display: flex;
     gap: 30px;
-    height: calc(100vh - 180px); /* Fill screen minus header */
-    min-height: 600px;
+    height: calc(100vh - 180px); /* Full height minus headers */
+    overflow: hidden; /* Prevent body scroll */
+    position: relative;
 }
 
 /* Editor Panel (Left) */
 .editor-panel {
     flex: 1;
     overflow-y: auto;
-    padding-right: 15px; /* Space for scrollbar */
+    padding-right: 15px;
     min-width: 350px;
+    padding-bottom: 50px;
 }
 
 /* Preview Panel (Right) */
 .preview-panel {
-    flex: 1;
-    background: #525659; /* Standard PDF Viewer Gray */
+    flex: 1.2;
+    background: #2d3035; /* Dark neutral background for contrast */
     border-radius: 16px;
     border: 1px solid var(--border);
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    overflow: hidden; /* Scroll inside scale-wrapper */
+    overflow: hidden; /* Scroll handled by wrapper */
     position: relative;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
 }
 
-/* Scale Wrapper (Handles Zooming) */
+/* Scale Wrapper (The Zoom Engine) */
 #scale-wrapper {
     transform-origin: top center;
-    transform: scale(0.7); /* Default Zoom for desktop */
-    padding: 40px 0;
-    transition: transform 0.3s ease;
-    height: 100%;
-    overflow-y: auto;
+    padding: 50px 0;
     width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Scrollable paper */
     display: flex;
     justify-content: center;
 }
 
-/* --- 2. EDITOR INPUTS --- */
-.input-group {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.group-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    font-weight: 700;
-    margin-bottom: 15px;
-    letter-spacing: 1px;
-}
-
-.input-grid {
-    display: flex;
-    gap: 15px;
-}
-
-/* AI Button Position */
-.ai-box {
-    position: absolute;
-    top: 15px;
-    right: 15px;
+/* --- 2. EDITOR CONTROLS --- */
+.panel-actions {
+    display: flex; gap: 10px; margin-bottom: 20px;
 }
 
 .small-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    background: rgba(255,255,255,0.05);
+    padding: 8px 14px;
+    font-size: 0.8rem; font-weight: 600;
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    cursor: pointer;
-    transition: 0.2s;
+    border-radius: 8px; color: var(--text);
+    cursor: pointer; transition: 0.2s;
+    display: flex; align-items: center; gap: 6px;
 }
-.small-btn:hover { background: var(--primary); border-color: var(--primary); }
+.small-btn:hover { background: var(--card-hover); border-color: var(--text); }
 
-.panel-actions {
-    display: flex;
-    gap: 10px;
+/* Special Fit Button */
+.fit-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none; color: white;
+}
+.fit-btn:hover { background: #047857; transform: translateY(-1px); }
+
+/* Input Groups */
+.input-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 16px;
     margin-bottom: 20px;
 }
 
-/* Small Upload Zone for Photo */
+.group-title {
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 18px; letter-spacing: 1px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.input-grid { display: flex; gap: 15px; }
+
+/* Profile Photo Uploader */
 .small-zone {
     width: 100px;
-    padding: 15px 5px;
-    font-size: 2rem;
-    margin-bottom: 0;
-    border-radius: 12px;
+    padding: 0; border: none; background: transparent;
+    display: flex; flex-direction: column; align-items: center;
 }
+.small-zone:hover { background: transparent; border: none; }
+
 #photo-preview-box {
-    width: 60px;
-    height: 60px;
-    background: rgba(0,0,0,0.2);
+    width: 70px; height: 70px;
+    background: var(--card-hover);
+    border: 2px dashed var(--border);
     border-radius: 50%;
-    margin: 0 auto;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+    color: var(--text-muted);
+}
+.small-zone:hover #photo-preview-box { border-color: var(--primary); color: var(--primary); }
+
+/* --- 3. RESUME PAPER (A4 HD) --- */
+.resume-paper {
+    width: 794px; /* A4 width at 96 DPI */
+    min-height: 1123px; /* A4 height */
+    background: white;
+    color: #1f2937;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    font-family: 'Open Sans', sans-serif;
+    transform: translateZ(0); /* Hardware Acceleration */
     overflow: hidden;
 }
 
-/* Color Pickers */
-.color-picker-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-.c-dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.2s;
-}
-.c-dot:hover { transform: scale(1.1); }
-.c-dot.active { border-color: white; transform: scale(1.15); }
-
-
-/* --- 3. RESUME PAPER (A4 Styles) --- */
-.resume-paper {
-    width: 210mm;
-    min-height: 297mm;
-    background: white;
-    color: #333;
-    display: flex;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    font-family: 'Open Sans', sans-serif;
-    overflow: hidden; /* Prevent spill */
-}
-
-/* Sidebar (Left) */
+/* Left Sidebar (Personal Info) */
 .paper-sidebar {
     width: 32%;
-    background: #f1f5f9;
-    padding: 30px 20px;
+    background: #f8fafc;
+    padding: 40px 25px;
     border-right: 1px solid #e2e8f0;
     text-align: center;
 }
 
+/* Profile Image Cropper */
 #res-photo-container {
-    width: 120px;
-    height: 120px;
-    background: #e2e8f0;
-    border-radius: 50%;
+    width: 140px; height: 140px;
     margin: 0 auto 30px;
+    border-radius: 50%;
     overflow: hidden;
-    border: 4px solid white;
+    border: 5px solid white;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-#res-photo-container img { width: 100%; height: 100%; object-fit: cover; }
-
-.sb-section { margin-bottom: 30px; text-align: left; }
-.sb-title {
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    color: #1e293b;
-    border-bottom: 2px solid #cbd5e1;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-    letter-spacing: 1px;
-}
-
-#res-contact-box div, #res-skills div, #res-languages div {
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    word-break: break-word;
-}
-#res-skills span {
+    position: relative;
     background: #e2e8f0;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-    margin-bottom: 5px;
-    margin-right: 3px;
+}
+#res-photo-img {
+    width: 100%; height: 100%;
+    object-fit: cover; /* Ensures perfect circle crop */
+    object-position: center;
 }
 
-/* Content (Right) */
+/* Sidebar Sections */
+.sb-section { margin-bottom: 35px; text-align: left; }
+.sb-title {
+    font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
+    color: #334155; border-bottom: 2px solid #cbd5e1;
+    padding-bottom: 6px; margin-bottom: 12px; letter-spacing: 0.5px;
+}
+
+/* Contact Items */
+.sb-section div {
+    font-size: 0.85rem; margin-bottom: 10px; color: #475569;
+    display: flex; align-items: center; gap: 10px;
+    word-break: break-word; line-height: 1.4;
+}
+.sb-section i { font-size: 1.1rem; color: var(--primary-theme, #6366f1); }
+
+/* Skills Pills */
+#res-skills span {
+    display: inline-block;
+    background: #e2e8f0; color: #334155;
+    padding: 4px 8px; border-radius: 4px;
+    font-size: 0.8rem; font-weight: 700;
+    margin: 0 5px 5px 0;
+}
+
+/* Right Content (Main) */
 .paper-content {
     flex: 1;
-    padding: 40px 30px;
+    padding: 50px 40px;
 }
 
+/* Header */
 .main-header {
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 25px;
 }
 #res-name {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.1;
-    text-transform: uppercase;
+    font-size: 2.6rem; font-weight: 800; color: #0f172a;
+    line-height: 1; text-transform: uppercase; letter-spacing: -1px;
 }
 #res-title {
-    font-size: 1rem;
-    color: var(--primary-theme, #6366f1);
-    font-weight: 600;
-    margin-top: 5px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    font-size: 1.1rem; color: var(--primary-theme, #6366f1);
+    font-weight: 700; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;
 }
 
-.main-section { margin-bottom: 25px; }
+/* Sections */
+.main-section { margin-bottom: 30px; }
 .sec-head {
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #334155;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 1rem; font-weight: 800; text-transform: uppercase;
+    color: #334155; margin-bottom: 15px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;
 }
 .sec-head i { color: var(--primary-theme, #6366f1); }
 
-.item-block { margin-bottom: 15px; }
-.item-title { font-weight: 700; font-size: 1rem; color: #1e293b; }
-.item-sub { font-size: 0.9rem; font-weight: 600; color: var(--primary-theme, #6366f1); }
-.item-date { float: right; font-size: 0.8rem; color: #64748b; font-weight: 600; }
-.item-desc { font-size: 0.9rem; color: #475569; margin-top: 5px; line-height: 1.5; white-space: pre-line; }
+/* Experience Items */
+.item-block { margin-bottom: 20px; }
+.item-title { font-weight: 700; font-size: 1.1rem; color: #1e293b; }
+.item-sub { font-size: 0.95rem; color: var(--primary-theme, #6366f1); font-weight: 600; margin-bottom: 4px; }
+.item-date { float: right; font-size: 0.85rem; color: #64748b; font-weight: 600; }
+.item-desc { 
+    font-size: 0.92rem; color: #475569; margin-top: 6px; 
+    line-height: 1.6; white-space: pre-wrap;
+}
 
-/* --- 4. THEME VARIANTS --- */
-/* Colors handled via JS injecting style vars, fallback classes here */
-.theme-blue { --primary-theme: #3b82f6; }
-.theme-green { --primary-theme: #10b981; }
-.theme-purple { --primary-theme: #8b5cf6; }
-.theme-gold { --primary-theme: #eab308; }
+/* --- 4. THEME SYSTEM --- */
+.theme-blue { --primary-theme: #2563eb; }
+.theme-green { --primary-theme: #059669; }
+.theme-purple { --primary-theme: #7c3aed; }
+.theme-gold { --primary-theme: #d97706; }
 .theme-dark { --primary-theme: #1f2937; }
 
-/* Fonts */
+/* Font Families */
 .font-sans { font-family: 'Open Sans', sans-serif; }
 .font-serif { font-family: 'Merriweather', serif; }
 .font-mono { font-family: 'Roboto Mono', monospace; }
@@ -264,26 +229,29 @@
     .split-view {
         flex-direction: column;
         height: auto;
+        gap: 20px;
     }
     
     .editor-panel {
-        width: 100%;
-        padding-right: 0;
-        overflow: visible;
-        margin-bottom: 30px;
+        width: 100%; padding-right: 0; 
+        min-width: auto; overflow: visible;
+        margin-bottom: 40px;
     }
     
     .preview-panel {
         width: 100%;
-        height: 500px; /* Fixed height for scroll on mobile */
+        height: 600px; /* Fixed height for scrolling */
+        border-radius: 0;
+        border: none;
     }
     
     #scale-wrapper {
-        transform: scale(0.5); /* Smaller zoom for phone */
         transform-origin: top left;
-        width: 200%; /* Compensate for scale */
-        height: 200%;
+        transform: scale(0.45); /* Force fit on mobile width */
+        width: 220%; /* Compensate for scale */
+        height: 220%;
         padding: 20px;
+        align-items: flex-start;
     }
     
     .input-grid { flex-direction: column; gap: 10px; }
