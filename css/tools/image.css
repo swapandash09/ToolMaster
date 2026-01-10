@@ -1,181 +1,199 @@
 /* =========================================
-   IMAGE ENGINE - TITANIUM V52 STABLE CORE
+   IMAGE ENGINE - TITANIUM V82 NEURAL CORE
    ========================================= */
 
-/* --- 1. VIEWER CONTAINER (Fixed Layout) --- */
+/* --- 1. VIEWER CONTAINER (Adaptive & Glass) --- */
 .compare-viewer {
     position: relative;
     width: 100%;
-    max-width: 900px;
-    height: 500px; /* Fixed Height for stability */
+    max-width: 1000px; /* Increased max-width */
+    height: 60vh;      /* Responsive Height */
+    min-height: 400px;
+    max-height: 600px;
     margin: 30px auto;
     
-    background: #0b0b0e;
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: #0f0f11;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
     overflow: hidden;
     
-    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+    /* Neon Glow Shadow */
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), 
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+    
     user-select: none;
     -webkit-user-drag: none;
-    
-    /* Hardware Acceleration */
     transform: translate3d(0,0,0);
     will-change: transform;
-    
-    /* Checkerboard Pattern for Transparency */
+
+    /* Professional Checkerboard (Subtle) */
     background-image: 
-        linear-gradient(45deg, #18181c 25%, transparent 25%), 
-        linear-gradient(-45deg, #18181c 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #18181c 75%), 
-        linear-gradient(-45deg, transparent 75%, #18181c 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        linear-gradient(45deg, #161618 25%, transparent 25%), 
+        linear-gradient(-45deg, #161618 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #161618 75%), 
+        linear-gradient(-45deg, transparent 75%, #161618 75%);
+    background-size: 24px 24px;
+    background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
 }
 
-/* --- 2. IMAGE LAYERS (Fixed Z-Index) --- */
+/* --- 2. IMAGE LAYERS --- */
 .img-back, .img-front {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    object-fit: contain; /* Ensures full image is seen */
+    object-fit: contain; 
+    padding: 20px; /* Inner padding so image doesn't touch edges */
     pointer-events: none;
     display: block;
 }
 
-/* Result Layer (Bottom) */
-.img-back {
-    z-index: 1;
-}
+.img-back { z-index: 1; }
 
-/* Original Layer (Top - Clipped) */
 .img-front {
     z-index: 2;
-    background: rgba(0,0,0,0.02); /* Slight tint to differentiate */
-    will-change: clip-path; /* Optimization */
-    /* Smooth clip transition */
+    background: rgba(11, 11, 14, 0.5); /* Dim the background of cut area */
+    backdrop-filter: grayscale(100%);   /* Cool effect for unrevealed area */
+    will-change: clip-path;
     transition: clip-path 0.05s linear;
 }
 
-/* --- 3. SLIDER CONTROLS (Center Fix) --- */
+/* --- 3. SLIDER CONTROLS (Neon & Glass) --- */
 .slider {
-    position: absolute;
-    top: 0; left: 0;
+    position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: 20;
-    opacity: 0;
-    cursor: col-resize;
-    margin: 0;
+    z-index: 20; opacity: 0;
+    cursor: col-resize; margin: 0;
+    touch-action: none;
 }
 
-/* The Vertical Line */
+/* The Vertical Glow Line */
 .slider-line-deco {
     position: absolute;
-    top: 0; bottom: 0; left: 50%; /* Default Center */
+    top: 0; bottom: 0; left: 50%;
     width: 2px;
-    background: #ffffff;
+    background: var(--primary);
     z-index: 10;
     pointer-events: none;
-    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    box-shadow: 0 0 15px var(--primary); /* Neon Glow */
 }
 
-/* The Handle */
+/* The Glass Handle */
 .slider-handle-deco {
     position: absolute;
-    top: 50%; left: 50%; /* Default Center */
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 44px; height: 44px;
+    width: 48px; height: 48px;
     
-    background: var(--primary);
-    border: 3px solid #ffffff;
+    /* Glassmorphism */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     
-    z-index: 12;
-    pointer-events: none;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    z-index: 12; pointer-events: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     display: grid; place-items: center;
+    transition: transform 0.2s ease;
 }
 
-/* Handle Icon */
+.compare-viewer:hover .slider-handle-deco {
+    transform: translate(-50%, -50%) scale(1.1);
+    border-color: var(--primary);
+    background: var(--primary);
+}
+
 .slider-handle-deco::after {
-    content: '↔';
-    color: white; font-weight: bold; font-size: 1.2rem;
-    padding-bottom: 2px;
+    content: '↔'; color: white;
+    font-size: 1.4rem; font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* --- 4. DOWNLOAD BUTTON CONTAINER (New) --- */
+/* --- 4. ACTION BOX --- */
 .dl-action-box {
-    text-align: center;
-    margin-top: 25px;
-    padding-bottom: 20px;
-    min-height: 60px; /* Reserve layout space */
+    text-align: center; margin-top: 25px;
+    padding-bottom: 20px; min-height: 60px;
+    display: flex; justify-content: center; gap: 15px;
 }
 
 /* --- 5. AI ART STYLES --- */
 #ai-generated-img {
-    max-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    max-width: 100%; width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     margin-top: 20px;
-    min-height: 200px;
-    background: #121212;
-    display: none; /* Hidden until loaded */
-    transition: opacity 0.5s ease;
+    min-height: 300px;
+    background: #18181c;
+    object-fit: contain;
+    display: none;
 }
 
-/* --- 6. LABELS --- */
+/* --- 6. LABELS (Tech Badges) --- */
 .comp-label {
-    position: absolute; top: 20px; 
-    padding: 6px 12px;
-    background: rgba(0,0,0,0.85);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    color: #ffffff;
-    font-size: 0.7rem; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
+    position: absolute; top: 20px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
     z-index: 15; pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
-.lbl-orig { left: 20px; border-left: 3px solid #ef4444; }
-.lbl-res { right: 20px; border-right: 3px solid var(--primary); text-align: right; }
 
-.compare-viewer:active .comp-label { opacity: 0; }
+.lbl-orig { left: 20px; border-left: 4px solid #ef4444; }
+.lbl-res { right: 20px; border-right: 4px solid var(--primary); text-align: right; }
+
+.compare-viewer:active .comp-label { opacity: 0; transform: scale(0.9); }
 
 /* --- 7. PALETTE --- */
 .bg-palette {
-    display: flex; gap: 10px; margin: 20px 0; 
-    justify-content: center;
-    background: var(--card);
-    padding: 10px 20px; border-radius: 50px;
+    display: flex; gap: 12px; margin: 25px auto;
+    justify-content: center; width: fit-content;
+    background: rgba(255,255,255,0.03);
+    padding: 8px 16px; border-radius: 50px;
     border: 1px solid var(--border);
-    width: fit-content; margin-left: auto; margin-right: auto;
 }
 .bg-dot {
-    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-    border: 2px solid transparent; transition: 0.2s;
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.1); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
 }
-.bg-dot:hover { transform: scale(1.2); }
-.bg-dot.active { border-color: #ffffff; box-shadow: 0 0 0 2px var(--primary); }
+.bg-dot:hover { transform: translateY(-3px); }
+.bg-dot.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 15px var(--primary); }
 
-/* --- 8. LOADING SCANNER --- */
+/* --- 8. LASER SCANNER ANIMATION --- */
 .compare-viewer.scanning::after {
     content: ''; position: absolute;
-    top: 0; left: 0; width: 4px; height: 100%;
-    background: #10b981; /* Green Scanner */
-    box-shadow: 0 0 20px #10b981;
-    animation: scan 1.5s infinite linear;
+    top: 0; left: 0; width: 3px; height: 100%;
+    background: #10b981;
+    box-shadow: 0 0 30px 5px #10b981, 0 0 10px #ffffff; /* Bright Laser Core */
+    animation: scan 1.2s infinite ease-in-out;
     z-index: 30; pointer-events: none;
 }
 
 @keyframes scan {
     0% { left: 0; opacity: 0; }
-    15% { opacity: 1; }
-    85% { opacity: 1; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
     100% { left: 100%; opacity: 0; }
 }
 
-/* Mobile */
+/* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
-    .compare-viewer { height: 350px; border-radius: 8px; }
-    .slider-handle-deco { width: 36px; height: 36px; }
+    .compare-viewer { 
+        height: 50vh; /* Use Viewport Height */
+        min-height: 350px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    .img-back, .img-front { padding: 10px; } /* Less padding on mobile */
+    .slider-handle-deco { width: 40px; height: 40px; }
+    .slider-handle-deco::after { font-size: 1.1rem; }
+    .comp-label { font-size: 0.6rem; padding: 5px 10px; top: 15px; }
+    .lbl-orig { left: 15px; }
+    .lbl-res { right: 15px; }
 }
