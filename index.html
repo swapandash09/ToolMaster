@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b0b0e">
+    <title>ToolMaster Titanium - V84 Stable</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tools/common.css">
+    <link rel="stylesheet" href="css/tools/resume.css">
+    
+    <style>
+        /* CORE SYSTEM STYLES (If external CSS fails) */
+        :root { --primary: #6366f1; --bg: #0b0b0e; --text: #fff; --card: #18181b; }
+        body.light { --bg: #f8fafc; --text: #1e293b; --card: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; transition: background 0.3s; }
+        
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .loader-bar { width: 120px; height: 3px; background: rgba(128,128,128,0.2); border-radius: 4px; overflow: hidden; margin-top: 15px; }
+        .loader-fill { width: 0%; height: 100%; background: var(--primary); animation: load 1.2s ease-out forwards; }
+        @keyframes load { to { width: 100%; } }
+
+        /* TOAST NOTIFICATIONS */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--card); color: var(--text); padding: 12px 20px; border-radius: 8px;
+            border-left: 4px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 0.9rem; animation: slideUp 0.3s ease forwards; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.error { border-color: #ef4444; }
+        .toast.success { border-color: #10b981; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* IMAGE SLIDER FIXES */
+        .compare-viewer { position: relative; width: 100%; height: 400px; overflow: hidden; border-radius: 12px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .img-back, .img-front { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+        .img-back { z-index: 1; }
+        .img-front { z-index: 2; width: 100%; object-fit: contain; clip-path: inset(0 50% 0 0); transition: clip-path 0.1s; }
+        .slider { position: absolute; top: 50%; left: 0; width: 100%; z-index: 10; cursor: ew-resize; opacity: 0; }
+        
+        /* SEARCH HIGHLIGHT */
+        .t-card { transition: transform 0.2s, opacity 0.2s; }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+    <div id="loading-overlay">
+        <i class="ri-flashlight-fill" style="font-size:3rem; color:var(--primary);"></i>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <p style="margin-top:15px; font-family:'JetBrains Mono'; font-size:0.7rem; opacity:0.6; letter-spacing:2px;">TITANIUM V84</p>
+    </div>
+
+    <div class="app-container">
+        
+        <aside class="desktop-sidebar">
+            <div class="brand-area">
+                <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
+                <div><span class="brand-text">Titanium</span><div style="font-size:0.6rem; color:#ec4899; font-weight:700;">V84 STABLE</div></div>
+            </div>
+            <nav class="side-nav">
+                <p class="menu-label">Main</p>
+                <ul>
+                    <li class="active" onclick="App.nav('home')"><i class="ri-home-5-line"></i> Dashboard</li>
+                    <li onclick="App.theme()"><i class="ri-contrast-drop-2-line"></i> Theme</li>
+                </ul>
+                <p class="menu-label">Creative Tools</p>
+                <ul>
+                    <li onclick="App.nav('resume')"><i class="ri-file-user-line"></i> Resume Studio</li>
+                    <li onclick="App.nav('bg-remover')"><i class="ri-magic-line"></i> Magic Eraser</li>
+                    <li onclick="App.nav('enhancer')"><i class="ri-hd-line"></i> AI Enhancer</li>
+                </ul>
+                <p class="menu-label">Utilities</p>
+                <ul>
+                    <li onclick="App.nav('excel')"><i class="ri-file-excel-2-line"></i> Excel AI</li>
+                    <li onclick="App.nav('pdf-excel')"><i class="ri-file-text-line"></i> PDF Scanner</li>
+                    <li onclick="App.nav('password')"><i class="ri-shield-keyhole-line"></i> Security</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <div class="mobile-header">
+                <div class="mh-left" style="display:flex; align-items:center; gap:10px;">
+                    <i class="ri-flashlight-fill" style="color:var(--primary);"></i>
+                    <span class="brand-text">Titanium</span>
+                </div>
+                <button onclick="App.theme()" style="background:none; border:none; color:var(--text); font-size:1.4rem;"><i class="ri-contrast-drop-2-line"></i></button>
+            </div>
+
+            <div id="home-page" class="view-section fade-in">
+                <header class="dash-hero">
+                    <div class="hero-content">
+                        <h1>Welcome Back 👋</h1>
+                        <p>Select a tool to start creating.</p>
+                    </div>
+                    <div class="search-wrapper">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="search-bar" placeholder="Find tools (e.g., PDF, Resume)..." autocomplete="off">
+                    </div>
+                </header>
+
+                <div class="tools-wrapper">
+                    <div class="category-block">
+                        <h3 class="cat-title"><i class="ri-file-text-line"></i> Documents</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="App.nav('resume')"><div class="tc-icon c-blue"><i class="ri-article-line"></i></div><div class="tc-info"><h4>Resume</h4><p>Border Edition</p></div></div>
+                            <div class="t-card" onclick="App.nav('excel')"><div class="tc-icon c-green"><i class="ri-file-excel-2-line"></i></div><div class="tc-info"><h4>Excel AI</h4><p>Data Analysis</p></div></div>
+                            <div class="t-card" onclick="App.nav('pdf-excel')"><div class="tc-icon c-orange"><i class="ri-file-text-line"></i></div><div class="tc-info"><h4>PDF Scanner</h4><p>Extract Text</p></div></div>
+                            <div class="t-card" onclick="App.nav('binary')"><div class="tc-icon c-cyan"><i class="ri-code-s-slash-line"></i></div><div class="tc-info"><h4>Binary Lab</h4><p>Text to Bin</p></div></div>
+                        </div>
+                    </div>
+                    <div class="category-block">
+                        <h3 class="cat-title"><i class="ri-palette-line"></i> Creative</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="App.nav('bg-remover')"><div class="tc-icon c-purple"><i class="ri-magic-line"></i></div><div class="tc-info"><h4>Magic Eraser</h4><p>Remove BG</p></div></div>
+                            <div class="t-card" onclick="App.nav('enhancer')"><div class="tc-icon c-gold"><i class="ri-hd-line"></i></div><div class="tc-info"><h4>Enhancer</h4><p>Upscale Img</p></div></div>
+                            <div class="t-card" onclick="App.nav('img')"><div class="tc-icon c-red"><i class="ri-file-zip-line"></i></div><div class="tc-info"><h4>Compressor</h4><p>Reduce Size</p></div></div>
+                            <div class="t-card" onclick="App.nav('ai-image')"><div class="tc-icon c-pink"><i class="ri-openai-fill"></i></div><div class="tc-info"><h4>AI Art</h4><p>Generator</p></div></div>
+                        </div>
+                    </div>
+                    <div class="category-block">
+                        <h3 class="cat-title"><i class="ri-robot-line"></i> Utilities</h3>
+                        <div class="tool-grid">
+                            <div class="t-card" onclick="App.nav('text-speech')"><div class="tc-icon c-blue"><i class="ri-volume-up-line"></i></div><div class="tc-info"><h4>Reader</h4><p>Text to Speech</p></div></div>
+                            <div class="t-card" onclick="App.nav('password')"><div class="tc-icon c-cyan"><i class="ri-shield-keyhole-line"></i></div><div class="tc-info"><h4>Security</h4><p>Pass Generator</p></div></div>
+                            <div class="t-card" onclick="App.nav('subtitle')"><div class="tc-icon c-red"><i class="ri-closed-captioning-line"></i></div><div class="tc-info"><h4>SubMaster</h4><p>Captions</p></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 100px;"></div> </div>
+
+            <div id="tool-container" class="hidden">
+                
+                <div id="resume-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Resume Studio</h2></div>
+                    <div class="resume-workspace">
+                        <div class="editor-panel">
+                             <div class="input-group">
+                                <label>THEME</label>
+                                <div class="theme-picker">
+                                    <div class="dot active" style="background:#2563eb; width:25px; height:25px; border-radius:50%; display:inline-block; margin:2px;" onclick="Resume.theme('blue')"></div>
+                                    <div class="dot" style="background:#059669; width:25px; height:25px; border-radius:50%; display:inline-block; margin:2px;" onclick="Resume.theme('green')"></div>
+                                    <div class="dot" style="background:#dc2626; width:25px; height:25px; border-radius:50%; display:inline-block; margin:2px;" onclick="Resume.theme('red')"></div>
+                                </div>
+                            </div>
+                            <input type="text" class="glass-input" id="res-in-name" placeholder="Full Name" oninput="Resume.update()">
+                            <input type="text" class="glass-input" id="res-in-title" placeholder="Job Title" oninput="Resume.update()">
+                            <textarea class="glass-input" id="res-in-summary" placeholder="Summary..." oninput="Resume.update()"></textarea>
+                            <button class="glow-btn" onclick="Resume.download()">Download PDF</button>
+                        </div>
+                        <div class="preview-panel">
+                            <div id="resume-paper" class="resume-paper" style="background:white; color:black; padding:40px; min-height:600px; width:100%; max-width:600px; margin:auto;">
+                                <h1 id="res-out-name" style="color:#2563eb; margin:0;">YOUR NAME</h1>
+                                <p id="res-out-title" style="color:#555; font-weight:bold;">JOB TITLE</p>
+                                <hr>
+                                <p id="res-out-summary">Your summary will appear here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bg-remover-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Magic Eraser</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('bg-in').click()">
+                            <i class="ri-upload-cloud-line"></i><p>Upload Image</p>
+                            <input type="file" id="bg-in" hidden>
+                        </div>
+                        <div id="bg-editor" class="hidden fade-in">
+                            <div class="bg-palette" style="display:flex; gap:10px; margin:15px 0;">
+                                <div class="bg-dot" style="width:30px; height:30px; border:1px solid #555; background:transparent;" onclick="ToolLogic.changeBg(this, 'transparent')"></div>
+                                <div class="bg-dot" style="width:30px; height:30px; border:1px solid #555; background:white;" onclick="ToolLogic.changeBg(this, '#ffffff')"></div>
+                                <div class="bg-dot" style="width:30px; height:30px; border:1px solid #555; background:black;" onclick="ToolLogic.changeBg(this, '#000000')"></div>
+                            </div>
+                            <div class="compare-viewer">
+                                <img id="bg-removed" class="img-back"> <img id="bg-original" class="img-front"> <input type="range" class="slider" min="0" max="100" value="50" oninput="ToolLogic.handleSlider(this.value, 'bg')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="excel-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Excel AI</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('excel-input').click()"><p>Upload .xlsx</p><input type="file" id="excel-input" hidden onchange="ToolLogic.analyzeExcel(this)"></div>
+                        <div id="excel-stats" style="margin-top:20px; color:#aaa;"></div>
+                        <div id="excel-preview-box" style="overflow-x:auto; margin-top:15px;"></div>
+                    </div>
+                </div>
+
+                <div id="enhancer-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>AI Enhancer</h2></div>
+                    <div class="ws-body">
+                        <div class="upload-zone" onclick="document.getElementById('enh-in').click()"><p>Upload Image</p><input type="file" id="enh-in" hidden></div>
+                        <div id="enh-editor" class="hidden fade-in">
+                            <div class="compare-viewer">
+                                <img id="enh-processed" class="img-back">
+                                <img id="enh-original" class="img-front">
+                                <input type="range" class="slider" min="0" max="100" value="50" oninput="ToolLogic.handleSlider(this.value, 'enh')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="password-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Security</h2></div>
+                    <div class="ws-body">
+                        <div id="generated-pass" style="font-family:'JetBrains Mono'; font-size:1.5rem; text-align:center; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; word-break:break-all;"></div>
+                        <div class="strength-meter" style="height:5px; background:#333; margin-top:10px; width:100%;"><div id="pass-strength" style="height:100%; width:0%; transition:0.3s;"></div></div>
+                        <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button class="glow-btn" onclick="ToolLogic.genPass()">Regenerate</button>
+                            <button class="small-btn" onclick="ToolLogic.copyPass()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="text-speech-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>AI Reader</h2></div>
+                    <div class="ws-body">
+                        <textarea id="tts-input" class="glass-input big" style="width:100%; height:150px; background:transparent; color:var(--text); border:1px solid #333; padding:10px;" placeholder="Type text..."></textarea>
+                        <button class="glow-btn" onclick="ToolLogic.speakText()" style="margin-top:15px;">Speak</button>
+                    </div>
+                </div>
+                
+                <div id="binary-tool" class="tool-workspace hidden">
+                    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Binary Lab</h2></div>
+                    <div class="ws-body">
+                        <textarea id="bin-input" class="glass-input" style="width:100%; height:100px; background:rgba(0,0,0,0.2); color:var(--text); padding:10px;" placeholder="Type text or binary..." oninput="ToolLogic.analyzeBinary()"></textarea>
+                        <div id="bin-preview" style="font-family:'JetBrains Mono'; margin-top:20px; color:#10b981; word-break:break-all;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        /* ==========================================
+           TITANIUM V84 CORE (Unified Logic)
+           ========================================== */
+        
+        const App = {
+            init: () => {
+                // Loader
+                setTimeout(() => {
+                    document.getElementById('loading-overlay').style.opacity = '0';
+                    setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+                }, 800);
+
+                // Initialize Search
+                const searchBar = document.getElementById('search-bar');
+                if(searchBar) {
+                    searchBar.addEventListener('input', (e) => App.search(e.target.value));
+                }
+                
+                // Initialize Back Button support
+                window.onpopstate = (e) => {
+                    if(e.state && e.state.tool) App.nav(e.state.tool, false);
+                    else App.nav('home', false);
+                };
+            },
+
+            // Navigation System
+            nav: (toolId, pushHistory = true) => {
+                const home = document.getElementById('home-page');
+                const container = document.getElementById('tool-container');
+                
+                if(toolId === 'home') {
+                    home.classList.remove('hidden');
+                    home.classList.add('fade-in');
+                    container.classList.add('hidden');
+                    if(pushHistory) history.pushState({tool:'home'}, '', window.location.pathname);
+                } else {
+                    const target = document.getElementById(toolId + '-tool');
+                    if(target) {
+                        home.classList.add('hidden');
+                        container.classList.remove('hidden');
+                        target.classList.remove('hidden');
+                        target.classList.add('fade-in');
+                        if(pushHistory) history.pushState({tool:toolId}, '', `#${toolId}`);
+                    }
+                }
+                window.scrollTo(0,0);
+            },
+
+            theme: () => {
+                document.body.classList.toggle('light');
+                const mode = document.body.classList.contains('light') ? "Light" : "Dark";
+                App.showToast(`${mode} Mode Active`);
+            },
+
+            search: (term) => {
+                const cards = document.querySelectorAll('.t-card');
+                term = term.toLowerCase();
+                cards.forEach(card => {
+                    const txt = card.innerText.toLowerCase();
+                    card.style.display = txt.includes(term) ? 'flex' : 'none';
+                });
+                // Hide empty categories
+                document.querySelectorAll('.category-block').forEach(block => {
+                    const visible = block.querySelectorAll('.t-card[style="display: flex;"]');
+                    block.style.display = visible.length > 0 ? 'block' : 'none';
+                });
+            },
+
+            showToast: (msg, type='success') => {
+                const box = document.getElementById('toast-container');
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                el.innerHTML = type === 'success' ? `<i class="ri-check-line"></i> ${msg}` : `<i class="ri-error-warning-line"></i> ${msg}`;
+                box.appendChild(el);
+                setTimeout(() => el.remove(), 3000);
+            }
+        };
+
+        // SPECIFIC TOOL LOGIC
+        const ToolLogic = {
+            
+            // 1. Image Slider (Generic for BG & Enhancer)
+            handleSlider: (val, type) => {
+                const id = type === 'bg' ? 'bg-original' : 'enh-original'; // The TOP image (Original) to clip
+                const img = document.getElementById(id);
+                if(img) img.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
+            },
+
+            // 2. Magic Eraser Background Change
+            changeBg: (el, color) => {
+                document.querySelectorAll('.bg-dot').forEach(d => d.style.border = '1px solid #555');
+                el.style.border = '2px solid var(--primary)';
+                const resImg = document.getElementById('bg-removed');
+                if(resImg) resImg.style.background = color;
+            },
+
+            // 3. Password Generator (Secure)
+            genPass: () => {
+                const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+                let pass = "";
+                const array = new Uint32Array(16);
+                window.crypto.getRandomValues(array);
+                for (let i = 0; i < 16; i++) pass += chars[array[i] % chars.length];
+                
+                document.getElementById('generated-pass').innerText = pass;
+                document.getElementById('pass-strength').style.width = '100%';
+                document.getElementById('pass-strength').style.background = '#10b981';
+            },
+
+            copyPass: () => {
+                const txt = document.getElementById('generated-pass').innerText;
+                if(txt) {
+                    navigator.clipboard.writeText(txt);
+                    App.showToast("Copied to clipboard");
+                }
+            },
+
+            // 4. Excel Logic
+            analyzeExcel: (input) => {
+                if(!input.files[0]) return;
+                const reader = new FileReader();
+                document.getElementById('excel-stats').innerText = "Reading file...";
+                
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(sheet, {header:1});
+                        
+                        document.getElementById('excel-stats').innerHTML = `
+                            <strong>Success!</strong><br>
+                            Rows: ${json.length} | Cols: ${json[0].length}
+                        `;
+                        
+                        // Simple Table Preview
+                        let html = "<table style='width:100%; border-collapse:collapse; font-size:0.8rem;'>";
+                        json.slice(0,5).forEach(row => {
+                            html += "<tr>";
+                            row.forEach(cell => html += `<td style='border:1px solid #333; padding:5px;'>${cell}</td>`);
+                            html += "</tr>";
+                        });
+                        html += "</table>";
+                        document.getElementById('excel-preview-box').innerHTML = html;
+                        App.showToast("Excel Analyzed Successfully");
+                    } catch(err) {
+                        App.showToast("Error reading Excel", "error");
+                        console.error(err);
+                    }
+                };
+                reader.readAsArrayBuffer(input.files[0]);
+            },
+
+            // 5. Binary Lab
+            analyzeBinary: () => {
+                const val = document.getElementById('bin-input').value;
+                const out = document.getElementById('bin-preview');
+                if(/^[01\s]+$/.test(val)) {
+                    // Bin to Text
+                    try {
+                        out.innerText = val.split(' ').map(b => String.fromCharCode(parseInt(b,2))).join('');
+                    } catch(e) { out.innerText = "Invalid Binary"; }
+                } else {
+                    // Text to Bin
+                    out.innerText = val.split('').map(c => c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ');
+                }
+            },
+
+            // 6. Speech
+            speakText: () => {
+                const txt = document.getElementById('tts-input').value;
+                if(!txt) return App.showToast("Enter text first", "error");
+                const u = new SpeechSynthesisUtterance(txt);
+                window.speechSynthesis.speak(u);
+            }
+        };
+
+        // RESUME LOGIC (Simplified)
+        const Resume = {
+            update: () => {
+                document.getElementById('res-out-name').innerText = document.getElementById('res-in-name').value || "YOUR NAME";
+                document.getElementById('res-out-title').innerText = document.getElementById('res-in-title').value || "JOB TITLE";
+                document.getElementById('res-out-summary').innerText = document.getElementById('res-in-summary').value || "Summary...";
+            },
+            theme: (color) => {
+                const paper = document.getElementById('resume-paper');
+                if(color === 'blue') paper.querySelector('h1').style.color = '#2563eb';
+                if(color === 'green') paper.querySelector('h1').style.color = '#059669';
+                if(color === 'red') paper.querySelector('h1').style.color = '#dc2626';
+            },
+            download: () => {
+                const el = document.getElementById('resume-paper');
+                html2pdf(el, { filename: 'My_Resume.pdf' });
+            }
+        };
+
+        // Event Listeners for Images
+        document.getElementById('bg-in')?.addEventListener('change', (e) => {
+            if(e.target.files[0]) {
+                const url = URL.createObjectURL(e.target.files[0]);
+                document.getElementById('bg-original').src = url;
+                // Simulating removal for demo (In real app, API call goes here)
+                document.getElementById('bg-removed').src = url; 
+                document.getElementById('bg-removed').style.filter = "grayscale(100%)";
+                document.getElementById('bg-editor').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('enh-in')?.addEventListener('change', (e) => {
+            if(e.target.files[0]) {
+                const url = URL.createObjectURL(e.target.files[0]);
+                document.getElementById('enh-original').src = url;
+                document.getElementById('enh-processed').src = url; 
+                document.getElementById('enh-processed').style.filter = "contrast(1.2) saturate(1.2)";
+                document.getElementById('enh-editor').classList.remove('hidden');
+            }
+        });
+
+        // Initialize App
+        window.onload = App.init;
+
+    </script>
+</body>
+</html>
