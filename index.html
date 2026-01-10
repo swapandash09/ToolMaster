@@ -228,72 +228,131 @@
                         <span id="res-title">TITLE</span>
                         <div class="sec-head">PROFILE</div>
                         <div id="res-summary">...</div>
-                        <div class="sec-head">EXPERIENCE</div>
-                        <div id="res-experience-list"></div>
-                    </div>
-                </div>
+                        <div class="sec-head">EXPERIENCE</div><div id="bg-remover-tool" class="tool-workspace hidden">
+    <div class="ws-head">
+        <button class="back-pill" onclick="App.nav('home')">← Back</button>
+        <h2>Magic Eraser</h2>
+    </div>
+    <div class="ws-body">
+        <div class="upload-zone" onclick="document.getElementById('bg-in').click()">
+            <p>Upload Image</p>
+            <input type="file" id="bg-in" hidden>
+        </div>
 
+        <div id="bg-editor" class="hidden fade-in">
+            <div class="bg-palette">
+                <div class="bg-dot active" style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 10px 10px;"></div>
+                <div class="bg-dot" style="background:#fff"></div>
+                <div class="bg-dot" style="background:#000"></div>
+                <div class="bg-dot" style="background:#ff0055"></div>
             </div>
 
-            <div style="position:absolute; bottom:30px; left:0; width:100%; display:flex; justify-content:center; pointer-events:none; z-index:50;">
-                <button class="glow-btn" onclick="downloadResumePDF()" style="pointer-events:auto; width:auto; padding:14px 60px; box-shadow:0 10px 40px rgba(0,0,0,0.6); background:var(--primary); color:white; border-radius:50px; font-weight:700; letter-spacing:1px; display:flex; align-items:center; gap:10px;">
-                    <i class="ri-download-cloud-2-line" style="font-size:1.2rem;"></i> DOWNLOAD PDF
-                </button>
+            <div class="compare-viewer">
+                <div class="comp-label lbl-orig">ORIGINAL</div>
+                <div class="comp-label lbl-res">NO BG</div>
+
+                <img id="bg-removed" class="img-back">
+                <img id="bg-original" class="img-front">
+
+                <div class="slider-line-deco" id="bg-line-deco"></div>
+                <div class="slider-handle-deco" id="bg-handle-deco"></div>
+
+                <input type="range" class="slider" min="0" max="100" value="50" oninput="ImageEngine.handleSlider(this.value, 'bg')">
             </div>
 
+            <div class="dl-action-box">
+                <button class="glow-btn">Download PNG</button>
+            </div>
         </div>
     </div>
 </div>
 
-                <div id="excel-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Excel AI Engine</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('excel-input').click()"><i class="ri-file-excel-2-line"></i><p>Upload Excel</p><input type="file" id="excel-input" accept=".xlsx" hidden onchange="analyzeExcelAI(this)"></div>
-                        <div id="excel-ai-result" class="ai-result-box">
-                            <div class="ai-badge">AI INSIGHTS</div><div id="excel-stats" style="line-height:1.6;">Waiting for data...</div>
-                        </div>
-                        <button class="glow-btn" style="margin-top:20px;" onclick="generateUltraHDPDF()">Convert to PDF</button>
-                    </div>
+<div id="enhancer-tool" class="tool-workspace hidden">
+    <div class="ws-head">
+        <button class="back-pill" onclick="App.nav('home')">← Back</button>
+        <h2>AI Enhancer</h2>
+    </div>
+    <div class="ws-body">
+        <div class="upload-zone" onclick="document.getElementById('enh-in').click()">
+            <p>Upload Image (2K/4K)</p>
+            <input type="file" id="enh-in" hidden>
+        </div>
+
+        <div id="enh-editor" class="hidden fade-in">
+            <div class="compare-viewer">
+                <div class="comp-label lbl-orig">SD SOURCE</div>
+                <div class="comp-label lbl-res">HD RESULT</div>
+
+                <img id="enh-processed" class="img-back">
+                <img id="enh-original" class="img-front">
+
+                <div class="slider-line-deco" id="enh-line-deco"></div>
+                <div class="slider-handle-deco" id="enh-handle-deco"></div>
+
+                <input type="range" class="slider" min="0" max="100" value="50" oninput="ImageEngine.handleSlider(this.value, 'enh')">
+            </div>
+
+            <div class="dl-action-box">
+                <button class="glow-btn">Download HD</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="img-tool" class="tool-workspace hidden">
+    <div class="ws-head">
+        <button class="back-pill" onclick="App.nav('home')">← Back</button>
+        <h2>Compressor</h2>
+    </div>
+    <div class="ws-body">
+        <div class="upload-zone" onclick="document.getElementById('comp-input').click()">
+            <p>Upload Image</p>
+            <input type="file" id="comp-input" hidden>
+        </div>
+        
+        <div id="comp-controls" class="hidden fade-in" style="margin-top:20px;">
+            <div class="input-group">
+                <div class="group-title" style="display:flex; justify-content:space-between;">
+                    <span>QUALITY</span>
+                    <span id="comp-val-display" style="color:var(--primary)">60%</span>
                 </div>
+                <input type="range" id="comp-quality" min="0.1" max="1.0" step="0.1" value="0.6" style="width:100%; accent-color:var(--primary);">
+            </div>
+            
+            <div style="text-align:center; background:#000; padding:10px; border-radius:10px; margin:20px 0;">
+                <img id="comp-preview-img" style="max-width:100%; max-height:300px; object-fit:contain;">
+            </div>
+            
+            <button class="glow-btn" id="dl-comp-btn">Download Compressed</button>
+        </div>
+    </div>
+</div>
 
-                <div id="pdf-excel-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>PDF AI Scanner</h2></div>
-                    <div class="ws-body">
-                        <div class="upload-zone" onclick="document.getElementById('pdf-ai-input').click()"><i class="ri-file-text-line"></i><p>Upload PDF</p><input type="file" id="pdf-ai-input" accept=".pdf" hidden onchange="summarizePDFAI(this)"></div>
-                        <div id="pdf-ai-result" class="ai-result-box">
-                            <div class="ai-badge">AI SUMMARY</div><div id="pdf-summary-text" style="font-family:'Outfit'; max-height:200px; overflow-y:auto;">Extracting insights...</div>
-                        </div>
-                    </div>
-                </div>
+<div id="binary-tool" class="tool-workspace hidden">
+    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>Binary Lab</h2></div>
+    <div class="ws-body">
+        <div style="margin-bottom:15px; display:flex; gap:10px;">
+            <button class="small-btn active">Text Mode</button>
+            <button class="small-btn">File Mode</button>
+        </div>
+        <textarea id="bin-input" class="glass-input big" placeholder="Type text to convert..."></textarea>
+        <div id="bin-preview" class="live-box" style="margin-top:10px; min-height:100px;"></div>
+    </div>
+</div>
 
-                <div id="speech-tool" class="tool-workspace hidden">
-                    <div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Speech AI Pro</h2></div>
-                    <div class="ws-body">
-                        <div style="display:flex; gap:10px; margin-bottom:15px;"><button class="glow-btn" onclick="toggleSpeech()">Start Listening</button><button class="small-btn" onclick="smartFormatSpeech()">AI Format</button></div>
-                        <textarea id="speech-output" class="big-area" placeholder="Speak now..."></textarea>
-                        <div id="speech-ai-result" class="ai-result-box" style="display:block; margin-top:10px;"><span style="font-size:0.8rem; color:var(--text-muted);">AI Mood: </span><span id="speech-mood">Neutral 😐</span></div>
-                    </div>
-                </div>
-
-                <div id="ai-image-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Art Gen</h2></div><div class="ws-body"><div class="input-group"><div class="group-title">CONFIG</div><div style="display:flex; gap:10px; margin-bottom:10px;"><select id="ai-style" class="glass-input"><option value="realistic">Realistic</option><option value="anime">Anime</option><option value="cyberpunk">Cyberpunk</option></select><select id="ai-ratio" class="glass-input"><option value="1:1">Square</option><option value="16:9">Wide</option></select></div><textarea class="glass-input" id="ai-img-prompt" placeholder="Describe image..."></textarea></div><button class="glow-btn" onclick="generateAIImage()">Generate</button><img id="ai-generated-img" style="margin-top:20px; width:100%; border-radius:10px;"></div></div>
-
-                <div id="subtitle-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>SubMaster AI</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('video-input').click()"><p>Upload Video</p><input type="file" id="video-input" hidden></div><div class="input-group" style="margin-top:20px;"><div class="group-title">STYLE</div><div style="display:flex; gap:10px;"><input type="color" id="sub-color" value="#ffffff" oninput="updateSubStyle()"><input type="color" id="sub-highlight" value="#000000" oninput="updateSubStyle()"></div></div><button class="glow-btn" onclick="startCaptioning()">Auto-Generate</button></div></div>
-
-                <div id="bg-remover-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Magic Eraser</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('bg-input').click()"><p>Upload Image</p><input type="file" id="bg-input" hidden></div><div id="compare-container" class="compare-viewer hidden"><div class="bg-palette"><div class="bg-dot active" style="background:transparent" onclick="changeBg(this,'transparent')"></div><div class="bg-dot" style="background:#fff" onclick="changeBg(this,'#ffffff')"></div><div class="bg-dot" style="display:grid; place-items:center;" onclick="document.getElementById('custom-bg-upload').click()"><i class="ri-upload-2-line"></i></div><input type="file" id="custom-bg-upload" hidden onchange="handleCustomBg(this)"></div><img id="bg-result-img" class="img-back"><img id="bg-original-img" class="img-front"><input type="range" class="slider" min="0" max="100" value="50" oninput="slideCompare(this.value)"></div></div></div>
-
-                <div id="binary-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Binary Lab</h2></div><div class="ws-body"><div style="margin-bottom:15px; display:flex; gap:10px;"><button class="small-btn active">Text Mode</button><button class="small-btn">File Mode</button></div><textarea id="bin-input" class="big-area" oninput="analyzeBinary()" placeholder="Type Text..."></textarea><div id="bin-preview" style="margin-top:10px;"></div></div></div>
-
-                <div id="password-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Security</h2></div><div class="ws-body"><div id="generated-pass" class="pass-display" onclick="copyPass()"></div><div class="strength-meter"><div class="strength-fill" id="pass-strength" style="width:0%;"></div></div><button class="glow-btn" style="margin-top:15px;" onclick="generatePass()">Regenerate</button></div></div>
-
-                <div id="jpg-pdf-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>JPG to PDF</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('jpg-input').click()"><p>Select Images</p><input type="file" id="jpg-input" multiple hidden onchange="previewJPGs(this)"></div><div id="jpg-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px,1fr)); gap:10px; margin-top:20px;"></div></div></div>
-
-                <div id="enhancer-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Enhancer</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('enhance-input').click()"><p>Upload Image</p><input type="file" id="enhance-input" hidden></div><div style="display:flex; gap:10px; margin-top:15px;"><button class="small-btn">2k</button><button class="small-btn">4k</button><button class="small-btn">8k</button></div></div></div>
-
-                <div id="img-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Compressor</h2></div><div class="ws-body"><div class="upload-zone" onclick="document.getElementById('comp-input').click()"><p>Upload Image</p><input type="file" id="comp-input" hidden></div><div id="comp-controls" class="hidden" style="margin-top:20px;"><div class="input-group"><div class="group-title">QUALITY</div><input type="range" id="comp-quality" min="0.1" max="1.0" step="0.1" value="0.6" style="width:100%;" oninput="updateCompression()"><p id="comp-val-display" style="text-align:center;">60%</p></div><img id="comp-preview-img" style="max-width:100%; margin:20px 0;"><button class="glow-btn" id="dl-comp-btn">Download</button></div></div></div>
-                <div id="text-speech-tool" class="tool-workspace hidden"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>AI Reader</h2></div><div class="ws-body"><textarea id="tts-input" class="big-area" placeholder="Type text..."></textarea><div class="input-group"><div class="group-title">SETTINGS</div><label>Speed</label><input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="1" style="width:100%;"><label>Pitch</label><input type="range" id="tts-pitch" min="0.5" max="2" step="0.1" value="1" style="width:100%;"></div><button class="glow-btn" onclick="speakText()">Speak</button></div></div>
-
-                <div id="about-page" class="tool-workspace hidden info-page"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>About</h2></div><div class="info-content"><h2 style="color:var(--primary);">ToolMaster Titanium</h2><p>V70.0 (Masterpiece)</p></div></div>
-                <div id="privacy-page" class="tool-workspace hidden info-page"><div class="ws-head"><button class="back-pill" onclick="showHome()">← Back</button><h2>Privacy Policy</h2></div><div class="info-content"><h2 style="color:#10b981;">Zero-Data Policy</h2><p>Local-First Architecture.</p></div></div>
+<div id="text-speech-tool" class="tool-workspace hidden">
+    <div class="ws-head"><button class="back-pill" onclick="App.nav('home')">← Back</button><h2>AI Reader</h2></div>
+    <div class="ws-body">
+        <textarea id="tts-input" class="glass-input big" placeholder="Paste text here..."></textarea>
+        <div class="input-group">
+            <label>Speed</label>
+            <input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="1" style="width:100%; accent-color:var(--primary)">
+            <label>Pitch</label>
+            <input type="range" id="tts-pitch" min="0.5" max="2" step="0.1" value="1" style="width:100%; accent-color:var(--primary)">
+        </div>
+        <button class="glow-btn" onclick="speakText()">Speak</button>
+    </div>
+</div>
 
             </div>
         </main>
@@ -315,87 +374,224 @@
     <script src="js/tools/binary.js"></script>
 
     <script>
-        // --- GLOBAL AI & SPECIAL FEATURES (V70) ---
-        
-        // 1. Excel AI
-        function analyzeExcelAI(input) {
-            if(!input.files[0]) return;
-            const file = input.files[0];
-            const reader = new FileReader();
-            document.getElementById('excel-ai-result').style.display = 'block';
-            document.getElementById('excel-stats').innerHTML = "🤖 AI Scanning Data...";
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const json = XLSX.utils.sheet_to_json(sheet);
-                setTimeout(() => {
-                    document.getElementById('excel-stats').innerHTML = `<strong>📊 Insights:</strong><br>• Rows: ${json.length}<br>• Columns: ${Object.keys(json[0]||{}).join(', ')}`;
-                }, 800);
-            };
-            reader.readAsArrayBuffer(file);
-        }
+        /* ==========================================
+   🛠️ MISC TOOLS ENGINE - TITANIUM V82 CORE
+   ========================================== */
 
-      // 2. PDF AI
-        function summarizePDFAI(input) {
-            if(!input.files[0]) return;
-            const reader = new FileReader();
-            document.getElementById('pdf-ai-result').style.display = 'block';
-            document.getElementById('pdf-summary-text').innerHTML = "🤖 AI Reading...";
-            reader.onload = function() {
+console.log("%c Misc Tools V82 Online ", "background: #f59e0b; color: black; padding: 4px; border-radius: 4px;");
+
+const ToolEngine = {
+
+    // --- 1. EXCEL INTELLIGENCE ---
+    analyzeExcel: (input) => {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        // UI Updates
+        const resultBox = document.getElementById('excel-ai-result');
+        const statsBox = document.getElementById('excel-stats');
+        const previewBox = document.getElementById('excel-preview-box'); // New Container
+
+        if (statsBox) statsBox.innerHTML = `<span class="blink">🤖 Reading Data Structures...</span>`;
+        if (resultBox) resultBox.style.display = 'block';
+
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            try {
+                if(typeof XLSX === 'undefined') throw new Error("SheetJS library missing.");
+
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Get First Sheet
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Array of Arrays
+
+                if (!json || json.length === 0) throw new Error("Empty Excel File");
+
+                // Real Analysis
+                const rows = json.length;
+                const cols = json[0].length;
+                const headers = json[0].join(', ');
+
+                // Generate HTML Table Preview (First 5 Rows)
+                let tableHTML = '<table class="preview-table"><thead><tr>';
+                json[0].forEach(h => tableHTML += `<th>${h}</th>`);
+                tableHTML += '</tr></thead><tbody>';
+                
+                // Data Rows (Limit to 5)
+                for(let i=1; i < Math.min(rows, 6); i++) {
+                    tableHTML += '<tr>';
+                    json[i].forEach(cell => tableHTML += `<td>${cell || ''}</td>`);
+                    tableHTML += '</tr>';
+                }
+                tableHTML += '</tbody></table>';
+
+                // Display
+                setTimeout(() => {
+                    if (statsBox) statsBox.innerHTML = `
+                        <strong>📊 Analysis Complete:</strong><br>
+                        • Sheet Name: ${sheetName}<br>
+                        • Dimensions: ${rows} Rows x ${cols} Columns<br>
+                        • Headers: ${headers.substring(0, 50)}...
+                    `;
+                    if (previewBox) {
+                        previewBox.innerHTML = tableHTML;
+                        previewBox.classList.remove('hidden');
+                    }
+                }, 500);
+
+            } catch (err) {
+                console.error(err);
+                if (statsBox) statsBox.innerHTML = `<span style="color:red">Error: ${err.message}</span>`;
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    },
+
+    // --- 2. PDF INTELLIGENCE ---
+    summarizePDF: (input) => {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        const resultBox = document.getElementById('pdf-ai-result');
+        const summaryText = document.getElementById('pdf-summary-text');
+
+        if (summaryText) summaryText.innerHTML = `<span class="blink">🤖 Scanning Document...</span>`;
+        if (resultBox) resultBox.style.display = 'block';
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            try {
+                if(typeof pdfjsLib === 'undefined') throw new Error("PDF.js library missing.");
+                
+                // Worker Set (Crucial fix)
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
                 const typedarray = new Uint8Array(this.result);
+                
                 pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-                    pdf.getPage(1).then(page => {
+                    // Fetch Metadata + Page 1 Text
+                    Promise.all([pdf.getMetadata(), pdf.getPage(1)]).then(([metaData, page]) => {
+                        
                         page.getTextContent().then(textContent => {
-                            let txt = textContent.items.map(i => i.str).join(' ').substring(0, 150);
-                            document.getElementById('pdf-summary-text').innerHTML = `<strong>📝 Summary:</strong><br>"${txt}..."`;
+                            // Better text joining
+                            let rawText = textContent.items.map(item => item.str).join(' ');
+                            
+                            // Clean up text
+                            let cleanText = rawText.replace(/\s+/g, ' ').trim().substring(0, 300);
+                            const title = metaData.info.Title || file.name;
+                            const author = metaData.info.Author || "Unknown";
+
+                            summaryText.innerHTML = `
+                                <strong>📄 File Info:</strong><br>
+                                • Name: ${title}<br>
+                                • Author: ${author} | Pages: ${pdf.numPages}<br><br>
+                                <strong>📝 Content Snippet:</strong><br>
+                                "${cleanText}..."
+                            `;
                         });
                     });
+                }).catch(err => {
+                    throw err;
                 });
-            };
-            reader.readAsArrayBuffer(input.files[0]);
+
+            } catch (err) {
+                console.error(err);
+                if (summaryText) summaryText.innerHTML = `<span style="color:red">Error: Could not read PDF.</span>`;
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    },
+
+    // --- 3. PASSWORD STRENGTH (REAL ENTROPY) ---
+    generatePass: () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+        const length = 16;
+        let pass = "";
+        
+        // Generate
+        for(let i=0; i<length; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
         }
 
-        // 3. Speech AI
-        function smartFormatSpeech() {
-            let text = document.getElementById('speech-output').value;
-            if(!text) return;
-            text = text.charAt(0).toUpperCase() + text.slice(1);
-            if(!text.endsWith('.')) text += '.';
-            document.getElementById('speech-output').value = text;
-            const moods = ["Happy 😊", "Neutral 😐", "Serious 🧐"];
-            document.getElementById('speech-mood').innerText = moods[Math.floor(Math.random()*moods.length)];
+        const passEl = document.getElementById('generated-pass');
+        if(passEl) {
+            passEl.innerText = pass;
+            passEl.classList.add('fade-in'); // Animation
+            setTimeout(() => passEl.classList.remove('fade-in'), 300);
         }
+        
+        // Calculate Strength (Visual)
+        ToolEngine.checkStrength(pass);
+    },
 
-        // 4. Password Strength (V70)
-        function generatePass() {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-            let pass = "";
-            for(let i=0; i<16; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('generated-pass').innerText = pass;
-            // Visual Meter
-            const bar = document.getElementById('pass-strength');
-            bar.style.width = "100%";
-            bar.style.background = "#10b981"; // Green for strong
+    checkStrength: (password) => {
+        const bar = document.getElementById('pass-strength');
+        if(!bar) return;
+
+        let strength = 0;
+        if (password.length > 8) strength += 20;
+        if (password.length > 12) strength += 20;
+        if (/[A-Z]/.test(password)) strength += 20;
+        if (/[0-9]/.test(password)) strength += 20;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+
+        bar.style.width = strength + "%";
+        
+        // Color Logic
+        if(strength < 40) bar.style.background = "#ef4444"; // Red
+        else if(strength < 80) bar.style.background = "#f59e0b"; // Orange
+        else bar.style.background = "#10b981"; // Green
+    },
+
+    // Copy Function
+    copyPass: () => {
+        const text = document.getElementById('generated-pass').innerText;
+        if(text) {
+            navigator.clipboard.writeText(text);
+            if(typeof showToast === 'function') showToast("Password Copied! 🔒", "success");
         }
+    },
 
-        // 5. JPG Grid (V70)
-        function previewJPGs(input) {
-            const grid = document.getElementById('jpg-grid');
-            grid.innerHTML = "";
+    // --- 4. JPG GRID (MEMORY OPTIMIZED) ---
+    previewJPGs: (input) => {
+        const grid = document.getElementById('jpg-grid');
+        if(!grid) return;
+        
+        grid.innerHTML = ""; // Clear
+        
+        if(input.files.length > 0) {
             Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.width = "100%"; img.style.borderRadius = "8px";
-                    grid.appendChild(img);
-                };
-                reader.readAsDataURL(file);
+                // Use ObjectURL instead of FileReader (Much Faster)
+                const url = URL.createObjectURL(file);
+                
+                const imgWrap = document.createElement('div');
+                imgWrap.className = 'img-thumb-wrap fade-in';
+                
+                const img = document.createElement('img');
+                img.src = url;
+                img.onclick = () => window.open(url, '_blank'); // Click to zoom
+                
+                imgWrap.appendChild(img);
+                grid.appendChild(imgWrap);
             });
+            
+            if(typeof showToast === 'function') showToast(`${input.files.length} Images Loaded`, "success");
         }
+    }
+};
 
-       // Navigation
+// Global Bindings for HTML onclick="ToolEngine.x()"
+window.analyzeExcelAI = ToolEngine.analyzeExcel;
+window.summarizePDFAI = ToolEngine.summarizePDF;
+window.generatePass = ToolEngine.generatePass;
+window.copyPass = ToolEngine.copyPass;
+window.previewJPGs = ToolEngine.previewJPGs;
+   
+        // Navigation
         window.showHome = function() {
             document.getElementById('home-page').classList.remove('hidden');
             document.getElementById('home-page').classList.add('fade-in');
